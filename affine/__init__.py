@@ -29,8 +29,77 @@
 from __future__ import division
 
 import math
-import planar
-from planar.util import cached_property, assert_unorderable, cos_sin_deg
+
+
+def set_epsilon(epsilon):
+    """Set the global absolute error value and rounding limit for approximate
+    floating point comparison operations. This value is accessible via the
+    :attr:`planar.EPSILON` global variable.
+
+    The default value of ``0.00001`` is suitable for values
+    that are in the "countable range". You may need a larger
+    epsilon when using large absolute values, and a smaller value
+    for very small values close to zero. Otherwise approximate
+    comparison operations will not behave as expected.
+    """
+    global EPSILON, EPSILON2
+    EPSILON = float(epsilon)
+    EPSILON2 = EPSILON**2
+
+set_epsilon(1e-5)
+
+class TransformNotInvertibleError(Exception):
+    """The transform could not be inverted"""
+
+# Define assert_unorderable() depending on the language 
+# implicit ordering rules. This keeps things consistent
+# across major Python versions
+try:
+    3 > ""
+except TypeError: # pragma: no cover
+    # No implicit ordering (newer Python)
+    def assert_unorderable(a, b):
+        """Assert that a and b are unorderable"""
+        return NotImplemented
+else: # pragma: no cover
+    # Implicit ordering by default (older Python)
+    # We must raise an exception ourselves
+    # To prevent nonsensical ordering
+    def assert_unorderable(a, b):
+        """Assert that a and b are unorderable"""
+        raise TypeError("unorderable types: %s and %s"
+            % (type(a).__name__, type(b).__name__))
+
+def cached_property(func):
+    """Special property decorator that caches the computed 
+    property value in the object's instance dict the first 
+    time it is accessed.
+    """
+
+    def getter(self, name=func.func_name):
+        try:
+            return self.__dict__[name]
+        except KeyError:
+            self.__dict__[name] = value = func(self)
+            return value
+    
+    getter.func_name = func.func_name
+    return property(getter, doc=func.func_doc)
+
+def cos_sin_deg(deg):
+    """Return the cosine and sin for the given angle
+    in degrees, with special-case handling of multiples
+    of 90 for perfect right angles
+    """
+    deg = deg % 360.0
+    if deg == 90.0:
+        return 0.0, 1.0
+    elif deg == 180.0:
+        return -1.0, 0
+    elif deg == 270.0:
+        return 0, -1.0
+    rad = math.radians(deg)
+    return math.cos(rad), math.sin(rad)
 
 
 class Affine(tuple):
@@ -66,32 +135,33 @@ class Affine(tuple):
         return identity
 
     @classmethod
-    def translation(cls, offset):
+    def translation(cls, xoff, yoff):
         """Create a translation transform from an offset vector.
 
-        :param offset: Translation offset.
-        :type offset: :class:`~planar.Vec2`
+        :param xoff: Translation x offset.
+        :type xoff: float
+        :param yoff: Translation y offset.
+        :type yoff: float
         :rtype: Affine
         """
-        ox, oy = offset
         return tuple.__new__(cls, 
-            (1.0, 0.0, ox, 
-             0.0, 1.0, oy,
+            (1.0, 0.0, xoff, 
+             0.0, 1.0, yoff,
              0.0, 0.0, 1.0))
 
     @classmethod
-    def scale(cls, scaling):
+    def scale(cls, *scaling):
         """Create a scaling transform from a scalar or vector.
 
         :param scaling: The scaling factor. A scalar value will
             scale in both dimensions equally. A vector scaling
             value scales the dimensions independently.
-        :type scaling: float or :class:`~planar.Vec2`
+        :type scaling: float or sequence
         :rtype: Affine
         """
-        try:
-            sx = sy = float(scaling)
-        except TypeError:
+        if len(scaling) == 1:
+            sx = sy = float(scaling[0])
+        else:
             sx, sy = scaling
         return tuple.__new__(cls, 
             (sx, 0.0, 0.0,
@@ -124,7 +194,7 @@ class Affine(tuple):
         :type angle: float
         :param pivot: Point to rotate about, if omitted the
             rotation is about the origin.
-        :type pivot: :class:`~planar.Vec2`
+        :type pivot: sequence
         :rtype: Affine
         """
         ca, sa = cos_sin_deg(angle)
@@ -174,8 +244,8 @@ class Affine(tuple):
         transform.
         """
         a, b, c, d, e, f, g, h, i = self
-        return ((abs(a) < planar.EPSILON and abs(e) < planar.EPSILON) 
-            or (abs(d) < planar.EPSILON and abs(b) < planar.EPSILON))
+        return ((abs(a) < EPSILON and abs(e) < EPSILON) 
+            or (abs(d) < EPSILON and abs(b) < EPSILON))
 
     @cached_property
     def is_conformal(self):
@@ -184,7 +254,7 @@ class Affine(tuple):
         This implies that the transform has no effective shear.
         """
         a, b, c, d, e, f, g, h, i = self
-        return abs(a*b + d*e) < planar.EPSILON
+        return abs(a*b + d*e) < EPSILON
 
     @cached_property
     def is_orthonormal(self):
@@ -196,8 +266,8 @@ class Affine(tuple):
         """
         a, b, c, d, e, f, g, h, i = self
         return (self.is_conformal 
-            and abs(1.0 - (a*a + d*d)) < planar.EPSILON
-            and abs(1.0 - (b*b + e*e)) < planar.EPSILON)
+            and abs(1.0 - (a*a + d*d)) < EPSILON
+            and abs(1.0 - (b*b + e*e)) < EPSILON)
 
     @cached_property
     def is_degenerate(self):
@@ -205,13 +275,13 @@ class Affine(tuple):
         collapse a shape to an effective area of zero. Degenerate transforms
         cannot be inverted.
         """
-        return abs(self.determinant) < planar.EPSILON
+        return abs(self.determinant) < EPSILON
 
     @property
     def column_vectors(self):
         """The values of the transform as three 2D column vectors"""
         a, b, c, d, e, f, _, _, _ = self
-        return planar.Vec2(a, d), planar.Vec2(b, e), planar.Vec2(c, f)
+        return (a, d), (b, e), (c, f)
 
     def almost_equals(self, other):
         """Compare transforms for approximate equality.
@@ -222,7 +292,7 @@ class Affine(tuple):
             of each respective tranform matrix < ``EPSILON``.
         """
         for i in (0, 1, 2, 3, 4, 5):
-            if abs(self[i] - other[i]) >= planar.EPSILON:
+            if abs(self[i] - other[i]) >= EPSILON:
                 return False
         return True
 
@@ -257,22 +327,12 @@ class Affine(tuple):
                 (sa*oa + sb*od, sa*ob + sb*oe, sa*oc + sb*of + sc,
                  sd*oa + se*od, sd*ob + se*oe, sd*oc + se*of + sf,
                  0.0, 0.0, 1.0))
-        elif hasattr(other, 'from_points'):
-            # Point/vector array
-            Point = planar.Point
-            points = getattr(other, 'points', other)
-            try:
-                return other.from_points(
-                    Point(px*sa + py*sd + sc, px*sb + py*se + sf)
-                    for px, py in points)
-            except TypeError:
-                return NotImplemented
         else:
             try:
                 vx, vy = other
             except Exception:
                 return NotImplemented
-            return planar.Vec2(vx*sa + vy*sd + sc, vx*sb + vy*se + sf)
+            return (vx*sa + vy*sd + sc, vx*sb + vy*se + sf)
     
     def __rmul__(self, other):
         # We should not be called if other is an affine instance
@@ -282,7 +342,7 @@ class Affine(tuple):
         return self.__mul__(other)
 
     def __imul__(self, other):
-        if isinstance(other, Affine) or isinstance(other, planar.Vec2):
+        if isinstance(other, Affine) or isinstance(other, tuple):
             return self.__mul__(other)
         else:
             return NotImplemented
@@ -296,9 +356,8 @@ class Affine(tuple):
         """
         if self is not identity and self != identity:
             sa, sb, sc, sd, se, sf, _, _, _ = self
-            Vec2 = planar.Vec2
             for i, (x, y) in enumerate(seq):
-                seq[i] = Vec2(x*sa + y*sd + sc, x*sb + y*se + sf)
+                seq[i] = (x*sa + y*sd + sc, x*sb + y*se + sf)
 
     def __invert__(self):
         """Return the inverse transform.
@@ -307,7 +366,7 @@ class Affine(tuple):
             is degenerate.
         """
         if self.is_degenerate:
-            raise planar.TransformNotInvertibleError(
+            raise TransformNotInvertibleError(
                 "Cannot invert degenerate transform")
         idet = 1.0 / self.determinant
         sa, sb, sc, sd, se, sf, _, _, _ = self
