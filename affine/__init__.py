@@ -1,3 +1,9 @@
+"""Affine transformation matrices
+
+The Affine package is derived from Casey Duncan's Planar package. See the
+copyright statement below.
+"""
+
 #############################################################################
 # Copyright (c) 2010 by Casey Duncan
 # All rights reserved.
@@ -5,7 +11,7 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
-# * Redistributions of source code must retain the above copyright notice, 
+# * Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
 # * Redistributions in binary form must reproduce the above copyright notice,
 #   this list of conditions and the following disclaimer in the documentation
@@ -19,7 +25,7 @@
 # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
 # EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT, INDIRECT,
 # INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
 # OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
@@ -28,7 +34,12 @@
 
 from __future__ import division
 
+from collections import namedtuple
 import math
+
+__all__ = ['Affine']
+__author__ = "Sean Gillies"
+__version__ = "1.0"
 
 
 def set_epsilon(epsilon):
@@ -51,7 +62,7 @@ set_epsilon(1e-5)
 class TransformNotInvertibleError(Exception):
     """The transform could not be inverted"""
 
-# Define assert_unorderable() depending on the language 
+# Define assert_unorderable() depending on the language
 # implicit ordering rules. This keeps things consistent
 # across major Python versions
 try:
@@ -71,8 +82,8 @@ else: # pragma: no cover
             % (type(a).__name__, type(b).__name__))
 
 def cached_property(func):
-    """Special property decorator that caches the computed 
-    property value in the object's instance dict the first 
+    """Special property decorator that caches the computed
+    property value in the object's instance dict the first
     time it is accessed.
     """
 
@@ -82,7 +93,7 @@ def cached_property(func):
         except KeyError:
             self.__dict__[name] = value = func(self)
             return value
-    
+
     getter.func_name = func.func_name
     return property(getter, doc=func.func_doc)
 
@@ -102,7 +113,8 @@ def cos_sin_deg(deg):
     return math.cos(rad), math.sin(rad)
 
 
-class Affine(tuple):
+class Affine(
+        namedtuple('Affine', ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'))):
     """Two dimensional affine transform for linear mapping from 2D coordinates
     to other 2D coordinates. Parallel lines are preserved by these
     transforms. Affine transforms can perform any combination of translations,
@@ -113,7 +125,7 @@ class Affine(tuple):
     transform may be constructed directly by specifying the first two rows of
     matrix values as 6 floats. Since the matrix is an affine transform, the
     last row is always ``(0, 0, 1)``.
-    
+
     :param members: 6 floats for the first two matrix rows.
     :type members: float
     """
@@ -125,6 +137,12 @@ class Affine(tuple):
         else:
             raise TypeError(
                 "Expected 6 number args, got %s" % len(members))
+
+    @classmethod
+    def from_gdal(cls, c, a, b, f, d, e):
+        members = [a, b, c, d, e, f]
+        mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
+        return tuple.__new__(Affine, mat3x3)
 
     @classmethod
     def identity(cls):
@@ -144,8 +162,8 @@ class Affine(tuple):
         :type yoff: float
         :rtype: Affine
         """
-        return tuple.__new__(cls, 
-            (1.0, 0.0, xoff, 
+        return tuple.__new__(cls,
+            (1.0, 0.0, xoff,
              0.0, 1.0, yoff,
              0.0, 0.0, 1.0))
 
@@ -163,11 +181,11 @@ class Affine(tuple):
             sx = sy = float(scaling[0])
         else:
             sx, sy = scaling
-        return tuple.__new__(cls, 
+        return tuple.__new__(cls,
             (sx, 0.0, 0.0,
              0.0, sy, 0.0,
              0.0, 0.0, 1.0))
-            
+
     @classmethod
     def shear(cls, x_angle=0, y_angle=0):
         """Create a shear transform along one or both axes.
@@ -180,7 +198,7 @@ class Affine(tuple):
         """
         sx = math.tan(math.radians(x_angle))
         sy = math.tan(math.radians(y_angle))
-        return tuple.__new__(cls, 
+        return tuple.__new__(cls,
             (1.0, sy, 0.0,
              sx, 1.0, 0.0,
              0.0, 0.0, 1.0))
@@ -199,7 +217,7 @@ class Affine(tuple):
         """
         ca, sa = cos_sin_deg(angle)
         if pivot is None:
-            return tuple.__new__(cls, 
+            return tuple.__new__(cls,
                 (ca, sa, 0.0,
                 -sa, ca, 0.0,
                  0.0, 0.0, 1.0))
@@ -220,6 +238,17 @@ class Affine(tuple):
         """Precise string representation."""
         return ("Affine(%r, %r, %r,\n"
                 "       %r, %r, %r)") % self[:6]
+
+    def to_gdal(self):
+        return (self.c, self.a, self.b, self.f, self.d, self.e)
+
+    @property
+    def xoff(self):
+        return self.c
+
+    @property
+    def yoff(self):
+        return self.f
 
     @cached_property
     def determinant(self):
@@ -244,7 +273,7 @@ class Affine(tuple):
         transform.
         """
         a, b, c, d, e, f, g, h, i = self
-        return ((abs(a) < EPSILON and abs(e) < EPSILON) 
+        return ((abs(a) < EPSILON and abs(e) < EPSILON)
             or (abs(d) < EPSILON and abs(b) < EPSILON))
 
     @cached_property
@@ -265,7 +294,7 @@ class Affine(tuple):
         orthonormal transform to a shape always results in a congruent shape.
         """
         a, b, c, d, e, f, g, h, i = self
-        return (self.is_conformal 
+        return (self.is_conformal
             and abs(1.0 - (a*a + d*d)) < EPSILON
             and abs(1.0 - (b*b + e*e)) < EPSILON)
 
@@ -316,14 +345,14 @@ class Affine(tuple):
         another transform, a vector, vector array, or shape.
 
         :param other: The object to transform.
-        :type other: Affine, :class:`~planar.Vec2`, 
+        :type other: Affine, :class:`~planar.Vec2`,
             :class:`~planar.Vec2Array`, :class:`~planar.Shape`
         :rtype: Same as ``other``
         """
         sa, sb, sc, sd, se, sf, _, _, _ = self
         if isinstance(other, Affine):
             oa, ob, oc, od, oe, of, _, _, _ = other
-            return tuple.__new__(Affine, 
+            return tuple.__new__(Affine,
                 (sa*oa + sb*od, sa*ob + sb*oe, sa*oc + sb*of + sc,
                  sd*oa + se*od, sd*ob + se*oe, sd*oc + se*of + sf,
                  0.0, 0.0, 1.0))
@@ -333,7 +362,7 @@ class Affine(tuple):
             except Exception:
                 return NotImplemented
             return (vx*sa + vy*sd + sc, vx*sb + vy*se + sf)
-    
+
     def __rmul__(self, other):
         # We should not be called if other is an affine instance
         # This is just a guarantee, since we would potentially
@@ -350,7 +379,7 @@ class Affine(tuple):
     def itransform(self, seq):
         """Transform a sequence of points or vectors in place.
 
-        :param seq: Mutable sequence of :class:`~planar.Vec2` to be 
+        :param seq: Mutable sequence of :class:`~planar.Vec2` to be
             transformed.
         :returns: None, the input sequence is mutated in place.
         """
@@ -361,7 +390,7 @@ class Affine(tuple):
 
     def __invert__(self):
         """Return the inverse transform.
-        
+
         :raises: :except:`TransformNotInvertible` if the transform
             is degenerate.
         """
@@ -374,7 +403,7 @@ class Affine(tuple):
         rb = -sb * idet
         rd = -sd * idet
         re = sa * idet
-        return tuple.__new__(Affine, 
+        return tuple.__new__(Affine,
             (ra, rb, -sc*ra - sf*rb,
              rd, re, -sc*rd - sf*re,
              0.0, 0.0, 1.0))
