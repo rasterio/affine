@@ -41,6 +41,8 @@ __all__ = ['Affine']
 __author__ = "Sean Gillies"
 __version__ = "1.0"
 
+EPSILON=1e-5
+EPSILON2=EPSILON**2
 
 def set_epsilon(epsilon):
     """Set the global absolute error value and rounding limit for approximate
@@ -53,11 +55,9 @@ def set_epsilon(epsilon):
     for very small values close to zero. Otherwise approximate
     comparison operations will not behave as expected.
     """
-    global EPSILON, EPSILON2
     EPSILON = float(epsilon)
     EPSILON2 = EPSILON**2
 
-set_epsilon(1e-5)
 
 class TransformNotInvertibleError(Exception):
     """The transform could not be inverted"""
