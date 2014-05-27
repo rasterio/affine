@@ -21,7 +21,7 @@ Matrices can be created by passing the values `a, b, c, d, e, f` to the
 `affine.Affine` constructor or by using its `identity()`, `translation()`,
 `scale()`, `shear()`, and `rotation()` class methods.
 
-```
+```python
 >>> from affine import Affine
 >>> Affine.identity()
 Affine(1.0, 0.0, 0.0,
@@ -43,7 +43,7 @@ Affine(0.7071067811865476, 0.7071067811865475, 0.0,
 These matrices can be applied to `(x, y)` tuples to obtain transformed
 coordinates `(x', y')`.
 
-```
+```python
 >>> Affine.translation(1.0, 5.0) * (1.0, 1.0)
 (2.0, 6.0)
 >>> Affine.rotation(45.0) * (1.0, 1.0)
@@ -52,7 +52,7 @@ coordinates `(x', y')`.
 
 They may also be multiplied together to combine transformations.
 
-```
+```python
 >>> Affine.translation(1.0, 5.0) * Affine.rotation(45.0)
 Affine(0.7071067811865476, 0.7071067811865475, 1.0,
        -0.7071067811865475, 0.7071067811865476, 5.0)
@@ -71,7 +71,7 @@ Using a GDAL dataset transformation matrix, the world coordinates `x, y`
 corresponding to the top left corner of the pixel 100 rows down from the 
 origin can be easily computed.
 
-```
+```python
 >>> fwd = Affine.from_gdal(-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
 >>> col, row = 0, 100
 >>> fwd * (col, row)
@@ -80,7 +80,7 @@ origin can be easily computed.
 
 The reverse transformation is obained using the `~` operator.
 
-```
+```python
 >>> rev = ~fwd
 >>> rev * fwd * (col, row)
 (0.0, 99.99999999999999)
