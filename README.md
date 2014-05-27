@@ -12,9 +12,9 @@ The 3x3 augmented affine transformation matrix for transformations in two
 dimensions is illustrated below.
 
 ```
-  | x' |   | a  b  c | | x |
-  | y' | = | d  e  f | | y |
-  | 1  |   | 0  0  1 | | 1 |
+| x' |   | a  b  c | | x |
+| y' | = | d  e  f | | y |
+| 1  |   | 0  0  1 | | 1 |
 ```
 
 Matrices can be created by passing the values `a, b, c, d, e, f` to the
@@ -22,40 +22,40 @@ Matrices can be created by passing the values `a, b, c, d, e, f` to the
 `scale()`, `shear()`, and `rotation()` class methods.
 
 ```
-  >>> from affine import Affine
-  >>> Affine.identity()
-  Affine(1.0, 0.0, 0.0,
-         0.0, 1.0, 0.0)
-  >>> Affine.translation(1.0, 5.0)
-  Affine(1.0, 0.0, 1.0,
-         0.0, 1.0, 5.0)
-  >>> Affine.scale(2.0)
-  Affine(2.0, 0.0, 0.0,
-         0.0, 2.0, 0.0)
-  >>> Affine.shear(45.0, 45.0)  # decimal degrees
-  Affine(1.0, 0.9999999999999999, 0.0,
-         0.9999999999999999, 1.0, 0.0)
-  >>> Affine.rotation(45.0)     # decimal degrees
-  Affine(0.7071067811865476, 0.7071067811865475, 0.0,
-         -0.7071067811865475, 0.7071067811865476, 0.0)
+>>> from affine import Affine
+>>> Affine.identity()
+Affine(1.0, 0.0, 0.0,
+       0.0, 1.0, 0.0)
+>>> Affine.translation(1.0, 5.0)
+Affine(1.0, 0.0, 1.0,
+       0.0, 1.0, 5.0)
+>>> Affine.scale(2.0)
+Affine(2.0, 0.0, 0.0,
+       0.0, 2.0, 0.0)
+>>> Affine.shear(45.0, 45.0)  # decimal degrees
+Affine(1.0, 0.9999999999999999, 0.0,
+       0.9999999999999999, 1.0, 0.0)
+>>> Affine.rotation(45.0)     # decimal degrees
+Affine(0.7071067811865476, 0.7071067811865475, 0.0,
+       -0.7071067811865475, 0.7071067811865476, 0.0)
 ```
 
 These matrices can be applied to `(x, y)` tuples to obtain transformed
 coordinates `(x', y')`.
 
 ```
-  >>> Affine.translation(1.0, 5.0) * (1.0, 1.0)
-  (2.0, 6.0)
-  >>> Affine.rotation(45.0) * (1.0, 1.0)
-  (1.1102230246251565e-16, 1.414213562373095)
+>>> Affine.translation(1.0, 5.0) * (1.0, 1.0)
+(2.0, 6.0)
+>>> Affine.rotation(45.0) * (1.0, 1.0)
+(1.1102230246251565e-16, 1.414213562373095)
 ```
 
 They may also be multiplied together to combine transformations.
 
 ```
-  >>> Affine.translation(1.0, 5.0) * Affine.rotation(45.0)
-  Affine(0.7071067811865476, 0.7071067811865475, 1.0,
-         -0.7071067811865475, 0.7071067811865476, 5.0)
+>>> Affine.translation(1.0, 5.0) * Affine.rotation(45.0)
+Affine(0.7071067811865476, 0.7071067811865475, 1.0,
+       -0.7071067811865475, 0.7071067811865476, 5.0)
 ```
 
 ## Use with GIS data packages
@@ -72,17 +72,17 @@ corresponding to the top left corner of the pixel 100 rows down from the
 origin can be easily computed.
 
 ```
-  >>> fwd = Affine.from_gdal(-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
-  >>> col, row = 0, 100
-  >>> fwd * (col, row)
-  (-237481.5, 195036.4)
+>>> fwd = Affine.from_gdal(-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
+>>> col, row = 0, 100
+>>> fwd * (col, row)
+(-237481.5, 195036.4)
 ```
 
 The reverse transformation is obained using the `~` operator.
 
 ```
-  >>> rev = ~fwd
-  >>> rev * fwd * (col, row)
-  (0.0, 99.99999999999999)
+>>> rev = ~fwd
+>>> rev * fwd * (col, row)
+(0.0, 99.99999999999999)
 ```
 
