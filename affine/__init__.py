@@ -1,5 +1,12 @@
 """Affine transformation matrices
 
+The 3x3 augmented affine transformation matrix for transformations in two
+dimensions is illustrated below.
+
+  | x' |   | a  b  c | | x |
+  | y' | = | d  e  f | | y |
+  | 1  |   | 0  0  1 | | 1 |
+
 The Affine package is derived from Casey Duncan's Planar package. See the
 copyright statement below.
 """
@@ -36,6 +43,7 @@ from __future__ import division
 
 from collections import namedtuple
 import math
+
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
