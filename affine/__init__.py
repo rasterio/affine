@@ -86,8 +86,8 @@ def cached_property(func):
     property value in the object's instance dict the first
     time it is accessed.
     """
-
-    def getter(self, name=func.func_name):
+    name = getattr(func, 'func_name', func.__name__)
+    def getter(self, name=name):
         try:
             return self.__dict__[name]
         except KeyError:
