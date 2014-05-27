@@ -86,16 +86,16 @@ def cached_property(func):
     property value in the object's instance dict the first
     time it is accessed.
     """
-    name = getattr(func, 'func_name', func.__name__)
+    name = func.__name__
+    doc = func.__doc__
     def getter(self, name=name):
         try:
             return self.__dict__[name]
         except KeyError:
             self.__dict__[name] = value = func(self)
             return value
-
-    getter.func_name = func.func_name
-    return property(getter, doc=func.func_doc)
+    getter.func_name = name
+    return property(getter, doc=doc)
 
 def cos_sin_deg(deg):
     """Return the cosine and sin for the given angle
