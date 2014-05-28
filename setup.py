@@ -10,12 +10,13 @@ with open('affine/__init__.py') as f:
             version = version.strip("'")
             continue
 
+readme = open('README.rst').read()
+
 setup(name='affine',
       version=version,
-      description="Affine transformation matrices",
-      long_description="""\
-""",
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      description="Matrices describing affine transformation of the plane",
+      long_description=readme,
+      classifiers=[],
       keywords='',
       author='Sean Gillies',
       author_email='sean@mapbox.com',
