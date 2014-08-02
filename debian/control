@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 9),
                python-all-dev (>= 2.7)
 Standards-Version: 3.9.3
 X-Python-Version: >= 2.7
-Homepage: http://scitools.org.uk/iris/
+Homepage: https://github.com/sgillies/affine
 
 Package: python-affine
 Architecture: any
