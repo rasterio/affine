@@ -330,6 +330,22 @@ class PyAffineTestCase(unittest.TestCase):
         t = Affine.scale(0)
         self.assertRaises(TransformNotInvertibleError, lambda: ~t)
 
+    def test_set_epsilon(self):
+        import affine
+
+        old_epsilon = affine.EPSILON
+        old_epsilon2 = affine.EPSILON2
+
+        try:
+            affine.set_epsilon(123)
+            assert_equal(123, affine.EPSILON)
+            assert_equal(123*123, affine.EPSILON2)
+        finally:
+            affine.set_epsilon(old_epsilon)
+            
+
+        
+
 
 def test_gdal():
     t = Affine.from_gdal(-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
