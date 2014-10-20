@@ -47,7 +47,7 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "1.0"
+__version__ = "1.0.1"
 
 EPSILON=1e-5
 EPSILON2=EPSILON**2

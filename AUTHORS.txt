@@ -1,0 +1,6 @@
+Authors
+=======
+
+- Sean Gillies <sean.gillies@gmail.com>
+- Sean Gillies <sean@mapbox.com> (same as ^^)
+- Steven Ring <smr@southsky.com.au>

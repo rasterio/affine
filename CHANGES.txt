@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+1.0.1 (2014-10-20)
+------------------
+- set_epsilon() now actually sets module EPSILON (#4).
+- add AUTHORS.txt.
+
 1.0 (2014-05-27)
 ----------------
 - Code ported from Casey Duncan's Planar package.
