@@ -47,7 +47,7 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 EPSILON = 1e-5
 EPSILON2 = EPSILON ** 2
@@ -149,18 +149,33 @@ class Affine(
             return tuple.__new__(Affine, mat3x3)
         else:
             raise TypeError(
-                "Expected 6 number args, got %s" % len(members))
+                "Expected 6 coefficients, found %d" % len(members))
 
     @classmethod
     def from_gdal(cls, c, a, b, f, d, e):
         """Use same coefficient order as GDAL's GetGeoTransform().
 
-        :param members: 6 floats ordered by GDAL.
+        :param c, a, b, f, d, e: 6 floats ordered by GDAL.
         :rtype: Affine
         """
         members = [a, b, c, d, e, f]
         mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
         return tuple.__new__(Affine, mat3x3)
+
+    @classmethod
+    def from_world(cls, s):
+        """Construct Affine from the contents of a world file string.
+
+        :param s: str with 6 floats ordered in a world file.
+        :rtype: Affine
+        """
+        if not hasattr(s, 'split'):
+            raise ValueError("Cannot split input string")
+        coeffs = s.split()
+        if len(coeffs) != 6:
+            raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
+        a, d, b, e, c, f = [float(x) for x in coeffs]
+        return tuple.__new__(Affine, [a, b, c, d, e, f, 0.0, 0.0, 1.0])
 
     @classmethod
     def identity(cls):
@@ -260,9 +275,16 @@ class Affine(
     def to_gdal(self):
         """Return same coefficient order as GDAL's SetGeoTransform().
 
-        :rtype: str
+        :rtype: tuple
         """
         return (self.c, self.a, self.b, self.f, self.d, self.e)
+
+    def to_world(self):
+        """Return string for a world file.
+
+        :rtype: str
+        """
+        return '\n'.join(repr(getattr(self, x)) for x in list('adbecf')) + '\n'
 
     @property
     def xoff(self):

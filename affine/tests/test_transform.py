@@ -29,8 +29,10 @@
 """Transform unit tests"""
 
 from __future__ import division
+
 import math
 import unittest
+from textwrap import dedent
 from nose.tools import assert_equal, assert_almost_equal, raises
 
 from affine import Affine
@@ -414,6 +416,39 @@ class PyAffineTestCase(unittest.TestCase):
             assert_equal(123 * 123, affine.EPSILON2)
         finally:
             affine.set_epsilon(old_epsilon)
+
+    @raises(ValueError)
+    def test_bad_world1(self):
+        # wrong type, i.e don't use readlines()
+        Affine.from_world(['1.0', '0.0', '0.0', '1.0', '0.0', '0.0'])
+
+    @raises(ValueError)
+    def test_bad_world2(self):
+        # wrong number of parameters
+        Affine.from_world('1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0')
+
+    def test_identity_world(self):
+        s = '1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n'
+        a = Affine.from_world(s)
+        self.assertTrue(a.is_identity)
+        self.assertEqual(a.to_world(), s)
+
+    def test_real_world(self):
+        s = dedent('''\
+            20.17541308822119
+            0.00000000000000
+            0.00000000000000
+            -20.17541308822119
+            424178.11472601280548
+            4313415.90726399607956''')  # no EOL
+        a = Affine.from_world(s)
+        self.assertTrue(a.almost_equals(
+            Affine(
+                20.17541308822119, 0.0, 424178.1147260128,
+                0.0, -20.17541308822119, 4313415.907263996)))
+        out = a.to_world()
+        self.assertTrue(isinstance(out, str))
+        self.assertGreaterEqual(len(out), 70)
 
 
 def test_gdal():
