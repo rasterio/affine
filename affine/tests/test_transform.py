@@ -417,11 +417,15 @@ class PyAffineTestCase(unittest.TestCase):
         finally:
             affine.set_epsilon(old_epsilon)
 
-    @raises(ValueError)
-    def test_bad_world(self):
+    @raises(TypeError)
+    def test_bad_type_world(self):
         from affine import loadsw
         # wrong type, i.e don't use readlines()
         loadsw(['1.0', '0.0', '0.0', '1.0', '0.0', '0.0'])
+
+    @raises(ValueError)
+    def test_bad_value_world(self):
+        from affine import loadsw
         # wrong number of parameters
         loadsw('1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0')
 

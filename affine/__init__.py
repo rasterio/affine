@@ -451,7 +451,7 @@ def loadsw(s):
     :rtype: Affine
     """
     if not hasattr(s, 'split'):
-        raise ValueError("Cannot split input string")
+        raise TypeError("Cannot split input string")
     coeffs = s.split()
     if len(coeffs) != 6:
         raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
@@ -460,7 +460,7 @@ def loadsw(s):
     return center * Affine.translation(-0.5, -0.5)
 
 
-def dumpsw(A):
+def dumpsw(obj):
     """Return string for a world file.
 
     This method also translates the coefficients from from corner- to
@@ -468,7 +468,7 @@ def dumpsw(A):
 
     :rtype: str
     """
-    center = A * Affine.translation(0.5, 0.5)
+    center = obj * Affine.translation(0.5, 0.5)
     return '\n'.join(repr(getattr(center, x)) for x in list('adbecf')) + '\n'
 
 
