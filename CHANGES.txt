@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+1.1.0 (201_-__-__)
+------------------
+ - add loadsw/dumpsw world file utilities (#6).
+
 1.0.1 (2014-10-20)
 ------------------
 - set_epsilon() now actually sets module EPSILON (#4).

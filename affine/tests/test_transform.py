@@ -5,7 +5,7 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
-# * Redistributions of source code must retain the above copyright notice, 
+# * Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
 # * Redistributions in binary form must reproduce the above copyright notice,
 #   this list of conditions and the following disclaimer in the documentation
@@ -19,7 +19,7 @@
 # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
 # EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT, INDIRECT,
 # INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
 # OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
@@ -29,9 +29,10 @@
 """Transform unit tests"""
 
 from __future__ import division
-import sys
+
 import math
 import unittest
+from textwrap import dedent
 from nose.tools import assert_equal, assert_almost_equal, raises
 
 from affine import Affine
@@ -98,93 +99,166 @@ class PyAffineTestCase(unittest.TestCase):
 
     def test_str(self):
         assert_equal(
-            str(Affine(1.111, 2.222, 3.333, -4.444, -5.555, 6.666)), 
+            str(Affine(1.111, 2.222, 3.333, -4.444, -5.555, 6.666)),
             "| 1.11, 2.22, 3.33|\n|-4.44,-5.55, 6.67|\n| 0.00, 0.00, 1.00|")
 
     def test_repr(self):
         assert_equal(
-            repr(Affine(1.111, 2.222, 3.456, 4.444, 5.5, 6.25)), 
+            repr(Affine(1.111, 2.222, 3.456, 4.444, 5.5, 6.25)),
             ("Affine(1.111, 2.222, 3.456,\n"
              "       4.444, 5.5, 6.25)"))
 
     def test_identity_constructor(self):
         ident = Affine.identity()
         assert isinstance(ident, Affine)
-        assert_equal(tuple(ident), (1,0,0, 0,1,0, 0,0,1))
+        assert_equal(
+            tuple(ident),
+            (1, 0, 0,
+             0, 1, 0,
+             0, 0, 1))
         assert ident.is_identity
 
     def test_translation_constructor(self):
         trans = Affine.translation(2, -5)
         assert isinstance(trans, Affine)
-        assert_equal(tuple(trans), (1,0,2, 0,1,-5, 0,0,1))
+        assert_equal(
+            tuple(trans),
+            (1, 0,  2,
+             0, 1, -5,
+             0, 0,  1))
 
     def test_scale_constructor(self):
         scale = Affine.scale(5)
         assert isinstance(scale, Affine)
-        assert_equal(tuple(scale), (5,0,0, 0,5,0, 0,0,1))
+        assert_equal(
+            tuple(scale),
+            (5, 0, 0,
+             0, 5, 0,
+             0, 0, 1))
         scale = Affine.scale(-1, 2)
-        assert_equal(tuple(scale), (-1,0,0, 0,2,0, 0,0,1))
-        assert_equal(tuple(Affine.scale(1)), 
-            tuple(Affine.identity()))
+        assert_equal(
+            tuple(scale),
+            (-1, 0, 0,
+              0, 2, 0,
+              0, 0, 1))
+        assert_equal(tuple(Affine.scale(1)), tuple(Affine.identity()))
 
     def test_shear_constructor(self):
         shear = Affine.shear(30)
         assert isinstance(shear, Affine)
         sx = math.tan(math.radians(30))
-        seq_almost_equal(tuple(shear), (1,0,0, sx,1,0, 0,0,1))
+        seq_almost_equal(
+            tuple(shear),
+            (1, 0, 0,
+            sx, 1, 0,
+             0, 0, 1))
         shear = Affine.shear(-15, 60)
         sx = math.tan(math.radians(-15))
         sy = math.tan(math.radians(60))
-        seq_almost_equal(tuple(shear), (1,sy,0, sx,1,0, 0,0,1))
+        seq_almost_equal(
+            tuple(shear),
+            (1, sy, 0,
+            sx,  1, 0,
+             0,  0, 1))
         shear = Affine.shear(y_angle=45)
-        seq_almost_equal(tuple(shear), (1,1,0, 0,1,0, 0,0,1))
+        seq_almost_equal(
+            tuple(shear),
+            (1, 1, 0,
+             0, 1, 0,
+             0, 0, 1))
 
     def test_rotation_constructor(self):
         rot = Affine.rotation(60)
         assert isinstance(rot, Affine)
         r = math.radians(60)
         s, c = math.sin(r), math.cos(r)
-        assert_equal(tuple(rot), (c,s,0, -s,c,0, 0,0,1))
+        assert_equal(
+            tuple(rot),
+            (c, s, 0,
+            -s, c, 0,
+             0, 0, 1))
         rot = Affine.rotation(337)
         r = math.radians(337)
         s, c = math.sin(r), math.cos(r)
-        seq_almost_equal(tuple(rot), (c,s,0, -s,c,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(0)), 
-            tuple(Affine.identity()))
+        seq_almost_equal(
+            tuple(rot),
+            (c, s, 0,
+            -s, c, 0,
+             0, 0, 1))
+        assert_equal(tuple(Affine.rotation(0)), tuple(Affine.identity()))
 
     def test_rotation_constructor_quadrants(self):
-        assert_equal(tuple(Affine.rotation(0)), (1,0,0, 0,1,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(90)), (0,1,0, -1,0,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(180)), (-1,0,0, 0,-1,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(-180)), (-1,0,0, 0,-1,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(270)), (0,-1,0, 1,0,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(-90)), (0,-1,0, 1,0,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(360)), (1,0,0, 0,1,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(450)), (0,1,0, -1,0,0, 0,0,1))
-        assert_equal(tuple(Affine.rotation(-450)), (0,-1,0, 1,0,0, 0,0,1))
+        assert_equal(
+            tuple(Affine.rotation(0)),
+            (1, 0, 0,
+             0, 1, 0,
+             0, 0, 1))
+        assert_equal(
+            tuple(Affine.rotation(90)),
+            (0, 1, 0,
+            -1, 0, 0,
+             0, 0, 1))
+        assert_equal(
+            tuple(Affine.rotation(180)),
+            (-1,  0, 0,
+              0, -1, 0,
+              0,  0, 1))
+        assert_equal(
+            tuple(Affine.rotation(-180)),
+            (-1,  0, 0,
+              0, -1, 0,
+              0,  0, 1))
+        assert_equal(
+            tuple(Affine.rotation(270)),
+            (0, -1, 0,
+             1,  0, 0,
+             0,  0, 1))
+        assert_equal(
+            tuple(Affine.rotation(-90)),
+            (0, -1, 0,
+             1,  0, 0,
+             0,  0, 1))
+        assert_equal(
+            tuple(Affine.rotation(360)),
+            (1, 0, 0,
+             0, 1, 0,
+             0, 0, 1))
+        assert_equal(
+            tuple(Affine.rotation(450)),
+            (0, 1, 0,
+            -1, 0, 0,
+             0, 0, 1))
+        assert_equal(
+            tuple(Affine.rotation(-450)),
+            (0, -1, 0,
+             1,  0, 0,
+             0,  0, 1))
 
     def test_rotation_constructor_with_pivot(self):
         assert_equal(tuple(Affine.rotation(60)),
-            tuple(Affine.rotation(60, pivot=(0,0))))
-        rot = Affine.rotation(27, pivot=(2,-4))
+            tuple(Affine.rotation(60, pivot=(0, 0))))
+        rot = Affine.rotation(27, pivot=(2, -4))
         r = math.radians(27)
         s, c = math.sin(r), math.cos(r)
-        assert_equal(tuple(rot), 
-            (c,s,2 - 2*c - 4*s, -s,c,-4 - 2*s + 4*c, 0,0,1))
-        assert_equal(tuple(Affine.rotation(0, (-3, 2))), 
-            tuple(Affine.identity()))
+        assert_equal(
+            tuple(rot),
+            (c, s, 2 - 2 * c - 4 * s,
+            -s, c, -4 - 2 * s + 4 * c,
+             0, 0, 1))
+        assert_equal(tuple(Affine.rotation(0, (-3, 2))),
+                     tuple(Affine.identity()))
 
     @raises(TypeError)
     def test_rotation_contructor_wrong_arg_types(self):
-        Affine.rotation(1,1)
+        Affine.rotation(1, 1)
 
     def test_determinant(self):
         assert_equal(Affine.identity().determinant, 1)
         assert_equal(Affine.scale(2).determinant, 4)
         assert_equal(Affine.scale(0).determinant, 0)
-        assert_equal(Affine.scale(5,1).determinant, 5)
-        assert_equal(Affine.scale(-1,1).determinant, -1)
-        assert_equal(Affine.scale(-1,0).determinant, 0)
+        assert_equal(Affine.scale(5, 1).determinant, 5)
+        assert_equal(Affine.scale(-1, 1).determinant, -1)
+        assert_equal(Affine.scale(-1, 0).determinant, 0)
         assert_almost_equal(Affine.rotation(77).determinant, 1)
         assert_almost_equal(Affine.translation(32, -47).determinant, 1)
 
@@ -228,7 +302,6 @@ class PyAffineTestCase(unittest.TestCase):
         assert Affine.scale(EPSILON).is_degenerate
 
     def test_column_vectors(self):
-        import affine
         a, b, c = Affine(2, 3, 4, 5, 6, 7).column_vectors
         assert isinstance(a, tuple)
         assert isinstance(b, tuple)
@@ -241,7 +314,7 @@ class PyAffineTestCase(unittest.TestCase):
         from affine import EPSILON
         assert EPSILON != 0, EPSILON
         E = EPSILON * 0.5
-        t = Affine(1.0, E, 0, -E, 1.0+E, E)
+        t = Affine(1.0, E, 0, -E, 1.0 + E, E)
         assert t.almost_equals(Affine.identity())
         assert Affine.identity().almost_equals(t)
         assert t.almost_equals(t)
@@ -265,22 +338,22 @@ class PyAffineTestCase(unittest.TestCase):
 
     @raises(TypeError)
     def test_gt(self):
-        Affine(1,2,3,4,5,6) > Affine(6,5,4,3,2,1)
+        Affine(1, 2, 3, 4, 5, 6) > Affine(6, 5, 4, 3, 2, 1)
 
     @raises(TypeError)
     def test_lt(self):
-        Affine(1,2,3,4,5,6) < Affine(6,5,4,3,2,1)
+        Affine(1, 2, 3, 4, 5, 6) < Affine(6, 5, 4, 3, 2, 1)
 
     @raises(TypeError)
     def test_add(self):
-        Affine(1,2,3,4,5,6) + Affine(6,5,4,3,2,1)
-        
+        Affine(1, 2, 3, 4, 5, 6) + Affine(6, 5, 4, 3, 2, 1)
+
     @raises(TypeError)
     def test_sub(self):
-        Affine(1,2,3,4,5,6) - Affine(6,5,4,3,2,1)
+        Affine(1, 2, 3, 4, 5, 6) - Affine(6, 5, 4, 3, 2, 1)
 
     def test_mul_by_identity(self):
-        t = Affine(1,2,3,4,5,6)
+        t = Affine(1, 2, 3, 4, 5, 6)
         assert_equal(tuple(t * Affine.identity()), tuple(t))
 
     def test_mul_transform(self):
@@ -291,14 +364,14 @@ class PyAffineTestCase(unittest.TestCase):
         seq_almost_equal(t, Affine.scale(6, 10))
 
     def test_itransform(self):
-        pts = [(4,1), (-1,0), (3,2)]
+        pts = [(4, 1), (-1, 0), (3, 2)]
         r = Affine.scale(-2).itransform(pts)
         assert r is None, r
-        assert_equal(pts, [(-8, -2), (2,0), (-6,-4)])
+        assert_equal(pts, [(-8, -2), (2, 0), (-6, -4)])
 
     @raises(TypeError)
     def test_mul_wrong_type(self):
-        Affine(1,2,3,4,5,6) * None
+        Affine(1, 2, 3, 4, 5, 6) * None
 
     @raises(TypeError)
     def test_mul_sequence_wrong_member_types(self):
@@ -306,10 +379,12 @@ class PyAffineTestCase(unittest.TestCase):
             @classmethod
             def from_points(cls, points):
                 list(points)
+
             def __iter__(self):
                 yield 0
-        Affine(1,2,3,4,5,6) * NotPtSeq()
-        
+
+        Affine(1, 2, 3, 4, 5, 6) * NotPtSeq()
+
     def test_imul_transform(self):
         t = Affine.translation(3, 5)
         t *= Affine.translation(-2, 3.5)
@@ -322,9 +397,9 @@ class PyAffineTestCase(unittest.TestCase):
             ~Affine.translation(2, -3), Affine.translation(-2, 3))
         seq_almost_equal(
             ~Affine.rotation(-33.3), Affine.rotation(33.3))
-        t = Affine(1,2,3,4,5,6)
+        t = Affine(1, 2, 3, 4, 5, 6)
         seq_almost_equal(~t * t,  Affine.identity())
-    
+
     def test_cant_invert_degenerate(self):
         from affine import TransformNotInvertibleError
         t = Affine.scale(0)
@@ -334,17 +409,55 @@ class PyAffineTestCase(unittest.TestCase):
         import affine
 
         old_epsilon = affine.EPSILON
-        old_epsilon2 = affine.EPSILON2
 
         try:
             affine.set_epsilon(123)
             assert_equal(123, affine.EPSILON)
-            assert_equal(123*123, affine.EPSILON2)
+            assert_equal(123 * 123, affine.EPSILON2)
         finally:
             affine.set_epsilon(old_epsilon)
-            
 
-        
+    @raises(TypeError)
+    def test_bad_type_world(self):
+        from affine import loadsw
+        # wrong type, i.e don't use readlines()
+        loadsw(['1.0', '0.0', '0.0', '1.0', '0.0', '0.0'])
+
+    @raises(ValueError)
+    def test_bad_value_world(self):
+        from affine import loadsw
+        # wrong number of parameters
+        loadsw('1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0')
+
+    def test_simple_world(self):
+        from affine import loadsw, dumpsw
+        s = '1.0\n0.0\n0.0\n-1.0\n100.5\n199.5\n'
+        a = loadsw(s)
+        self.assertEqual(
+            a,
+            Affine(
+                1.0, 0.0, 100.0,
+                0.0, -1., 200.0))
+        self.assertEqual(dumpsw(a), s)
+
+    def test_real_world(self):
+        from affine import loadsw, dumpsw
+        s = dedent('''\
+                 39.9317755024
+                 30.0907511581
+                 30.0907511576
+                -39.9317755019
+            2658137.2266720217
+            5990821.7039887439''')  # no EOL
+        a1 = loadsw(s)
+        self.assertTrue(a1.almost_equals(
+            Affine(
+                39.931775502364644, 30.090751157602412, 2658102.2154086917,
+                30.090751157602412, -39.931775502364644, 5990826.624500916)))
+        a1out = dumpsw(a1)
+        self.assertTrue(isinstance(a1out, str))
+        a2 = loadsw(a1out)
+        self.assertTrue(a1.almost_equals(a2))
 
 
 def test_gdal():
@@ -352,7 +465,7 @@ def test_gdal():
     assert t.c == t.xoff == -237481.5
     assert t.a == 425.0
     assert t.b == 0.0
-    assert t.f == t.yoff ==  237536.4
+    assert t.f == t.yoff == 237536.4
     assert t.d == 0.0
     assert t.e == -425.0
     assert tuple(t) == (425.0, 0.0, -237481.5, 0.0, -425.0, 237536.4, 0, 0, 1.0)
@@ -364,4 +477,3 @@ if __name__ == '__main__':
 
 
 # vim: ai ts=4 sts=4 et sw=4 tw=78
-
