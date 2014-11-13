@@ -4,7 +4,7 @@ Affine
 Matrices describing affine transformation of the plane
 
 The Affine package is derived from Casey Duncan's Planar package. Please see
-the copyright statement in `affine/__init__.py] <affine/__init__.py>`__.
+the copyright statement in `affine/__init__.py <affine/__init__.py>`__.
 
 Usage
 -----
@@ -41,8 +41,8 @@ Matrices can be created by passing the values ``a, b, c, d, e, f`` to the
   Affine(0.7071067811865476, 0.7071067811865475, 0.0,
          -0.7071067811865475, 0.7071067811865476, 0.0)
 
-These matrices can be applied to `(x, y)` tuples to obtain transformed
-coordinates `(x', y')`.
+These matrices can be applied to ``(x, y)`` tuples to obtain transformed
+coordinates ``(x', y')``.
 
 .. code-block:: pycon
 
@@ -64,23 +64,24 @@ Usage with GIS data packages
 
 Georeferenced raster datasets use affine transformations to map from image
 coordinates to world coordinates. The ``affine.Affine.from_gdal()`` class
-method helps convert `GDAL geotransforms
-<http://www.gdal.org/classGDALDataset.html#af9593cc241e7d140f5f3c4798a43a668>`__, 
+method helps convert `GDAL GeoTransform
+<http://www.gdal.org/classGDALDataset.html#af9593cc241e7d140f5f3c4798a43a668>`__,
 sequences of 6 numbers in which the first and fourth are the x and y offsets
 and the second and sixth are the x and y pixel sizes.
 
-Using a GDAL dataset transformation matrix, the world coordinates ``x, y`` 
-corresponding to the top left corner of the pixel 100 rows down from the 
+Using a GDAL dataset transformation matrix, the world coordinates ``(x, y)``
+corresponding to the top left corner of the pixel 100 rows down from the
 origin can be easily computed.
 
 .. code-block:: pycon
 
-  >>> fwd = Affine.from_gdal(-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
+  >>> geotransform = (-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
+  >>> fwd = Affine.from_gdal(*geotransform)
   >>> col, row = 0, 100
   >>> fwd * (col, row)
   (-237481.5, 195036.4)
 
-The reverse transformation is obained using the `~` operator.
+The reverse transformation is obtained using the ``~`` operator.
 
 .. code-block:: pycon
 
