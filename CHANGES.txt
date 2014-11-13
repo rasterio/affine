@@ -1,9 +1,10 @@
 CHANGES
 =======
 
-1.1.0 (201_-__-__)
+1.1.0 (2014-11-13)
 ------------------
- - add loadsw/dumpsw world file utilities (#6).
+- add loadsw/dumpsw world file utilities (#6).
+- Travis-CI and Coveralls config and web hooks added (#10).
 
 1.0.1 (2014-10-20)
 ------------------
@@ -14,4 +15,3 @@ CHANGES
 ----------------
 - Code ported from Casey Duncan's Planar package.
 - from_gdal() class method added.
-
