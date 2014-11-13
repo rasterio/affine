@@ -2,16 +2,18 @@
 
 from setuptools import setup
 
+
 # Parse the version from the affine module.
-with open('affine/__init__.py') as fp:
-    for line in fp:
+with open('affine/__init__.py') as f:
+    for line in f:
         if "__version__" in line:
             version = line.split("=")[1].strip()
             version = version.strip('"').strip("'")
             break
 
-with open('README.rst') as fp:
-    readme = fp.read()
+with open('README.rst') as f:
+    readme = f.read()
+
 
 setup(name='affine',
       version=version,
@@ -27,5 +29,5 @@ setup(name='affine',
       packages=['affine'],
       include_package_data=True,
       zip_safe=False,
-      # test_suite='nose.collector',  # use pytest
+      extras_require = {'test':  ['pytest']}
       )
