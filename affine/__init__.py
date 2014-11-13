@@ -160,22 +160,7 @@ class Affine(
         """
         members = [a, b, c, d, e, f]
         mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
-        return tuple.__new__(Affine, mat3x3)
-
-    @classmethod
-    def from_world(cls, s):
-        """Construct Affine from the contents of a world file string.
-
-        :param s: str with 6 floats ordered in a world file.
-        :rtype: Affine
-        """
-        if not hasattr(s, 'split'):
-            raise ValueError("Cannot split input string")
-        coeffs = s.split()
-        if len(coeffs) != 6:
-            raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
-        a, d, b, e, c, f = [float(x) for x in coeffs]
-        return tuple.__new__(Affine, [a, b, c, d, e, f, 0.0, 0.0, 1.0])
+        return tuple.__new__(cls, mat3x3)
 
     @classmethod
     def identity(cls):
@@ -278,13 +263,6 @@ class Affine(
         :rtype: tuple
         """
         return (self.c, self.a, self.b, self.f, self.d, self.e)
-
-    def to_world(self):
-        """Return string for a world file.
-
-        :rtype: str
-        """
-        return '\n'.join(repr(getattr(self, x)) for x in list('adbecf')) + '\n'
 
     @property
     def xoff(self):
@@ -459,6 +437,39 @@ class Affine(
 
 identity = Affine(1, 0, 0, 0, 1, 0)
 """The identity transform"""
+
+# Miscellaneous utilities
+
+
+def loadsw(s):
+    """Returns Affine from the contents of a world file string.
+
+    This method also translates the coefficients from from center- to
+    corner-based coordinates.
+
+    :param s: str with 6 floats ordered in a world file.
+    :rtype: Affine
+    """
+    if not hasattr(s, 'split'):
+        raise ValueError("Cannot split input string")
+    coeffs = s.split()
+    if len(coeffs) != 6:
+        raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
+    a, d, b, e, c, f = [float(x) for x in coeffs]
+    center = tuple.__new__(Affine, [a, b, c, d, e, f, 0.0, 0.0, 1.0])
+    return center * Affine.translation(-0.5, -0.5)
+
+
+def dumpsw(A):
+    """Return string for a world file.
+
+    This method also translates the coefficients from from corner- to
+    center-based coordinates.
+
+    :rtype: str
+    """
+    center = A * Affine.translation(0.5, 0.5)
+    return '\n'.join(repr(getattr(center, x)) for x in list('adbecf')) + '\n'
 
 
 # vim: ai ts=4 sts=4 et sw=4 tw=78

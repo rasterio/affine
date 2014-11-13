@@ -418,37 +418,42 @@ class PyAffineTestCase(unittest.TestCase):
             affine.set_epsilon(old_epsilon)
 
     @raises(ValueError)
-    def test_bad_world1(self):
+    def test_bad_world(self):
+        from affine import loadsw
         # wrong type, i.e don't use readlines()
-        Affine.from_world(['1.0', '0.0', '0.0', '1.0', '0.0', '0.0'])
-
-    @raises(ValueError)
-    def test_bad_world2(self):
+        loadsw(['1.0', '0.0', '0.0', '1.0', '0.0', '0.0'])
         # wrong number of parameters
-        Affine.from_world('1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0')
+        loadsw('1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0')
 
-    def test_identity_world(self):
-        s = '1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n'
-        a = Affine.from_world(s)
-        self.assertTrue(a.is_identity)
-        self.assertEqual(a.to_world(), s)
+    def test_simple_world(self):
+        from affine import loadsw, dumpsw
+        s = '1.0\n0.0\n0.0\n-1.0\n100.5\n199.5\n'
+        a = loadsw(s)
+        self.assertEqual(
+            a,
+            Affine(
+                1.0, 0.0, 100.0,
+                0.0, -1., 200.0))
+        self.assertEqual(dumpsw(a), s)
 
     def test_real_world(self):
+        from affine import loadsw, dumpsw
         s = dedent('''\
-            20.17541308822119
-            0.00000000000000
-            0.00000000000000
-            -20.17541308822119
-            424178.11472601280548
-            4313415.90726399607956''')  # no EOL
-        a = Affine.from_world(s)
-        self.assertTrue(a.almost_equals(
+                 39.9317755024
+                 30.0907511581
+                 30.0907511576
+                -39.9317755019
+            2658137.2266720217
+            5990821.7039887439''')  # no EOL
+        a1 = loadsw(s)
+        self.assertTrue(a1.almost_equals(
             Affine(
-                20.17541308822119, 0.0, 424178.1147260128,
-                0.0, -20.17541308822119, 4313415.907263996)))
-        out = a.to_world()
-        self.assertTrue(isinstance(out, str))
-        self.assertGreaterEqual(len(out), 70)
+                39.931775502364644, 30.090751157602412, 2658102.2154086917,
+                30.090751157602412, -39.931775502364644, 5990826.624500916)))
+        a1out = dumpsw(a1)
+        self.assertTrue(isinstance(a1out, str))
+        a2 = loadsw(a1out)
+        self.assertTrue(a1.almost_equals(a2))
 
 
 def test_gdal():
