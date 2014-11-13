@@ -47,11 +47,10 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "1.1.0"
+__version__ = "1.0.1"
 
-EPSILON = 1e-5
-EPSILON2 = EPSILON ** 2
-
+EPSILON=1e-5
+EPSILON2=EPSILON**2
 
 def set_epsilon(epsilon):
     """Set the global absolute error value and rounding limit for approximate
@@ -66,7 +65,7 @@ def set_epsilon(epsilon):
     """
     global EPSILON, EPSILON2
     EPSILON = float(epsilon)
-    EPSILON2 = EPSILON ** 2
+    EPSILON2 = EPSILON**2
 
 
 class TransformNotInvertibleError(Exception):
@@ -77,12 +76,12 @@ class TransformNotInvertibleError(Exception):
 # across major Python versions
 try:
     3 > ""
-except TypeError:  # pragma: no cover
+except TypeError: # pragma: no cover
     # No implicit ordering (newer Python)
     def assert_unorderable(a, b):
         """Assert that a and b are unorderable"""
         return NotImplemented
-else:  # pragma: no cover
+else: # pragma: no cover
     # Implicit ordering by default (older Python)
     # We must raise an exception ourselves
     # To prevent nonsensical ordering
@@ -91,7 +90,6 @@ else:  # pragma: no cover
         raise TypeError("unorderable types: %s and %s"
             % (type(a).__name__, type(b).__name__))
 
-
 def cached_property(func):
     """Special property decorator that caches the computed
     property value in the object's instance dict the first
@@ -99,7 +97,6 @@ def cached_property(func):
     """
     name = func.__name__
     doc = func.__doc__
-
     def getter(self, name=name):
         try:
             return self.__dict__[name]
@@ -108,7 +105,6 @@ def cached_property(func):
             return value
     getter.func_name = name
     return property(getter, doc=doc)
-
 
 def cos_sin_deg(deg):
     """Return the cosine and sin for the given angle
@@ -149,18 +145,13 @@ class Affine(
             return tuple.__new__(Affine, mat3x3)
         else:
             raise TypeError(
-                "Expected 6 coefficients, found %d" % len(members))
+                "Expected 6 number args, got %s" % len(members))
 
     @classmethod
     def from_gdal(cls, c, a, b, f, d, e):
-        """Use same coefficient order as GDAL's GetGeoTransform().
-
-        :param c, a, b, f, d, e: 6 floats ordered by GDAL.
-        :rtype: Affine
-        """
         members = [a, b, c, d, e, f]
         mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
-        return tuple.__new__(cls, mat3x3)
+        return tuple.__new__(Affine, mat3x3)
 
     @classmethod
     def identity(cls):
@@ -242,8 +233,8 @@ class Affine(
         else:
             px, py = pivot
             return tuple.__new__(cls,
-                (ca, sa, px - px * ca + py * sa,
-                -sa, ca, py - px * sa - py * ca,
+                (ca, sa, px - px*ca + py*sa,
+                -sa, ca, py - px*sa - py*ca,
                  0.0, 0.0, 1.0))
 
     def __str__(self):
@@ -258,20 +249,14 @@ class Affine(
                 "       %r, %r, %r)") % self[:6]
 
     def to_gdal(self):
-        """Return same coefficient order as GDAL's SetGeoTransform().
-
-        :rtype: tuple
-        """
         return (self.c, self.a, self.b, self.f, self.d, self.e)
 
     @property
     def xoff(self):
-        """Alias for 'c'"""
         return self.c
 
     @property
     def yoff(self):
-        """Alias for 'f'"""
         return self.f
 
     @cached_property
@@ -281,7 +266,7 @@ class Affine(
         is applied to a shape.
         """
         a, b, c, d, e, f, g, h, i = self
-        return a * e - b * d
+        return a*e - b*d
 
     @cached_property
     def is_identity(self):
@@ -307,7 +292,7 @@ class Affine(
         This implies that the transform has no effective shear.
         """
         a, b, c, d, e, f, g, h, i = self
-        return abs(a * b + d * e) < EPSILON
+        return abs(a*b + d*e) < EPSILON
 
     @cached_property
     def is_orthonormal(self):
@@ -319,8 +304,8 @@ class Affine(
         """
         a, b, c, d, e, f, g, h, i = self
         return (self.is_conformal
-            and abs(1.0 - (a * a + d * d)) < EPSILON
-            and abs(1.0 - (b * b + e * e)) < EPSILON)
+            and abs(1.0 - (a*a + d*d)) < EPSILON
+            and abs(1.0 - (b*b + e*e)) < EPSILON)
 
     @cached_property
     def is_degenerate(self):
@@ -342,7 +327,7 @@ class Affine(
         :param other: Transform being compared.
         :type other: Affine
         :return: True if absolute difference between each element
-            of each respective transform matrix < ``EPSILON``.
+            of each respective tranform matrix < ``EPSILON``.
         """
         for i in (0, 1, 2, 3, 4, 5):
             if abs(self[i] - other[i]) >= EPSILON:
@@ -377,15 +362,15 @@ class Affine(
         if isinstance(other, Affine):
             oa, ob, oc, od, oe, of, _, _, _ = other
             return tuple.__new__(Affine,
-                (sa * oa + sb * od, sa * ob + sb * oe, sa * oc + sb * of + sc,
-                 sd * oa + se * od, sd * ob + se * oe, sd * oc + se * of + sf,
+                (sa*oa + sb*od, sa*ob + sb*oe, sa*oc + sb*of + sc,
+                 sd*oa + se*od, sd*ob + se*oe, sd*oc + se*of + sf,
                  0.0, 0.0, 1.0))
         else:
             try:
                 vx, vy = other
             except Exception:
                 return NotImplemented
-            return (vx * sa + vy * sd + sc, vx * sb + vy * se + sf)
+            return (vx*sa + vy*sd + sc, vx*sb + vy*se + sf)
 
     def __rmul__(self, other):
         # We should not be called if other is an affine instance
@@ -410,7 +395,7 @@ class Affine(
         if self is not identity and self != identity:
             sa, sb, sc, sd, se, sf, _, _, _ = self
             for i, (x, y) in enumerate(seq):
-                seq[i] = (x * sa + y * sd + sc, x * sb + y * se + sf)
+                seq[i] = (x*sa + y*sd + sc, x*sb + y*se + sf)
 
     def __invert__(self):
         """Return the inverse transform.
@@ -428,48 +413,16 @@ class Affine(
         rd = -sd * idet
         re = sa * idet
         return tuple.__new__(Affine,
-            (ra, rb, -sc * ra - sf * rb,
-             rd, re, -sc * rd - sf * re,
+            (ra, rb, -sc*ra - sf*rb,
+             rd, re, -sc*rd - sf*re,
              0.0, 0.0, 1.0))
 
-    __hash__ = tuple.__hash__  # hash is not inherited in Py 3
+    __hash__ = tuple.__hash__ # hash is not inherited in Py 3
 
 
 identity = Affine(1, 0, 0, 0, 1, 0)
 """The identity transform"""
 
-# Miscellaneous utilities
-
-
-def loadsw(s):
-    """Returns Affine from the contents of a world file string.
-
-    This method also translates the coefficients from from center- to
-    corner-based coordinates.
-
-    :param s: str with 6 floats ordered in a world file.
-    :rtype: Affine
-    """
-    if not hasattr(s, 'split'):
-        raise TypeError("Cannot split input string")
-    coeffs = s.split()
-    if len(coeffs) != 6:
-        raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
-    a, d, b, e, c, f = [float(x) for x in coeffs]
-    center = tuple.__new__(Affine, [a, b, c, d, e, f, 0.0, 0.0, 1.0])
-    return center * Affine.translation(-0.5, -0.5)
-
-
-def dumpsw(obj):
-    """Return string for a world file.
-
-    This method also translates the coefficients from from corner- to
-    center-based coordinates.
-
-    :rtype: str
-    """
-    center = obj * Affine.translation(0.5, 0.5)
-    return '\n'.join(repr(getattr(center, x)) for x in list('adbecf')) + '\n'
-
 
 # vim: ai ts=4 sts=4 et sw=4 tw=78
+
