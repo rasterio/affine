@@ -434,6 +434,13 @@ class Affine(
 
     __hash__ = tuple.__hash__  # hash is not inherited in Py 3
 
+    def __getnewargs__(self):
+        # Required for unpickling.
+        # Normal unpickling creates a situation where __new__ receives all 9
+        # elements rather than the 6 that are required for the constructor.
+        # This method ensures that only the 6 are provided.
+        return self.a, self.b, self.c, self.d, self.e, self.f
+
 
 identity = Affine(1, 0, 0, 0, 1, 0)
 """The identity transform"""
