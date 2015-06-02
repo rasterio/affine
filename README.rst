@@ -1,12 +1,12 @@
 Affine
 ======
 
-Matrices describing affine transformation of the plane
+Matrices describing affine transformation of the plane.
 
 .. image:: https://travis-ci.org/sgillies/affine.svg?branch=master
     :target: https://travis-ci.org/sgillies/affine
 
-.. image:: https://coveralls.io/repos/sgillies/affine/badge.png
+.. image:: https://coveralls.io/repos/sgillies/affine/badge.svg
     :target: https://coveralls.io/r/sgillies/affine
 
 The Affine package is derived from Casey Duncan's Planar package. Please see

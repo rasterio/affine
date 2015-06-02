@@ -47,7 +47,7 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 EPSILON = 1e-5
 EPSILON2 = EPSILON ** 2
@@ -208,17 +208,17 @@ class Affine(
     def shear(cls, x_angle=0, y_angle=0):
         """Create a shear transform along one or both axes.
 
-        :param x_angle: Angle in degrees to shear along the x-axis.
+        :param x_angle: Shear angle in degrees parallel to the x-axis.
         :type x_angle: float
-        :param y_angle: Angle in degrees to shear along the y-axis.
+        :param y_angle: Shear angle in degrees parallel to the y-axis.
         :type y_angle: float
         :rtype: Affine
         """
-        sx = math.tan(math.radians(x_angle))
-        sy = math.tan(math.radians(y_angle))
+        mx = math.tan(math.radians(x_angle))
+        my = math.tan(math.radians(y_angle))
         return tuple.__new__(cls,
-            (1.0, sy, 0.0,
-             sx, 1.0, 0.0,
+            (1.0, mx, 0.0,
+             my, 1.0, 0.0,
              0.0, 0.0, 1.0))
 
     @classmethod

@@ -146,25 +146,25 @@ class PyAffineTestCase(unittest.TestCase):
     def test_shear_constructor(self):
         shear = Affine.shear(30)
         assert isinstance(shear, Affine)
-        sx = math.tan(math.radians(30))
+        mx = math.tan(math.radians(30))
         seq_almost_equal(
             tuple(shear),
-            (1, 0, 0,
-            sx, 1, 0,
+            (1, mx, 0,
+             0, 1, 0,
              0, 0, 1))
         shear = Affine.shear(-15, 60)
-        sx = math.tan(math.radians(-15))
-        sy = math.tan(math.radians(60))
+        mx = math.tan(math.radians(-15))
+        my = math.tan(math.radians(60))
         seq_almost_equal(
             tuple(shear),
-            (1, sy, 0,
-            sx,  1, 0,
+            (1, mx, 0,
+            my,  1, 0,
              0,  0, 1))
         shear = Affine.shear(y_angle=45)
         seq_almost_equal(
             tuple(shear),
-            (1, 1, 0,
-             0, 1, 0,
+            (1, 0, 0,
+             1, 1, 0,
              0, 0, 1))
 
     def test_rotation_constructor(self):

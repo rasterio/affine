@@ -1,9 +1,14 @@
 CHANGES
 =======
 
+1.2.0 (2015-06-01)
+------------------
+- Enable pickling of Affine objects (#14).
+- Sort out the mixed up shearing parameters (#12).
+
 1.1.0 (2014-11-13)
 ------------------
-- add loadsw/dumpsw world file utilities (#6).
+- Add loadsw/dumpsw world file utilities (#6).
 - Travis-CI and Coveralls config and web hooks added (#10).
 
 1.0.1 (2014-10-20)
