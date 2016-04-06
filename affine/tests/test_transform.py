@@ -288,7 +288,6 @@ class PyAffineTestCase(unittest.TestCase):
         assert not Affine.shear(4, -1).is_orthonormal
 
     def test_is_degenerate(self):
-        from affine import EPSILON
         assert not Affine.identity().is_degenerate
         assert not Affine.translation(2, -1).is_degenerate
         assert not Affine.shear(0, -22.5).is_degenerate
@@ -299,7 +298,7 @@ class PyAffineTestCase(unittest.TestCase):
         assert Affine.scale(0, 300).is_degenerate
         assert Affine.scale(0).is_degenerate
         assert Affine.scale(0).is_degenerate
-        assert Affine.scale(EPSILON).is_degenerate
+        assert Affine.scale(Affine.identity().EPSILON).is_degenerate
 
     def test_column_vectors(self):
         a, b, c = Affine(2, 3, 4, 5, 6, 7).column_vectors
@@ -311,7 +310,7 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(c, (4, 7))
 
     def test_almost_equals(self):
-        from affine import EPSILON
+        EPSILON = Affine.identity().EPSILON
         assert EPSILON != 0, EPSILON
         E = EPSILON * 0.5
         t = Affine(1.0, E, 0, -E, 1.0 + E, E)
@@ -404,18 +403,6 @@ class PyAffineTestCase(unittest.TestCase):
         from affine import TransformNotInvertibleError
         t = Affine.scale(0)
         self.assertRaises(TransformNotInvertibleError, lambda: ~t)
-
-    def test_set_epsilon(self):
-        import affine
-
-        old_epsilon = affine.EPSILON
-
-        try:
-            affine.set_epsilon(123)
-            assert_equal(123, affine.EPSILON)
-            assert_equal(123 * 123, affine.EPSILON2)
-        finally:
-            affine.set_epsilon(old_epsilon)
 
     @raises(TypeError)
     def test_bad_type_world(self):
