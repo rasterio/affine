@@ -43,7 +43,6 @@ from __future__ import division
 
 from collections import namedtuple
 import math
-import sys
 
 
 __all__ = ['Affine']
@@ -308,7 +307,7 @@ class Affine(
         collapse a shape to an effective area of zero. Degenerate transforms
         cannot be inverted.
         """
-        return abs(self.determinant) < sys.float_info.epsilon
+        return self.determinant == 0.0
 
     @property
     def column_vectors(self):

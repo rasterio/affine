@@ -288,7 +288,6 @@ class PyAffineTestCase(unittest.TestCase):
         assert not Affine.shear(4, -1).is_orthonormal()
 
     def test_is_degenerate(self):
-        from affine import EPSILON
         assert not Affine.identity().is_degenerate
         assert not Affine.translation(2, -1).is_degenerate
         assert not Affine.shear(0, -22.5).is_degenerate
@@ -310,8 +309,7 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(c, (4, 7))
 
     def test_almost_equals(self):
-        from affine import EPSILON
-        assert EPSILON != 0, EPSILON
+        EPSILON = 1e-5
         E = EPSILON * 0.5
         t = Affine(1.0, E, 0, -E, 1.0 + E, E)
         assert t.almost_equals(Affine.identity())
@@ -321,6 +319,18 @@ class PyAffineTestCase(unittest.TestCase):
         assert not t.almost_equals(Affine.identity())
         assert not Affine.identity().almost_equals(t)
         assert t.almost_equals(t)
+
+    def test_almost_equals_2(self):
+        EPSILON = 1e-10
+        E = EPSILON * 0.5
+        t = Affine(1.0, E, 0, -E, 1.0 + E, E)
+        assert t.almost_equals(Affine.identity(), precision=EPSILON)
+        assert Affine.identity().almost_equals(t, precision=EPSILON)
+        assert t.almost_equals(t, precision=EPSILON)
+        t = Affine(1.0, 0, 0, -EPSILON, 1.0, 0)
+        assert not t.almost_equals(Affine.identity(), precision=EPSILON)
+        assert not Affine.identity().almost_equals(t, precision=EPSILON)
+        assert t.almost_equals(t, precision=EPSILON)
 
     def test_equality(self):
         t1 = Affine(1, 2, 3, 4, 5, 6)
