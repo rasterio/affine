@@ -366,12 +366,12 @@ class Affine(
                 return NotImplemented
             return (vx * sa + vy * sd + sc, vx * sb + vy * se + sf)
 
-    def __rmul__(self, other):
-        # We should not be called if other is an affine instance
-        # This is just a guarantee, since we would potentially
-        # return the wrong answer in that case
-        assert not isinstance(other, Affine)
-        return self.__mul__(other)
+#    def __rmul__(self, other):
+#        # We should not be called if other is an affine instance
+#        # This is just a guarantee, since we would potentially
+#        # return the wrong answer in that case
+#        assert not isinstance(other, Affine)
+#        return self.__mul__(other)
 
     def __imul__(self, other):
         if isinstance(other, Affine) or isinstance(other, tuple):

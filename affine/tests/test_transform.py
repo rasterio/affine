@@ -469,6 +469,19 @@ def test_gdal():
     assert t.to_gdal() == (-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
 
 
+def test_imult_number():
+    t = Affine(1, 2, 3, 4, 5, 6)
+    try:
+        t *= 2.0
+    except TypeError:
+        assert True
+
+
+def test_mult_tuple():
+    t = Affine(1, 2, 3, 4, 5, 6)
+    result = t * (2.0, 2.0)
+
+
 if __name__ == '__main__':
     unittest.main()
 
