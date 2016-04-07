@@ -116,16 +116,16 @@ class PyAffineTestCase(unittest.TestCase):
             (1, 0, 0,
              0, 1, 0,
              0, 0, 1))
-        assert ident.is_identity
+        assert ident.is_identity()
 
     def test_translation_constructor(self):
         trans = Affine.translation(2, -5)
         assert isinstance(trans, Affine)
         assert_equal(
             tuple(trans),
-            (1, 0,  2,
+            (1, 0, 2,
              0, 1, -5,
-             0, 0,  1))
+             0, 0, 1))
 
     def test_scale_constructor(self):
         scale = Affine.scale(5)
@@ -139,8 +139,8 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(scale),
             (-1, 0, 0,
-              0, 2, 0,
-              0, 0, 1))
+             0, 2, 0,
+             0, 0, 1))
         assert_equal(tuple(Affine.scale(1)), tuple(Affine.identity()))
 
     def test_shear_constructor(self):
@@ -158,7 +158,7 @@ class PyAffineTestCase(unittest.TestCase):
         seq_almost_equal(
             tuple(shear),
             (1, mx, 0,
-            my,  1, 0,
+             my,  1, 0,
              0,  0, 1))
         shear = Affine.shear(y_angle=45)
         seq_almost_equal(
@@ -175,7 +175,7 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(rot),
             (c, s, 0,
-            -s, c, 0,
+             -s, c, 0,
              0, 0, 1))
         rot = Affine.rotation(337)
         r = math.radians(337)
@@ -183,7 +183,7 @@ class PyAffineTestCase(unittest.TestCase):
         seq_almost_equal(
             tuple(rot),
             (c, s, 0,
-            -s, c, 0,
+             -s, c, 0,
              0, 0, 1))
         assert_equal(tuple(Affine.rotation(0)), tuple(Affine.identity()))
 
@@ -196,18 +196,18 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(Affine.rotation(90)),
             (0, 1, 0,
-            -1, 0, 0,
+             -1, 0, 0,
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(180)),
             (-1,  0, 0,
-              0, -1, 0,
-              0,  0, 1))
+             0, -1, 0,
+             0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(-180)),
             (-1,  0, 0,
-              0, -1, 0,
-              0,  0, 1))
+             0, -1, 0,
+             0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(270)),
             (0, -1, 0,
@@ -226,7 +226,7 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(Affine.rotation(450)),
             (0, 1, 0,
-            -1, 0, 0,
+             -1, 0, 0,
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(-450)),
@@ -263,29 +263,29 @@ class PyAffineTestCase(unittest.TestCase):
         assert_almost_equal(Affine.translation(32, -47).determinant, 1)
 
     def test_is_rectilinear(self):
-        assert Affine.identity().is_rectilinear
-        assert Affine.scale(2.5, 6.1).is_rectilinear
-        assert Affine.translation(4, -1).is_rectilinear
-        assert Affine.rotation(90).is_rectilinear
-        assert not Affine.shear(4, -1).is_rectilinear
-        assert not Affine.rotation(-26).is_rectilinear
+        assert Affine.identity().is_rectilinear()
+        assert Affine.scale(2.5, 6.1).is_rectilinear()
+        assert Affine.translation(4, -1).is_rectilinear()
+        assert Affine.rotation(90).is_rectilinear()
+        assert not Affine.shear(4, -1).is_rectilinear()
+        assert not Affine.rotation(-26).is_rectilinear()
 
     def test_is_conformal(self):
-        assert Affine.identity().is_conformal
-        assert Affine.scale(2.5, 6.1).is_conformal
-        assert Affine.translation(4, -1).is_conformal
-        assert Affine.rotation(90).is_conformal
-        assert Affine.rotation(-26).is_conformal
-        assert not Affine.shear(4, -1).is_conformal
+        assert Affine.identity().is_conformal()
+        assert Affine.scale(2.5, 6.1).is_conformal()
+        assert Affine.translation(4, -1).is_conformal()
+        assert Affine.rotation(90).is_conformal()
+        assert Affine.rotation(-26).is_conformal()
+        assert not Affine.shear(4, -1).is_conformal()
 
     def test_is_orthonormal(self):
-        assert Affine.identity().is_orthonormal
-        assert Affine.translation(4, -1).is_orthonormal
-        assert Affine.rotation(90).is_orthonormal
-        assert Affine.rotation(-26).is_orthonormal
-        assert not Affine.scale(2.5, 6.1).is_orthonormal
-        assert not Affine.scale(.5, 2).is_orthonormal
-        assert not Affine.shear(4, -1).is_orthonormal
+        assert Affine.identity().is_orthonormal()
+        assert Affine.translation(4, -1).is_orthonormal()
+        assert Affine.rotation(90).is_orthonormal()
+        assert Affine.rotation(-26).is_orthonormal()
+        assert not Affine.scale(2.5, 6.1).is_orthonormal()
+        assert not Affine.scale(.5, 2).is_orthonormal()
+        assert not Affine.shear(4, -1).is_orthonormal()
 
     def test_is_degenerate(self):
         from affine import EPSILON
@@ -299,7 +299,6 @@ class PyAffineTestCase(unittest.TestCase):
         assert Affine.scale(0, 300).is_degenerate
         assert Affine.scale(0).is_degenerate
         assert Affine.scale(0).is_degenerate
-        assert Affine.scale(EPSILON).is_degenerate
 
     def test_column_vectors(self):
         a, b, c = Affine(2, 3, 4, 5, 6, 7).column_vectors
@@ -404,18 +403,6 @@ class PyAffineTestCase(unittest.TestCase):
         from affine import TransformNotInvertibleError
         t = Affine.scale(0)
         self.assertRaises(TransformNotInvertibleError, lambda: ~t)
-
-    def test_set_epsilon(self):
-        import affine
-
-        old_epsilon = affine.EPSILON
-
-        try:
-            affine.set_epsilon(123)
-            assert_equal(123, affine.EPSILON)
-            assert_equal(123 * 123, affine.EPSILON2)
-        finally:
-            affine.set_epsilon(old_epsilon)
 
     @raises(TypeError)
     def test_bad_type_world(self):

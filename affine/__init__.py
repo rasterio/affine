@@ -43,30 +43,14 @@ from __future__ import division
 
 from collections import namedtuple
 import math
+import sys
 
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "1.2.0"
+__version__ = "2.0.0"
 
 EPSILON = 1e-5
-EPSILON2 = EPSILON ** 2
-
-
-def set_epsilon(epsilon):
-    """Set the global absolute error value and rounding limit for approximate
-    floating point comparison operations. This value is accessible via the
-    :attr:`planar.EPSILON` global variable.
-
-    The default value of ``0.00001`` is suitable for values
-    that are in the "countable range". You may need a larger
-    epsilon when using large absolute values, and a smaller value
-    for very small values close to zero. Otherwise approximate
-    comparison operations will not behave as expected.
-    """
-    global EPSILON, EPSILON2
-    EPSILON = float(epsilon)
-    EPSILON2 = EPSILON ** 2
 
 
 class TransformNotInvertibleError(Exception):
@@ -283,34 +267,30 @@ class Affine(
         a, b, c, d, e, f, g, h, i = self
         return a * e - b * d
 
-    @cached_property
-    def is_identity(self):
+    def is_identity(self, precision=EPSILON):
         """True if this transform equals the identity matrix,
         within rounding limits.
         """
-        return self is identity or self.almost_equals(identity)
+        return self is identity or self.almost_equals(identity, precision)
 
-    @cached_property
-    def is_rectilinear(self):
+    def is_rectilinear(self, precision=EPSILON):
         """True if the transform is rectilinear, i.e., whether a shape would
         remain axis-aligned, within rounding limits, after applying the
         transform.
         """
         a, b, c, d, e, f, g, h, i = self
-        return ((abs(a) < EPSILON and abs(e) < EPSILON)
-            or (abs(d) < EPSILON and abs(b) < EPSILON))
+        return ((abs(a) < precision and abs(e) < precision)
+            or (abs(d) < precision and abs(b) < precision))
 
-    @cached_property
-    def is_conformal(self):
+    def is_conformal(self, precision=EPSILON):
         """True if the transform is conformal, i.e., if angles between points
         are preserved after applying the transform, within rounding limits.
         This implies that the transform has no effective shear.
         """
         a, b, c, d, e, f, g, h, i = self
-        return abs(a * b + d * e) < EPSILON
+        return abs(a * b + d * e) < precision
 
-    @cached_property
-    def is_orthonormal(self):
+    def is_orthonormal(self, precision=EPSILON):
         """True if the transform is orthonormal, which means that the
         transform represents a rigid motion, which has no effective scaling or
         shear. Mathematically, this means that the axis vectors of the
@@ -318,9 +298,9 @@ class Affine(
         orthonormal transform to a shape always results in a congruent shape.
         """
         a, b, c, d, e, f, g, h, i = self
-        return (self.is_conformal
-            and abs(1.0 - (a * a + d * d)) < EPSILON
-            and abs(1.0 - (b * b + e * e)) < EPSILON)
+        return (self.is_conformal(precision)
+            and abs(1.0 - (a * a + d * d)) < precision
+            and abs(1.0 - (b * b + e * e)) < precision)
 
     @cached_property
     def is_degenerate(self):
@@ -328,7 +308,7 @@ class Affine(
         collapse a shape to an effective area of zero. Degenerate transforms
         cannot be inverted.
         """
-        return abs(self.determinant) < EPSILON
+        return abs(self.determinant) < sys.float_info.epsilon
 
     @property
     def column_vectors(self):
@@ -336,16 +316,16 @@ class Affine(
         a, b, c, d, e, f, _, _, _ = self
         return (a, d), (b, e), (c, f)
 
-    def almost_equals(self, other):
+    def almost_equals(self, other, precision=EPSILON):
         """Compare transforms for approximate equality.
 
         :param other: Transform being compared.
         :type other: Affine
         :return: True if absolute difference between each element
-            of each respective transform matrix < ``EPSILON``.
+            of each respective transform matrix < ``self.precision``.
         """
         for i in (0, 1, 2, 3, 4, 5):
-            if abs(self[i] - other[i]) >= EPSILON:
+            if abs(self[i] - other[i]) >= precision:
                 return False
         return True
 
