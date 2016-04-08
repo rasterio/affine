@@ -299,7 +299,6 @@ class PyAffineTestCase(unittest.TestCase):
         assert Affine.scale(0, 300).is_degenerate
         assert Affine.scale(0).is_degenerate
         assert Affine.scale(0).is_degenerate
-        assert Affine.scale(EPSILON).is_degenerate
 
     def test_column_vectors(self):
         a, b, c = Affine(2, 3, 4, 5, 6, 7).column_vectors

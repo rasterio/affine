@@ -47,7 +47,7 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 EPSILON = 1e-5
 EPSILON2 = EPSILON ** 2
@@ -328,7 +328,7 @@ class Affine(
         collapse a shape to an effective area of zero. Degenerate transforms
         cannot be inverted.
         """
-        return abs(self.determinant) < EPSILON
+        return self.determinant == 0.0
 
     @property
     def column_vectors(self):
