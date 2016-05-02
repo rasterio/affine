@@ -175,16 +175,16 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(rot),
             (c, s, 0,
-            -s, c, 0,
-             0, 0, 1))
+             -s,  c, 0,
+             0,  0, 1))
         rot = Affine.rotation(337)
         r = math.radians(337)
         s, c = math.sin(r), math.cos(r)
         seq_almost_equal(
             tuple(rot),
             (c, s, 0,
-            -s, c, 0,
-             0, 0, 1))
+             -s,  c, 0,
+             0,  0, 1))
         assert_equal(tuple(Affine.rotation(0)), tuple(Affine.identity()))
 
     def test_rotation_constructor_quadrants(self):
@@ -196,23 +196,23 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(Affine.rotation(90)),
             (0, 1, 0,
-            -1, 0, 0,
-             0, 0, 1))
+             -1,  0, 0,
+             0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(180)),
             (-1,  0, 0,
-              0, -1, 0,
-              0,  0, 1))
+             0, -1, 0,
+             0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(-180)),
             (-1,  0, 0,
-              0, -1, 0,
-              0,  0, 1))
+             0, -1, 0,
+             0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(270)),
             (0, -1, 0,
-             1,  0, 0,
-             0,  0, 1))
+             1, 0, 0,
+             0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(-90)),
             (0, -1, 0,
@@ -226,27 +226,23 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(Affine.rotation(450)),
             (0, 1, 0,
-            -1, 0, 0,
+             -1, 0, 0,
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(-450)),
             (0, -1, 0,
-             1,  0, 0,
-             0,  0, 1))
+             1, 0, 0,
+             0, 0, 1))
 
     def test_rotation_constructor_with_pivot(self):
         assert_equal(tuple(Affine.rotation(60)),
-            tuple(Affine.rotation(60, pivot=(0, 0))))
-        rot = Affine.rotation(27, pivot=(2, -4))
-        r = math.radians(27)
-        s, c = math.sin(r), math.cos(r)
-        assert_equal(
-            tuple(rot),
-            (c, s, 2 - 2 * c - 4 * s,
-            -s, c, -4 - 2 * s + 4 * c,
-             0, 0, 1))
+                     tuple(Affine.rotation(60, pivot=(0, 0))))
         assert_equal(tuple(Affine.rotation(0, (-3, 2))),
                      tuple(Affine.identity()))
+        rot_pivot = Affine.rotation(27, pivot=(2, -4))
+        trans_rot_trans = (Affine.translation(2, -4) * Affine.rotation(27) *
+                           Affine.translation(-2, 4))
+        seq_almost_equal(tuple(rot_pivot), tuple(trans_rot_trans))
 
     @raises(TypeError)
     def test_rotation_contructor_wrong_arg_types(self):
@@ -362,6 +358,26 @@ class PyAffineTestCase(unittest.TestCase):
         t = Affine.scale(3, 5) * Affine.scale(2)
         seq_almost_equal(t, Affine.scale(6, 10))
 
+    def test_mul_vector(self):
+        seq_almost_equal(Affine.rotation(45.) * (1., 1.), (math.sqrt(2.), 0.))
+
+    def test_associative(self):
+        point = (12, 5)
+        trans = Affine.translation(-10., -5.)
+        rot90 = Affine.rotation(90.)
+        result1 = rot90 * (trans * point)
+        result2 = (rot90 * trans) * point
+        seq_almost_equal(result1, (0., -2.))
+        seq_almost_equal(result1, result2)
+
+    def test_roundtrip(self):
+        point = (12, 5)
+        trans = Affine.translation(3, 4)
+        rot37 = Affine.rotation(37.)
+        point_prime = (trans * rot37) * point
+        roundtrip_point = ~(trans * rot37) * point_prime
+        seq_almost_equal(point, roundtrip_point)
+        
     def test_itransform(self):
         pts = [(4, 1), (-1, 0), (3, 2)]
         r = Affine.scale(-2).itransform(pts)
