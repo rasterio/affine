@@ -31,7 +31,7 @@ Matrices can be created by passing the values ``a, b, c, d, e, f`` to the
 .. code-block:: pycon
 
   >>> from affine import Affine
-  >>> Affine.identity()
+  >>> Affine.identity() 
   Affine(1.0, 0.0, 0.0,
          0.0, 1.0, 0.0)
   >>> Affine.translation(1.0, 5.0)
@@ -55,7 +55,7 @@ coordinates ``(x', y')``.
   >>> Affine.translation(1.0, 5.0) * (1.0, 1.0)
   (2.0, 6.0)
   >>> Affine.rotation(45.0) * (1.0, 1.0)
-  (1.1102230246251565e-16, 1.414213562373095)
+  (1.414213562373095, 1.1102230246251565e-16)
 
 They may also be multiplied together to combine transformations.
 
