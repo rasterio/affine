@@ -23,5 +23,5 @@ def test_rotation_angle():
         0----------
     """
     x, y = Affine.rotation(45.0) * (1.0, 0.0)
-    assert round(x) == round(sqrt(2.0) / 2.0)
-    assert round(y) == round(sqrt(2.0) / 2.0)
+    assert round(x, 14) == round(sqrt(2.0) / 2.0, 14)
+    assert round(y, 14) == round(sqrt(2.0) / 2.0, 14)
