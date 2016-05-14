@@ -174,16 +174,16 @@ class PyAffineTestCase(unittest.TestCase):
         s, c = math.sin(r), math.cos(r)
         assert_equal(
             tuple(rot),
-            (c, s, 0,
-            -s, c, 0,
+            (c, -s, 0,
+             s, c, 0,
              0, 0, 1))
         rot = Affine.rotation(337)
         r = math.radians(337)
         s, c = math.sin(r), math.cos(r)
         seq_almost_equal(
             tuple(rot),
-            (c, s, 0,
-            -s, c, 0,
+            (c, -s, 0,
+             s, c, 0,
              0, 0, 1))
         assert_equal(tuple(Affine.rotation(0)), tuple(Affine.identity()))
 
@@ -195,8 +195,8 @@ class PyAffineTestCase(unittest.TestCase):
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(90)),
-            (0, 1, 0,
-            -1, 0, 0,
+            (0, -1, 0,
+             1, 0, 0,
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(180)),
@@ -210,13 +210,13 @@ class PyAffineTestCase(unittest.TestCase):
               0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(270)),
-            (0, -1, 0,
-             1,  0, 0,
+            (0, 1, 0,
+             -1,  0, 0,
              0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(-90)),
-            (0, -1, 0,
-             1,  0, 0,
+            (0, 1, 0,
+             -1,  0, 0,
              0,  0, 1))
         assert_equal(
             tuple(Affine.rotation(360)),
@@ -225,13 +225,13 @@ class PyAffineTestCase(unittest.TestCase):
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(450)),
-            (0, 1, 0,
-            -1, 0, 0,
+            (0, -1, 0,
+             1, 0, 0,
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(-450)),
-            (0, -1, 0,
-             1,  0, 0,
+            (0, 1, 0,
+             -1,  0, 0,
              0,  0, 1))
 
     def test_rotation_constructor_with_pivot(self):
@@ -242,8 +242,8 @@ class PyAffineTestCase(unittest.TestCase):
         s, c = math.sin(r), math.cos(r)
         assert_equal(
             tuple(rot),
-            (c, s, 2 - 2 * c - 4 * s,
-            -s, c, -4 - 2 * s + 4 * c,
+            (c, -s, 2 - 2 * c - 4 * s,
+             s, c, -4 - 2 * s + 4 * c,
              0, 0, 1))
         assert_equal(tuple(Affine.rotation(0, (-3, 2))),
                      tuple(Affine.identity()))
