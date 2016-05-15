@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+1.3.0 (2016-04-08)
+------------------
+- is_degenerate predicate is precise, not approximate (#22).
+
 1.2.0 (2015-06-01)
 ------------------
 - Enable pickling of Affine objects (#14).
