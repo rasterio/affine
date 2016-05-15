@@ -35,7 +35,7 @@ import unittest
 from textwrap import dedent
 from nose.tools import assert_equal, assert_almost_equal, raises
 
-from affine import Affine
+from affine import Affine, EPSILON
 
 
 def seq_almost_equal(t1, t2, error=0.00001):
@@ -116,7 +116,7 @@ class PyAffineTestCase(unittest.TestCase):
             (1, 0, 0,
              0, 1, 0,
              0, 0, 1))
-        assert ident.is_identity()
+        assert ident.is_identity
 
     def test_translation_constructor(self):
         trans = Affine.translation(2, -5)
@@ -263,29 +263,29 @@ class PyAffineTestCase(unittest.TestCase):
         assert_almost_equal(Affine.translation(32, -47).determinant, 1)
 
     def test_is_rectilinear(self):
-        assert Affine.identity().is_rectilinear()
-        assert Affine.scale(2.5, 6.1).is_rectilinear()
-        assert Affine.translation(4, -1).is_rectilinear()
-        assert Affine.rotation(90).is_rectilinear()
-        assert not Affine.shear(4, -1).is_rectilinear()
-        assert not Affine.rotation(-26).is_rectilinear()
+        assert Affine.identity().is_rectilinear
+        assert Affine.scale(2.5, 6.1).is_rectilinear
+        assert Affine.translation(4, -1).is_rectilinear
+        assert Affine.rotation(90).is_rectilinear
+        assert not Affine.shear(4, -1).is_rectilinear
+        assert not Affine.rotation(-26).is_rectilinear
 
     def test_is_conformal(self):
-        assert Affine.identity().is_conformal()
-        assert Affine.scale(2.5, 6.1).is_conformal()
-        assert Affine.translation(4, -1).is_conformal()
-        assert Affine.rotation(90).is_conformal()
-        assert Affine.rotation(-26).is_conformal()
-        assert not Affine.shear(4, -1).is_conformal()
+        assert Affine.identity().is_conformal
+        assert Affine.scale(2.5, 6.1).is_conformal
+        assert Affine.translation(4, -1).is_conformal
+        assert Affine.rotation(90).is_conformal
+        assert Affine.rotation(-26).is_conformal
+        assert not Affine.shear(4, -1).is_conformal
 
     def test_is_orthonormal(self):
-        assert Affine.identity().is_orthonormal()
-        assert Affine.translation(4, -1).is_orthonormal()
-        assert Affine.rotation(90).is_orthonormal()
-        assert Affine.rotation(-26).is_orthonormal()
-        assert not Affine.scale(2.5, 6.1).is_orthonormal()
-        assert not Affine.scale(.5, 2).is_orthonormal()
-        assert not Affine.shear(4, -1).is_orthonormal()
+        assert Affine.identity().is_orthonormal
+        assert Affine.translation(4, -1).is_orthonormal
+        assert Affine.rotation(90).is_orthonormal
+        assert Affine.rotation(-26).is_orthonormal
+        assert not Affine.scale(2.5, 6.1).is_orthonormal
+        assert not Affine.scale(.5, 2).is_orthonormal
+        assert not Affine.shear(4, -1).is_orthonormal
 
     def test_is_degenerate(self):
         assert not Affine.identity().is_degenerate
@@ -480,6 +480,14 @@ def test_imult_number():
 def test_mult_tuple():
     t = Affine(1, 2, 3, 4, 5, 6)
     result = t * (2.0, 2.0)
+
+
+def test_transform_precision():
+    t = Affine.rotation(45.0)
+    assert t.precision == EPSILON
+    t.precision = 1e-10
+    assert t.precision == 1e-10
+    assert Affine.rotation(0.0).precision == EPSILON
 
 
 if __name__ == '__main__':
