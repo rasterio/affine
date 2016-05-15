@@ -212,13 +212,16 @@ class Affine(
 
     @classmethod
     def rotation(cls, angle, pivot=None):
-        """Create a rotation transform at the specified angle,
-        optionally about the specified pivot point.
+        """Create a rotation transform at the specified angle.
 
-        :param angle: Rotation angle in degrees
+        A pivot point other than the coordinate system origin may be
+        optionally specified.
+
+        :param angle: Rotation angle in degrees, counter-clockwise
+            about the pivot point.
         :type angle: float
-        :param pivot: Point to rotate about, if omitted the
-            rotation is about the origin.
+        :param pivot: Point to rotate about, if omitted the rotation is
+            about the origin.
         :type pivot: sequence
         :rtype: Affine
         """
@@ -226,15 +229,15 @@ class Affine(
         if pivot is None:
             return tuple.__new__(
                 cls,
-                (ca, sa, 0.0,
-                 -sa, ca, 0.0,
+                (ca, -sa, 0.0,
+                 sa, ca, 0.0,
                  0.0, 0.0, 1.0))
         else:
             px, py = pivot
             return tuple.__new__(
                 cls,
-                (ca, sa, px - px * ca + py * sa,
-                 -sa, ca, py - px * sa - py * ca,
+                (ca, -sa, px - px * ca + py * sa,
+                 sa, ca, py - px * sa - py * ca,
                  0.0, 0.0, 1.0))
 
     def __str__(self):
@@ -384,7 +387,7 @@ class Affine(
                 vx, vy = other
             except Exception:
                 return NotImplemented
-            return (vx * sa + vy * sd + sc, vx * sb + vy * se + sf)
+            return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
 
     def __imul__(self, other):
         if isinstance(other, Affine) or isinstance(other, tuple):
