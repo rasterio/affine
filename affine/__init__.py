@@ -47,26 +47,9 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "1.3.0"
+__version__ = "2.0.0"
 
 EPSILON = 1e-5
-EPSILON2 = EPSILON ** 2
-
-
-def set_epsilon(epsilon):
-    """Set the global absolute error value and rounding limit for approximate
-    floating point comparison operations. This value is accessible via the
-    :attr:`planar.EPSILON` global variable.
-
-    The default value of ``0.00001`` is suitable for values
-    that are in the "countable range". You may need a larger
-    epsilon when using large absolute values, and a smaller value
-    for very small values close to zero. Otherwise approximate
-    comparison operations will not behave as expected.
-    """
-    global EPSILON, EPSILON2
-    EPSILON = float(epsilon)
-    EPSILON2 = EPSILON ** 2
 
 
 class TransformNotInvertibleError(Exception):
@@ -89,7 +72,7 @@ else:  # pragma: no cover
     def assert_unorderable(a, b):
         """Assert that a and b are unorderable"""
         raise TypeError("unorderable types: %s and %s"
-            % (type(a).__name__, type(b).__name__))
+                        % (type(a).__name__, type(b).__name__))
 
 
 def cached_property(func):
@@ -111,9 +94,10 @@ def cached_property(func):
 
 
 def cos_sin_deg(deg):
-    """Return the cosine and sin for the given angle
-    in degrees, with special-case handling of multiples
-    of 90 for perfect right angles
+    """Return the cosine and sin for the given angle in degrees.
+
+    With special-case handling of multiples of 90 for perfect right
+    angles.
     """
     deg = deg % 360.0
     if deg == 90.0:
@@ -128,20 +112,22 @@ def cos_sin_deg(deg):
 
 class Affine(
         namedtuple('Affine', ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'))):
-    """Two dimensional affine transform for linear mapping from 2D coordinates
-    to other 2D coordinates. Parallel lines are preserved by these
-    transforms. Affine transforms can perform any combination of translations,
-    scales/flips, shears, and rotations.  Class methods are provided to
-    conveniently compose transforms from these operations.
+    """Two dimensional affine transform for 2D linear mapping.
 
-    Internally the transform is stored as a 3x3 transformation matrix.  The
-    transform may be constructed directly by specifying the first two rows of
-    matrix values as 6 floats. Since the matrix is an affine transform, the
-    last row is always ``(0, 0, 1)``.
+    Parallel lines are preserved by these transforms. Affine transforms
+    can perform any combination of translations, scales/flips, shears,
+    and rotations.  Class methods are provided to conveniently compose
+    transforms from these operations.
+
+    Internally the transform is stored as a 3x3 transformation matrix.
+    The transform may be constructed directly by specifying the first
+    two rows of matrix values as 6 floats. Since the matrix is an affine
+    transform, the last row is always ``(0, 0, 1)``.
 
     :param members: 6 floats for the first two matrix rows.
     :type members: float
     """
+    precision = EPSILON
 
     def __new__(self, *members):
         if len(members) == 6:
@@ -180,7 +166,8 @@ class Affine(
         :type yoff: float
         :rtype: Affine
         """
-        return tuple.__new__(cls,
+        return tuple.__new__(
+            cls,
             (1.0, 0.0, xoff,
              0.0, 1.0, yoff,
              0.0, 0.0, 1.0))
@@ -199,7 +186,8 @@ class Affine(
             sx = sy = float(scaling[0])
         else:
             sx, sy = scaling
-        return tuple.__new__(cls,
+        return tuple.__new__(
+            cls,
             (sx, 0.0, 0.0,
              0.0, sy, 0.0,
              0.0, 0.0, 1.0))
@@ -216,32 +204,38 @@ class Affine(
         """
         mx = math.tan(math.radians(x_angle))
         my = math.tan(math.radians(y_angle))
-        return tuple.__new__(cls,
+        return tuple.__new__(
+            cls,
             (1.0, mx, 0.0,
              my, 1.0, 0.0,
              0.0, 0.0, 1.0))
 
     @classmethod
     def rotation(cls, angle, pivot=None):
-        """Create a rotation transform at the specified angle,
-        optionally about the specified pivot point.
+        """Create a rotation transform at the specified angle.
 
-        :param angle: Rotation angle in degrees
+        A pivot point other than the coordinate system origin may be
+        optionally specified.
+
+        :param angle: Rotation angle in degrees, counter-clockwise
+            about the pivot point.
         :type angle: float
-        :param pivot: Point to rotate about, if omitted the
-            rotation is about the origin.
+        :param pivot: Point to rotate about, if omitted the rotation is
+            about the origin.
         :type pivot: sequence
         :rtype: Affine
         """
         ca, sa = cos_sin_deg(angle)
         if pivot is None:
-            return tuple.__new__(cls,
+            return tuple.__new__(
+                cls,
                 (ca, -sa, 0.0,
                  sa, ca, 0.0,
                  0.0, 0.0, 1.0))
         else:
             px, py = pivot
-            return tuple.__new__(cls,
+            return tuple.__new__(
+                cls,
                 (ca, -sa, px - px * ca + py * sa,
                  sa, ca, py - px * sa - py * ca,
                  0.0, 0.0, 1.0))
@@ -276,57 +270,64 @@ class Affine(
 
     @cached_property
     def determinant(self):
-        """The determinant of the transform matrix. This value
-        is equal to the area scaling factor when the transform
-        is applied to a shape.
+        """The determinant of the transform matrix.
+
+        This value is equal to the area scaling factor when the
+        transform is applied to a shape.
         """
         a, b, c, d, e, f, g, h, i = self
         return a * e - b * d
 
-    @cached_property
+    @property
     def is_identity(self):
         """True if this transform equals the identity matrix,
         within rounding limits.
         """
-        return self is identity or self.almost_equals(identity)
+        return self is identity or self.almost_equals(identity, self.precision)
 
-    @cached_property
+    @property
     def is_rectilinear(self):
-        """True if the transform is rectilinear, i.e., whether a shape would
-        remain axis-aligned, within rounding limits, after applying the
-        transform.
+        """True if the transform is rectilinear.
+
+        i.e., whether a shape would remain axis-aligned, within rounding
+        limits, after applying the transform.
         """
         a, b, c, d, e, f, g, h, i = self
-        return ((abs(a) < EPSILON and abs(e) < EPSILON)
-            or (abs(d) < EPSILON and abs(b) < EPSILON))
+        return ((abs(a) < self.precision and abs(e) < self.precision)
+                or (abs(d) < self.precision and abs(b) < self.precision))
 
-    @cached_property
+    @property
     def is_conformal(self):
-        """True if the transform is conformal, i.e., if angles between points
-        are preserved after applying the transform, within rounding limits.
-        This implies that the transform has no effective shear.
+        """True if the transform is conformal.
+
+        i.e., if angles between points are preserved after applying the
+        transform, within rounding limits.  This implies that the
+        transform has no effective shear.
         """
         a, b, c, d, e, f, g, h, i = self
-        return abs(a * b + d * e) < EPSILON
+        return abs(a * b + d * e) < self.precision
 
-    @cached_property
+    @property
     def is_orthonormal(self):
-        """True if the transform is orthonormal, which means that the
-        transform represents a rigid motion, which has no effective scaling or
-        shear. Mathematically, this means that the axis vectors of the
-        transform matrix are perpendicular and unit-length.  Applying an
-        orthonormal transform to a shape always results in a congruent shape.
+        """True if the transform is orthonormal.
+
+        Which means that the transform represents a rigid motion, which
+        has no effective scaling or shear. Mathematically, this means
+        that the axis vectors of the transform matrix are perpendicular
+        and unit-length.  Applying an orthonormal transform to a shape
+        always results in a congruent shape.
         """
         a, b, c, d, e, f, g, h, i = self
         return (self.is_conformal
-            and abs(1.0 - (a * a + d * d)) < EPSILON
-            and abs(1.0 - (b * b + e * e)) < EPSILON)
+                and abs(1.0 - (a * a + d * d)) < self.precision
+                and abs(1.0 - (b * b + e * e)) < self.precision)
 
     @cached_property
     def is_degenerate(self):
-        """True if this transform is degenerate, which means that it will
-        collapse a shape to an effective area of zero. Degenerate transforms
-        cannot be inverted.
+        """True if this transform is degenerate.
+
+        Which means that it will collapse a shape to an effective area
+        of zero. Degenerate transforms cannot be inverted.
         """
         return self.determinant == 0.0
 
@@ -336,16 +337,16 @@ class Affine(
         a, b, c, d, e, f, _, _, _ = self
         return (a, d), (b, e), (c, f)
 
-    def almost_equals(self, other):
+    def almost_equals(self, other, precision=EPSILON):
         """Compare transforms for approximate equality.
 
         :param other: Transform being compared.
         :type other: Affine
         :return: True if absolute difference between each element
-            of each respective transform matrix < ``EPSILON``.
+            of each respective transform matrix < ``self.precision``.
         """
         for i in (0, 1, 2, 3, 4, 5):
-            if abs(self[i] - other[i]) >= EPSILON:
+            if abs(self[i] - other[i]) >= precision:
                 return False
         return True
 
@@ -376,7 +377,8 @@ class Affine(
         sa, sb, sc, sd, se, sf, _, _, _ = self
         if isinstance(other, Affine):
             oa, ob, oc, od, oe, of, _, _, _ = other
-            return tuple.__new__(Affine,
+            return tuple.__new__(
+                Affine,
                 (sa * oa + sb * od, sa * ob + sb * oe, sa * oc + sb * of + sc,
                  sd * oa + se * od, sd * ob + se * oe, sd * oc + se * of + sf,
                  0.0, 0.0, 1.0))
@@ -386,13 +388,6 @@ class Affine(
             except Exception:
                 return NotImplemented
             return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
-
-    def __rmul__(self, other):
-        # We should not be called if other is an affine instance
-        # This is just a guarantee, since we would potentially
-        # return the wrong answer in that case
-        assert not isinstance(other, Affine)
-        return self.__mul__(other)
 
     def __imul__(self, other):
         if isinstance(other, Affine) or isinstance(other, tuple):
@@ -427,7 +422,8 @@ class Affine(
         rb = -sb * idet
         rd = -sd * idet
         re = sa * idet
-        return tuple.__new__(Affine,
+        return tuple.__new__(
+            Affine,
             (ra, rb, -sc * ra - sf * rb,
              rd, re, -sc * rd - sf * re,
              0.0, 0.0, 1.0))

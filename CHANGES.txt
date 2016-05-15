@@ -1,6 +1,18 @@
 CHANGES
 =======
 
+2.0.0 (?)
+---------
+- Breaking change: precision used in properties like ``is_conformal`` is no
+  longer a global module attribute, but an Affine class or instance attribute
+  (#19, #20).
+- Breaking change: ``is_degenerate`` property is now exact and not subject to
+  a level of precision (#23).
+- Breaking change: we have reversed our sense of rotation, a positive angle
+  now rotates a point counter-clockwise about the pivot point (#25).
+- Bug fix: a bug in matrix-vector multiplication had been reversing the
+  direction of rotation and is now fixed (#25).
+
 1.3.0 (2016-04-08)
 ------------------
 - is_degenerate predicate is precise, not approximate (#22).
