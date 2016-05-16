@@ -47,7 +47,7 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "2.0b1"
+__version__ = "2.0b2"
 
 EPSILON = 1e-5
 
@@ -123,6 +123,13 @@ class Affine(
     The transform may be constructed directly by specifying the first
     two rows of matrix values as 6 floats. Since the matrix is an affine
     transform, the last row is always ``(0, 0, 1)``.
+
+    N.B.: multiplication of a transform and an (x, y) vector *always*
+    returns the column vector that is the matrix multiplication product
+    of the transform and (x, y) as a column vector, no matter which is
+    on the left or right side. This is obviously not the case for 
+    matrices and vectors in general, but provides a convenience for
+    users of this class.
 
     :param members: 6 floats for the first two matrix rows.
     :type members: float
@@ -388,6 +395,13 @@ class Affine(
             except Exception:
                 return NotImplemented
             return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
+
+    def __rmul__(self, other):
+        # We should not be called if other is an affine instance
+        # This is just a guarantee, since we would potentially
+        # return the wrong answer in that case.
+        assert not isinstance(other, Affine)
+        return self.__mul__(other)
 
     def __imul__(self, other):
         if isinstance(other, Affine) or isinstance(other, tuple):

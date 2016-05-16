@@ -158,8 +158,8 @@ class PyAffineTestCase(unittest.TestCase):
         seq_almost_equal(
             tuple(shear),
             (1, mx, 0,
-             my,  1, 0,
-             0,  0, 1))
+             my, 1, 0,
+             0, 0, 1))
         shear = Affine.shear(y_angle=45)
         seq_almost_equal(
             tuple(shear),
@@ -200,24 +200,24 @@ class PyAffineTestCase(unittest.TestCase):
              0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(180)),
-            (-1,  0, 0,
+            (-1, 0, 0,
              0, -1, 0,
-             0,  0, 1))
+             0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(-180)),
-            (-1,  0, 0,
+            (-1, 0, 0,
              0, -1, 0,
-             0,  0, 1))
+             0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(270)),
             (0, 1, 0,
-             -1,  0, 0,
-             0,  0, 1))
+             -1, 0, 0,
+             0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(-90)),
             (0, 1, 0,
-             -1,  0, 0,
-             0,  0, 1))
+             -1, 0, 0,
+             0, 0, 1))
         assert_equal(
             tuple(Affine.rotation(360)),
             (1, 0, 0,
@@ -231,12 +231,12 @@ class PyAffineTestCase(unittest.TestCase):
         assert_equal(
             tuple(Affine.rotation(-450)),
             (0, 1, 0,
-             -1,  0, 0,
-             0,  0, 1))
+             -1, 0, 0,
+             0, 0, 1))
 
     def test_rotation_constructor_with_pivot(self):
         assert_equal(tuple(Affine.rotation(60)),
-            tuple(Affine.rotation(60, pivot=(0, 0))))
+                     tuple(Affine.rotation(60, pivot=(0, 0))))
         rot = Affine.rotation(27, pivot=(2, -4))
         r = math.radians(27)
         s, c = math.sin(r), math.cos(r)
@@ -407,7 +407,7 @@ class PyAffineTestCase(unittest.TestCase):
         seq_almost_equal(
             ~Affine.rotation(-33.3), Affine.rotation(33.3))
         t = Affine(1, 2, 3, 4, 5, 6)
-        seq_almost_equal(~t * t,  Affine.identity())
+        seq_almost_equal(~t * t, Affine.identity())
 
     def test_cant_invert_degenerate(self):
         from affine import TransformNotInvertibleError
@@ -472,7 +472,7 @@ def test_gdal():
     assert t.to_gdal() == (-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
 
 
-def test_imult_number():
+def test_imul_number():
     t = Affine(1, 2, 3, 4, 5, 6)
     try:
         t *= 2.0
@@ -480,9 +480,14 @@ def test_imult_number():
         assert True
 
 
-def test_mult_tuple():
+def test_mul_tuple():
     t = Affine(1, 2, 3, 4, 5, 6)
-    result = t * (2.0, 2.0)
+    t * (2.0, 2.0)
+
+
+def test_rmul_tuple():
+    t = Affine(1, 2, 3, 4, 5, 6)
+    (2.0, 2.0) * t
 
 
 def test_transform_precision():
