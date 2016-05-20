@@ -1,9 +1,11 @@
 CHANGES
 =======
 
-2.0.0 (2016-05-20)
-------------------
-- Final release.
+2.0.0.post1 (2016-05-20)
+------------------------
+- This is the final 2.0.0 release. The post-release version segment is used
+  because we accidentally uploaded a 2.0.0 to PyPI before the beta releases
+  below.
 
 2.0b2 (2016-05-16)
 ------------------
