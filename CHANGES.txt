@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+2.0.0 (2016-05-20)
+------------------
+- Final release.
+
 2.0b2 (2016-05-16)
 ------------------
 - Bug fix: restore ``Affine __rmul__`` even though it permits dubious 

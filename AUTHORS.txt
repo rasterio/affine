@@ -1,8 +1,8 @@
 Authors
 =======
 
-- Sean Gillies <sean.gillies@gmail.com>
-- Sean Gillies <sean@mapbox.com> (same as ^^)
+- Sean Gillies <sean@mapbox.com>
 - Steven Ring <smr@southsky.com.au>
 - Mike Toews <mwtoews@gmail.com>
 - Kevin Wurster <wursterk@gmail.com>
+- Todd Small <todd_small@icloud.com>
