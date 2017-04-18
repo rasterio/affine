@@ -1,0 +1,5 @@
+affine (1.0.0-0~trusty1) trusty; urgency=low
+
+  * Initial Debian packaging.
+
+ -- Angelos Tzotsos <gcpp.kalxas@gmail.com>  Sat, 02 Aug 2014 17:23:00 +0200
