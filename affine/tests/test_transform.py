@@ -568,6 +568,15 @@ def test_eccentricity_improper():
     assert_equal(Affine.scale(-1, 1).eccentricity, -0.0)
 
 
+def test_rotation_angle():
+    assert_equal(Affine.identity().rotation_angle, 0.0)
+    assert_equal(Affine.scale(2).rotation_angle, 0.0)
+    assert_equal(Affine.scale(2, 1).rotation_angle, 0.0)
+    assert_almost_equal(Affine.translation(32, -47).rotation_angle, 0.0)
+    assert_almost_equal(Affine.rotation(30).rotation_angle, 30 * math.pi / 180)
+    assert_almost_equal(Affine.rotation(-150).rotation_angle, -150 * math.pi / 180)
+
+
 if __name__ == '__main__':
     unittest.main()
 

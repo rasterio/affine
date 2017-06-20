@@ -302,7 +302,7 @@ class Affine(
         Raises NotImplementedError for improper transformations.
         """
         if self.is_proper or self.is_degenerate:
-            U, s, V = self._decompose()
+            U, s, _ = self._decompose()
             sx, sy = np.diag(U @ np.diag(s) @ U.T)
             return sx, sy
         else:
@@ -317,6 +317,21 @@ class Affine(
         """
         sx, sy = self.scaling
         return math.sqrt(abs(sx ** 2 - sy ** 2)) / max(sx, sy)
+
+    @property
+    def rotation_angle(self):
+        """The rotation angle of the affine transformation.
+
+        XXX
+
+        Raises NotImplementedError for improper transformations.
+        """
+        if self.is_proper or self.is_degenerate:
+            U, _, V = self._decompose()
+            y, x = (U @ V)[-1]
+            return np.arctan2(y, x)
+        else:
+            raise NotImplementedError
 
     @property
     def is_identity(self):
