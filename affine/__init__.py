@@ -285,6 +285,25 @@ class Affine(
         a, b, c, d, e, f, g, h, i = self
         return a * e - b * d
 
+    @cached_property
+    def scaling(self):
+        """The scaling factors of the transformation.
+
+        XXX
+        """
+        a, b, c, d, e, f, g, h, i = self
+        return a, e
+
+    @cached_property
+    def eccentricity(self):
+        """The eccentricity of the affine transformation.
+
+        This value represents the eccentricity of an ellipse under
+        this affine transformation.
+        """
+        sx, sy = self.scaling
+        return math.sqrt(abs(sx ** 2 - sy ** 2)) / max(sx, sy)
+
     @property
     def is_identity(self):
         """True if this transform equals the identity matrix,
