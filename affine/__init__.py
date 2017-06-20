@@ -44,6 +44,9 @@ from __future__ import division
 from collections import namedtuple
 import math
 
+import numpy as np
+from numpy.linalg import svd
+
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
@@ -275,6 +278,10 @@ class Affine(
         """Alias for 'f'"""
         return self.f
 
+    def _decompose(self):
+        a, b, c, d, e, f, g, h, i = self
+        return svd(np.array([[a, b], [d, e]]))
+
     @cached_property
     def determinant(self):
         """The determinant of the transform matrix.
@@ -285,17 +292,23 @@ class Affine(
         a, b, c, d, e, f, g, h, i = self
         return a * e - b * d
 
-    @cached_property
+    @property
     def scaling(self):
         """The scaling factors of the transformation.
 
         This tuple represents the scaling factors of the
         transformation.
-        """
-        a, b, c, d, e, f, g, h, i = self
-        return a, e
 
-    @cached_property
+        Raises NotImplementedError for improper transformations.
+        """
+        if self.is_proper or self.is_degenerate:
+            U, s, V = self._decompose()
+            sx, sy = np.diag(U @ np.diag(s) @ U.T)
+            return sx, sy
+        else:
+            raise NotImplementedError
+
+    @property
     def eccentricity(self):
         """The eccentricity of the affine transformation.
 
@@ -357,6 +370,14 @@ class Affine(
         of zero. Degenerate transforms cannot be inverted.
         """
         return self.determinant == 0.0
+
+    @cached_property
+    def is_proper(self):
+        """True if this transform is proper.
+
+        Which means that it does not include reflection.
+        """
+        return self.determinant > 0.0
 
     @property
     def column_vectors(self):

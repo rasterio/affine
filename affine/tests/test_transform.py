@@ -523,10 +523,18 @@ def test_scaling():
     assert_equal(Affine.scale(0).scaling, (0, 0))
     assert_equal(Affine.scale(5, 1).scaling, (5, 1))
     assert_equal(Affine.scale(1, 3).scaling, (1, 3))
+
+    assert_almost_equal(Affine.translation(32, -47).scaling[0], 1)
+    assert_almost_equal(Affine.translation(32, -47).scaling[1], 1)
+
+    assert_almost_equal(Affine.rotation(77).scaling[0], 1)
+    assert_almost_equal(Affine.rotation(77).scaling[1], 1)
+
+
+@raises(NotImplementedError)
+def test_scaling_improper():
     assert_equal(Affine.scale(-1, 1).scaling, (-1, 1))
     assert_equal(Affine.scale(-1, 0).scaling, (-1, 0))
-    assert_equal(Affine.translation(32, -47).scaling, (1, 1))
-    assert_equal(Affine.rotation(77).scaling, (1, 1))
 
 
 def test_eccentricity():
@@ -536,9 +544,13 @@ def test_eccentricity():
     assert_almost_equal(Affine.scale(2, 1).eccentricity, math.sqrt(3) / 2)
     assert_almost_equal(Affine.scale(2, 3).eccentricity, math.sqrt(5) / 3)
     assert_equal(Affine.scale(1, 0).eccentricity, 1.0)
-    assert_equal(Affine.scale(-1, 1).eccentricity, -0.0)
     assert_almost_equal(Affine.rotation(77).eccentricity, 0.0)
     assert_almost_equal(Affine.translation(32, -47).eccentricity, 0.0)
+
+
+@raises(NotImplementedError)
+def test_eccentricity_improper():
+    assert_equal(Affine.scale(-1, 1).eccentricity, -0.0)
 
 
 if __name__ == '__main__':
