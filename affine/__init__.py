@@ -289,7 +289,8 @@ class Affine(
     def scaling(self):
         """The scaling factors of the transformation.
 
-        XXX
+        This tuple represents the scaling factors of the
+        transformation.
         """
         a, b, c, d, e, f, g, h, i = self
         return a, e
