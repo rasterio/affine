@@ -517,6 +517,18 @@ def test_roundtrip():
     seq_almost_equal(point, roundtrip_point)
 
 
+def test_eccentricity():
+    assert_equal(Affine.identity().eccentricity, 0.0)
+    assert_equal(Affine.scale(2).eccentricity, 0.0)
+    #assert_equal(Affine.scale(0).eccentricity, ?)
+    assert_almost_equal(Affine.scale(2, 1).eccentricity, math.sqrt(3) / 2)
+    assert_almost_equal(Affine.scale(2, 3).eccentricity, math.sqrt(5) / 3)
+    assert_equal(Affine.scale(1, 0).eccentricity, 1.0)
+    assert_equal(Affine.scale(-1, 1).eccentricity, -0.0)
+    assert_almost_equal(Affine.rotation(77).eccentricity, 0.0)
+    assert_almost_equal(Affine.translation(32, -47).eccentricity, 0.0)
+
+
 if __name__ == '__main__':
     unittest.main()
 
