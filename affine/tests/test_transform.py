@@ -548,6 +548,21 @@ def test_eccentricity():
     assert_almost_equal(Affine.translation(32, -47).eccentricity, 0.0)
 
 
+def test_eccentricity_complex():
+    assert_almost_equal(
+        (Affine.scale(2, 3) * Affine.rotation(77)).eccentricity,
+        math.sqrt(5) / 3
+    )
+    assert_almost_equal(
+        (Affine.rotation(77) * Affine.scale(2, 3)).eccentricity,
+        math.sqrt(5) / 3
+    )
+    assert_almost_equal(
+        (Affine.translation(32, -47) * Affine.rotation(77) * Affine.scale(2, 3)).eccentricity,
+        math.sqrt(5) / 3
+    )
+
+
 @raises(NotImplementedError)
 def test_eccentricity_improper():
     assert_equal(Affine.scale(-1, 1).eccentricity, -0.0)
