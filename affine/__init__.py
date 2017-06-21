@@ -139,10 +139,10 @@ class Affine(
     """
     precision = EPSILON
 
-    def __new__(self, *members):
+    def __new__(cls, *members):
         if len(members) == 6:
             mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
-            return tuple.__new__(Affine, mat3x3)
+            return tuple.__new__(cls, mat3x3)
         else:
             raise TypeError(
                 "Expected 6 coefficients, found %d" % len(members))
@@ -441,7 +441,7 @@ class Affine(
         if isinstance(other, Affine):
             oa, ob, oc, od, oe, of, _, _, _ = other
             return tuple.__new__(
-                Affine,
+                self.__class__,
                 (sa * oa + sb * od, sa * ob + sb * oe, sa * oc + sb * of + sc,
                  sd * oa + se * od, sd * ob + se * oe, sd * oc + se * of + sf,
                  0.0, 0.0, 1.0))
@@ -493,7 +493,7 @@ class Affine(
         rd = -sd * idet
         re = sa * idet
         return tuple.__new__(
-            Affine,
+            self.__class__,
             (ra, rb, -sc * ra - sf * rb,
              rd, re, -sc * rd - sf * re,
              0.0, 0.0, 1.0))
