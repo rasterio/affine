@@ -545,7 +545,7 @@ def test_eccentricity_complex():
 
 @raises(NotImplementedError)
 def test_eccentricity_improper():
-    assert_equal(Affine.scale(-1, 1).eccentricity, -0.0)
+    Affine.scale(-1, 1).eccentricity
 
 
 def test_rotation_angle():
@@ -555,6 +555,11 @@ def test_rotation_angle():
     assert_almost_equal(Affine.translation(32, -47).rotation_angle, 0.0)
     assert_almost_equal(Affine.rotation(30).rotation_angle, 30 * math.pi / 180)
     assert_almost_equal(Affine.rotation(-150).rotation_angle, -150 * math.pi / 180)
+
+
+@raises(NotImplementedError)
+def test_rotation_improper():
+    Affine.scale(-1, 1).rotation_angle
 
 
 if __name__ == '__main__':
