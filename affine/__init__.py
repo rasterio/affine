@@ -290,13 +290,15 @@ class Affine(
         """The absolute scaling factors of the transformation.
 
         This tuple represents the absolute value of the scaling factors of the
-        transformation.
-
-        Raises NotImplementedError for improper transformations.
+        transformation, sorted from bigger to smaller.
         """
-        a, b, _, c, d, _, _, _, _ = self
-        trace = a**2 + b**2 + c**2 + d**2
-        det = (a * d - b * c)**2
+        a, b, _, d, e, _, _, _, _ = self
+
+        # The singular values are the square root of the eigenvalues
+        # of the matrix times its transpose, M M*
+        # Computing trace and determinant of M M*
+        trace = a**2 + b**2 + d**2 + e**2
+        det = (a * e - b * d)**2
 
         delta = trace**2 / 4 - det
         if delta < 1e-12:
@@ -312,6 +314,8 @@ class Affine(
 
         This value represents the eccentricity of an ellipse under
         this affine transformation.
+
+        Raises NotImplementedError for improper transformations.
         """
         if self.is_proper or self.is_degenerate:
             l1, l2 = self._scaling
