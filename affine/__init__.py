@@ -293,20 +293,25 @@ class Affine(
         return a * e - b * d
 
     @property
-    def scaling(self):
-        """The scaling factors of the transformation.
+    def _scaling(self):
+        """The absolute scaling factors of the transformation.
 
-        This tuple represents the scaling factors of the
+        This tuple represents the absolute value of the scaling factors of the
         transformation.
 
         Raises NotImplementedError for improper transformations.
         """
-        if self.is_proper or self.is_degenerate:
-            U, s, _ = self._decompose()
-            sx, sy = np.diag(U @ np.diag(s) @ U.T)
-            return sx, sy
-        else:
-            raise NotImplementedError
+        a, b, _, c, d, _, _, _, _ = self
+        trace = a**2 + b**2 + c**2 + d**2
+        det = (a * d - b * c)**2
+
+        delta = trace**2 / 4 - det
+        if delta < 1e-12:
+            delta = 0
+
+        l1 = math.sqrt(trace / 2 + math.sqrt(delta))
+        l2 = math.sqrt(trace / 2 - math.sqrt(delta))
+        return l1, l2
 
     @property
     def eccentricity(self):
@@ -315,8 +320,11 @@ class Affine(
         This value represents the eccentricity of an ellipse under
         this affine transformation.
         """
-        sx, sy = self.scaling
-        return math.sqrt(abs(sx ** 2 - sy ** 2)) / max(sx, sy)
+        if self.is_proper or self.is_degenerate:
+            l1, l2 = self._scaling
+            return math.sqrt(l1 ** 2 - l2 ** 2) / l1
+        else:
+            raise NotImplementedError
 
     @property
     def rotation_angle(self):
