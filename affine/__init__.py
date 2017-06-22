@@ -325,10 +325,11 @@ class Affine(
 
     @property
     def rotation_angle(self):
-        """The rotation angle of the affine transformation.
+        """The rotation angle in degrees of the affine transformation.
 
-        This is the rotation angle of the affine transformation, assuming
-        it is in the form M = R S, where R is a rotation and S is a scaling.
+        This is the rotation angle in degrees of the affine transformation,
+        assuming it is in the form M = R S, where R is a rotation and S is a
+        scaling.
 
         Raises NotImplementedError for improper transformations.
         """
@@ -336,7 +337,7 @@ class Affine(
         if self.is_proper or self.is_degenerate:
             l1, _ = self._scaling
             y, x = c / l1, a / l1
-            return math.atan2(y, x)
+            return math.atan2(y, x) * 180 / math.pi
         else:
             raise NotImplementedError
 
