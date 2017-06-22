@@ -44,9 +44,6 @@ from __future__ import division
 from collections import namedtuple
 import math
 
-import numpy as np
-from numpy.linalg import svd
-
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
@@ -278,10 +275,6 @@ class Affine(
         """Alias for 'f'"""
         return self.f
 
-    def _decompose(self):
-        a, b, c, d, e, f, g, h, i = self
-        return svd(np.array([[a, b], [d, e]]))
-
     @cached_property
     def determinant(self):
         """The determinant of the transform matrix.
@@ -330,14 +323,16 @@ class Affine(
     def rotation_angle(self):
         """The rotation angle of the affine transformation.
 
-        XXX
+        This is the rotation angle of the affine transformation, assuming
+        it is in the form M = R S, where R is a rotation and S is a scaling.
 
         Raises NotImplementedError for improper transformations.
         """
+        a, b, _, c, d, _, _, _, _ = self
         if self.is_proper or self.is_degenerate:
-            U, _, V = self._decompose()
-            y, x = (U @ V)[-1]
-            return np.arctan2(y, x)
+            l1, _ = self._scaling
+            y, x = c / l1, a / l1
+            return math.atan2(y, x)
         else:
             raise NotImplementedError
 
