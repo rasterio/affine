@@ -47,13 +47,22 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "2.0.0.post1"
+__version__ = "2.1.dev0"
 
 EPSILON = 1e-5
 
 
-class TransformNotInvertibleError(Exception):
+class AffineError(Exception):
+    pass
+
+
+class TransformNotInvertibleError(AffineError):
     """The transform could not be inverted"""
+
+
+class UndefinedRotationError(AffineError):
+    """The rotation angle could not be computed for this transform"""
+
 
 # Define assert_unorderable() depending on the language
 # implicit ordering rules. This keeps things consistent
@@ -136,10 +145,10 @@ class Affine(
     """
     precision = EPSILON
 
-    def __new__(self, *members):
+    def __new__(cls, *members):
         if len(members) == 6:
             mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
-            return tuple.__new__(Affine, mat3x3)
+            return tuple.__new__(cls, mat3x3)
         else:
             raise TypeError(
                 "Expected 6 coefficients, found %d" % len(members))
@@ -286,6 +295,59 @@ class Affine(
         return a * e - b * d
 
     @property
+    def _scaling(self):
+        """The absolute scaling factors of the transformation.
+
+        This tuple represents the absolute value of the scaling factors of the
+        transformation, sorted from bigger to smaller.
+        """
+        a, b, _, d, e, _, _, _, _ = self
+
+        # The singular values are the square root of the eigenvalues
+        # of the matrix times its transpose, M M*
+        # Computing trace and determinant of M M*
+        trace = a**2 + b**2 + d**2 + e**2
+        det = (a * e - b * d)**2
+
+        delta = trace**2 / 4 - det
+        if delta < 1e-12:
+            delta = 0
+
+        l1 = math.sqrt(trace / 2 + math.sqrt(delta))
+        l2 = math.sqrt(trace / 2 - math.sqrt(delta))
+        return l1, l2
+
+    @property
+    def eccentricity(self):
+        """The eccentricity of the affine transformation.
+
+        This value represents the eccentricity of an ellipse under
+        this affine transformation.
+
+        Raises NotImplementedError for improper transformations.
+        """
+        l1, l2 = self._scaling
+        return math.sqrt(l1 ** 2 - l2 ** 2) / l1
+
+    @property
+    def rotation_angle(self):
+        """The rotation angle in degrees of the affine transformation.
+
+        This is the rotation angle in degrees of the affine transformation,
+        assuming it is in the form M = R S, where R is a rotation and S is a
+        scaling.
+
+        Raises NotImplementedError for improper transformations.
+        """
+        a, b, _, c, d, _, _, _, _ = self
+        if self.is_proper or self.is_degenerate:
+            l1, _ = self._scaling
+            y, x = c / l1, a / l1
+            return math.atan2(y, x) * 180 / math.pi
+        else:
+            raise UndefinedRotationError
+
+    @property
     def is_identity(self):
         """True if this transform equals the identity matrix,
         within rounding limits.
@@ -338,6 +400,14 @@ class Affine(
         """
         return self.determinant == 0.0
 
+    @cached_property
+    def is_proper(self):
+        """True if this transform is proper.
+
+        Which means that it does not include reflection.
+        """
+        return self.determinant > 0.0
+
     @property
     def column_vectors(self):
         """The values of the transform as three 2D column vectors"""
@@ -385,7 +455,7 @@ class Affine(
         if isinstance(other, Affine):
             oa, ob, oc, od, oe, of, _, _, _ = other
             return tuple.__new__(
-                Affine,
+                self.__class__,
                 (sa * oa + sb * od, sa * ob + sb * oe, sa * oc + sb * of + sc,
                  sd * oa + se * od, sd * ob + se * oe, sd * oc + se * of + sf,
                  0.0, 0.0, 1.0))
@@ -437,7 +507,7 @@ class Affine(
         rd = -sd * idet
         re = sa * idet
         return tuple.__new__(
-            Affine,
+            self.__class__,
             (ra, rb, -sc * ra - sf * rb,
              rd, re, -sc * rd - sf * re,
              0.0, 0.0, 1.0))
