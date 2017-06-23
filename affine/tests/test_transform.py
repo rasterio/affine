@@ -35,7 +35,7 @@ import unittest
 from textwrap import dedent
 from nose.tools import assert_equal, assert_almost_equal, raises
 
-from affine import Affine, EPSILON
+from affine import Affine, EPSILON, UndefinedRotationError
 
 
 def seq_almost_equal(t1, t2, error=0.00001):
@@ -526,6 +526,7 @@ def test_eccentricity():
     assert_equal(Affine.scale(1, 0).eccentricity, 1.0)
     assert_almost_equal(Affine.rotation(77).eccentricity, 0.0)
     assert_almost_equal(Affine.translation(32, -47).eccentricity, 0.0)
+    assert_almost_equal(Affine.scale(-1, 1).eccentricity, 0.0)
 
 
 def test_eccentricity_complex():
@@ -543,11 +544,6 @@ def test_eccentricity_complex():
     )
 
 
-@raises(NotImplementedError)
-def test_eccentricity_improper():
-    Affine.scale(-1, 1).eccentricity
-
-
 def test_rotation_angle():
     assert_equal(Affine.identity().rotation_angle, 0.0)
     assert_equal(Affine.scale(2).rotation_angle, 0.0)
@@ -557,7 +553,7 @@ def test_rotation_angle():
     assert_almost_equal(Affine.rotation(-150).rotation_angle, -150)
 
 
-@raises(NotImplementedError)
+@raises(UndefinedRotationError)
 def test_rotation_improper():
     Affine.scale(-1, 1).rotation_angle
 

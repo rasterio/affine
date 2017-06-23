@@ -52,8 +52,17 @@ __version__ = "2.1.dev0"
 EPSILON = 1e-5
 
 
-class TransformNotInvertibleError(Exception):
+class AffineError(Exception):
+    pass
+
+
+class TransformNotInvertibleError(AffineError):
     """The transform could not be inverted"""
+
+
+class UndefinedRotationError(AffineError):
+    """The rotation angle could not be computed for this transform"""
+
 
 # Define assert_unorderable() depending on the language
 # implicit ordering rules. This keeps things consistent
@@ -317,11 +326,8 @@ class Affine(
 
         Raises NotImplementedError for improper transformations.
         """
-        if self.is_proper or self.is_degenerate:
-            l1, l2 = self._scaling
-            return math.sqrt(l1 ** 2 - l2 ** 2) / l1
-        else:
-            raise NotImplementedError
+        l1, l2 = self._scaling
+        return math.sqrt(l1 ** 2 - l2 ** 2) / l1
 
     @property
     def rotation_angle(self):
@@ -339,7 +345,7 @@ class Affine(
             y, x = c / l1, a / l1
             return math.atan2(y, x) * 180 / math.pi
         else:
-            raise NotImplementedError
+            raise UndefinedRotationError
 
     @property
     def is_identity(self):
