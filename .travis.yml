@@ -1,11 +1,11 @@
 sudo: false
 language: python
 python:
-  - "2.6"
   - "2.7"
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 install:
   - "pip install pytest pytest-cov nose"
   - "pip install coveralls"
@@ -20,5 +20,3 @@ deploy:
   provider: pypi
   distributions: "sdist bdist_wheel"
   user: seang
-  password:
-    secure: "FlfcoO8a26yNTtxJ9BmzLHCM18r0sDSJvXWNQ2LN/j0qTgKK9XeD9huMeE3s/OptD6DlY36bNgxSW87rsIx/nboyn+eJQA5tvhMP48lhLDZ6rDkRT1jsizxDYskQf4V//nsOoycuV6nTKDnneITGR1tn4AqDRbiwHSKho4GuBaM="

@@ -47,7 +47,7 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "2.1.dev0"
+__version__ = "2.1.0"
 
 EPSILON = 1e-5
 
@@ -136,7 +136,7 @@ class Affine(
     N.B.: multiplication of a transform and an (x, y) vector *always*
     returns the column vector that is the matrix multiplication product
     of the transform and (x, y) as a column vector, no matter which is
-    on the left or right side. This is obviously not the case for 
+    on the left or right side. This is obviously not the case for
     matrices and vectors in general, but provides a convenience for
     users of this class.
 
