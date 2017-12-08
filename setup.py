@@ -1,22 +1,24 @@
-from codecs import open as codecs_open
-from setuptools import setup, find_packages
+import codecs
+import os
+
+from setuptools import find_packages, setup
 
 
 # Parse the version from the affine module.
-with open('affine/__init__.py') as f:
+with codecs.open(os.path.join('affine', '__init__.py')) as f:
     for line in f:
         if "__version__" in line:
             version = line.split("=")[1].strip()
             version = version.strip('"').strip("'")
             break
 
-with codecs_open('README.rst', encoding='utf-8') as f:
+with codecs.open('README.rst', encoding='utf-8') as f:
     readme = f.read()
 
 
 setup(name='affine',
       version=version,
-      description="Matrices describing affine transformation of the plane",
+      description="Matrices describing affine transformation of the plane.",
       long_description=readme,
       classifiers=[],
       keywords='affine transformation matrix',
