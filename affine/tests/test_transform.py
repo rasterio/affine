@@ -553,6 +553,3 @@ def test_rotation_improper():
 
 if __name__ == '__main__':
     unittest.main()
-
-
-# vim: ai ts=4 sts=4 et sw=4 tw=78
