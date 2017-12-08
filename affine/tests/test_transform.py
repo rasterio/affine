@@ -33,7 +33,7 @@ from __future__ import division
 import os
 import math
 import unittest
-from textwrap import dedent
+import textwrap
 
 import pytest
 
@@ -410,9 +410,9 @@ class PyAffineTestCase(unittest.TestCase):
         seq_almost_equal(~t * t, Affine.identity())
 
     def test_cant_invert_degenerate(self):
-        from affine import TransformNotInvertibleError
         t = Affine.scale(0)
-        self.assertRaises(TransformNotInvertibleError, lambda: ~t)
+        with pytest.raises(affine.TransformNotInvertibleError):
+            ~t
 
     def test_bad_type_world(self):
         """wrong type, i.e don't use readlines()"""
@@ -425,34 +425,32 @@ class PyAffineTestCase(unittest.TestCase):
             affine.loadsw('1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0')
 
     def test_simple_world(self):
-        from affine import loadsw, dumpsw
         s = '1.0\n0.0\n0.0\n-1.0\n100.5\n199.5\n'
-        a = loadsw(s)
-        self.assertEqual(
-            a,
+        a = affine.loadsw(s)
+        assert \
+            a == \
             Affine(
                 1.0, 0.0, 100.0,
-                0.0, -1., 200.0))
-        self.assertEqual(dumpsw(a), s)
+                0.0, -1., 200.0)
+        assert affine.dumpsw(a) == s
 
     def test_real_world(self):
-        from affine import loadsw, dumpsw
-        s = dedent('''\
+        s = textwrap.dedent('''\
                  39.9317755024
                  30.0907511581
                  30.0907511576
                 -39.9317755019
             2658137.2266720217
             5990821.7039887439''')  # no EOL
-        a1 = loadsw(s)
-        self.assertTrue(a1.almost_equals(
+        a1 = affine.loadsw(s)
+        assert a1.almost_equals(
             Affine(
                 39.931775502364644, 30.090751157602412, 2658102.2154086917,
-                30.090751157602412, -39.931775502364644, 5990826.624500916)))
-        a1out = dumpsw(a1)
-        self.assertTrue(isinstance(a1out, str))
-        a2 = loadsw(a1out)
-        self.assertTrue(a1.almost_equals(a2))
+                30.090751157602412, -39.931775502364644, 5990826.624500916))
+        a1out = affine.dumpsw(a1)
+        assert isinstance(a1out, str)
+        a2 = affine.loadsw(a1out)
+        assert a1.almost_equals(a2)
 
 
 # We're using pytest for tests added after 1.0 and don't need unittest
