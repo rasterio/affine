@@ -8,6 +8,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+venv/
 bin/
 build/
 develop-eggs/
@@ -40,6 +41,9 @@ coverage.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# PyCharm
+.idea/
 
 # Rope
 .ropeproject
