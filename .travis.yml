@@ -6,8 +6,8 @@ python:
 install:
   - pip install wheel
   - pip install .[test]
-script: 
-  - python -m pytest affine/tests --cov affine --cov-report term-missing
+script:
+  - pytest --cov affine --cov-report term-missing
 after_success:
   - pip install coveralls
   - coveralls
