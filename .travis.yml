@@ -7,9 +7,8 @@ python:
   - "3.5"
   - "3.6"
 install:
-  - "pip install pytest pytest-cov nose"
-  - "pip install coveralls"
-  - "pip install -e ."
+  - pip install wheel
+  - pip install .[test]
 script: 
   - python -m pytest affine/tests --cov affine --cov-report term-missing
 after_success:
