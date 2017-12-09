@@ -557,6 +557,3 @@ def dumpsw(obj):
     """
     center = obj * Affine.translation(0.5, 0.5)
     return '\n'.join(repr(getattr(center, x)) for x in list('adbecf')) + '\n'
-
-
-# vim: ai ts=4 sts=4 et sw=4 tw=78

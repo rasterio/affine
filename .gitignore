@@ -8,6 +8,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+venv/
 bin/
 build/
 develop-eggs/
@@ -31,7 +32,6 @@ htmlcov/
 .tox/
 .coverage
 .cache
-nosetests.xml
 coverage.xml
 
 # Translations
@@ -41,6 +41,9 @@ coverage.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# PyCharm
+.idea/
 
 # Rope
 .ropeproject

@@ -1,18 +1,16 @@
 sudo: false
 language: python
+cache: pip
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
+  - 2.7
+  - 3.6
 install:
-  - "pip install pytest pytest-cov nose"
-  - "pip install coveralls"
-  - "pip install -e ."
-script: 
-  - python -m pytest affine/tests --cov affine --cov-report term-missing
+  - pip install wheel --upgrade
+  - pip install .[test]
+script:
+  - pytest --cov affine --cov-report term-missing
 after_success:
+  - pip install coveralls
   - coveralls
 deploy:
   on:
