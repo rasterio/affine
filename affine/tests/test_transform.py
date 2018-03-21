@@ -120,6 +120,16 @@ class PyAffineTestCase(unittest.TestCase):
              0, 0, 1)
         assert ident.is_identity
 
+    def test_permutation_constructor(self):
+        perm = Affine.permutation()
+        assert isinstance(perm, Affine)
+        assert \
+            tuple(perm) == \
+            (0, 1, 0,
+             1, 0, 0,
+             0, 0, 1)
+        assert (perm*perm).is_identity        
+        
     def test_translation_constructor(self):
         trans = Affine.translation(2, -5)
         assert isinstance(trans, Affine)

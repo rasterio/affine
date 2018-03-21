@@ -255,7 +255,20 @@ class Affine(
                 (ca, -sa, px - px * ca + py * sa,
                  sa, ca, py - px * sa - py * ca,
                  0.0, 0.0, 1.0))
-
+                 
+    @classmethod
+    def permutation(cls, *scaling):
+        """Create the permutation transform. For 2x2 matrices, there is only one permutation matrix that is not the identity.
+        
+        :rtype: Affine
+        """
+        
+        return tuple.__new__(
+            cls,
+            (0.0, 1.0, 0.0,
+             1.0, 0.0, 0.0,
+             0.0, 0.0, 1.0))
+             
     def __str__(self):
         """Concise string representation."""
         return ("|% .2f,% .2f,% .2f|\n"
