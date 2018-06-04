@@ -5,12 +5,13 @@ python:
   - 2.7
   - 3.6
 install:
+  - pip install -r requirements
   - pip install wheel --upgrade
   - pip install .[test]
 script:
-  - pytest --cov affine --cov-report term-missing
+  - python -m pytest --cov affine --cov-report term-missing
+  - python -m pydocstyle affine
 after_success:
-  - pip install coveralls
   - coveralls
 deploy:
   on:

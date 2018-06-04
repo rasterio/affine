@@ -47,7 +47,7 @@ import math
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 
 EPSILON = 1e-5
 
@@ -255,20 +255,20 @@ class Affine(
                 (ca, -sa, px - px * ca + py * sa,
                  sa, ca, py - px * sa - py * ca,
                  0.0, 0.0, 1.0))
-                 
+
     @classmethod
     def permutation(cls, *scaling):
         """Create the permutation transform. For 2x2 matrices, there is only one permutation matrix that is not the identity.
-        
+
         :rtype: Affine
         """
-        
+
         return tuple.__new__(
             cls,
             (0.0, 1.0, 0.0,
              1.0, 0.0, 0.0,
              0.0, 0.0, 1.0))
-             
+
     def __str__(self):
         """Concise string representation."""
         return ("|% .2f,% .2f,% .2f|\n"
@@ -375,8 +375,8 @@ class Affine(
         limits, after applying the transform.
         """
         a, b, c, d, e, f, g, h, i = self
-        return ((abs(a) < self.precision and abs(e) < self.precision)
-                or (abs(d) < self.precision and abs(b) < self.precision))
+        return ((abs(a) < self.precision and abs(e) < self.precision) or
+                (abs(d) < self.precision and abs(b) < self.precision))
 
     @property
     def is_conformal(self):
@@ -400,9 +400,9 @@ class Affine(
         always results in a congruent shape.
         """
         a, b, c, d, e, f, g, h, i = self
-        return (self.is_conformal
-                and abs(1.0 - (a * a + d * d)) < self.precision
-                and abs(1.0 - (b * b + e * e)) < self.precision)
+        return (self.is_conformal and
+                abs(1.0 - (a * a + d * d)) < self.precision and
+                abs(1.0 - (b * b + e * e)) < self.precision)
 
     @cached_property
     def is_degenerate(self):
