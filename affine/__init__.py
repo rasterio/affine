@@ -146,6 +146,13 @@ class Affine(
     precision = EPSILON
 
     def __new__(cls, *members):
+        """Create a new object
+
+        Parameters
+        ----------
+        members : list of float
+            Affine matrix members a, b, c, d, e, f
+        """
         if len(members) == 6:
             mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
             return tuple.__new__(cls, mat3x3)
@@ -455,9 +462,11 @@ class Affine(
     __iadd__ = __add__
 
     def __mul__(self, other):
-        """Apply the transform using matrix multiplication, creating a
-        resulting object of the same type.  A transform may be applied to
-        another transform, a vector, vector array, or shape.
+        """Multiplication
+
+        Apply the transform using matrix multiplication, creating
+        a resulting object of the same type.  A transform may be applied
+        to another transform, a vector, vector array, or shape.
 
         :param other: The object to transform.
         :type other: Affine, :class:`~planar.Vec2`,
@@ -480,9 +489,14 @@ class Affine(
             return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
 
     def __rmul__(self, other):
-        # We should not be called if other is an affine instance
-        # This is just a guarantee, since we would potentially
-        # return the wrong answer in that case.
+        """Right hand multiplication
+
+        Notes
+        -----
+        We should not be called if other is an affine instance This is
+        just a guarantee, since we would potentially return the wrong
+        answer in that case.
+        """
         assert not isinstance(other, Affine)
         return self.__mul__(other)
 
@@ -528,10 +542,14 @@ class Affine(
     __hash__ = tuple.__hash__  # hash is not inherited in Py 3
 
     def __getnewargs__(self):
-        # Required for unpickling.
-        # Normal unpickling creates a situation where __new__ receives all 9
-        # elements rather than the 6 that are required for the constructor.
-        # This method ensures that only the 6 are provided.
+        """Pickle protocol support
+
+        Notes
+        -----
+        Normal unpickling creates a situation where __new__ receives all
+        9 elements rather than the 6 that are required for the
+        constructor.  This method ensures that only the 6 are provided.
+        """
         return self.a, self.b, self.c, self.d, self.e, self.f
 
 
