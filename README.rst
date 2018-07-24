@@ -44,8 +44,8 @@ Matrices can be created by passing the values ``a, b, c, d, e, f`` to the
   Affine(1.0, 0.9999999999999999, 0.0,
          0.9999999999999999, 1.0, 0.0)
   >>> Affine.rotation(45.0)     # decimal degrees
-  Affine(0.7071067811865476, 0.7071067811865475, 0.0,
-         -0.7071067811865475, 0.7071067811865476, 0.0)
+  Affine(0.7071067811865476, -0.7071067811865475, 0.0,
+         0.7071067811865475, 0.7071067811865476, 0.0)
 
 These matrices can be applied to ``(x, y)`` tuples to obtain transformed
 coordinates ``(x', y')``.
@@ -62,8 +62,8 @@ They may also be multiplied together to combine transformations.
 .. code-block:: pycon
 
   >>> Affine.translation(1.0, 5.0) * Affine.rotation(45.0)
-  Affine(0.7071067811865476, 0.7071067811865475, 1.0,
-         -0.7071067811865475, 0.7071067811865476, 5.0)
+  Affine(0.7071067811865476, -0.7071067811865475, 1.0,
+         0.7071067811865475, 0.7071067811865476, 5.0)
 
 Usage with GIS data packages
 ----------------------------
