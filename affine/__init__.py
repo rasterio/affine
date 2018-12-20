@@ -516,7 +516,7 @@ class Affine(
         if self is not identity and self != identity:
             sa, sb, sc, sd, se, sf, _, _, _ = self
             for i, (x, y) in enumerate(seq):
-                seq[i] = (x * sa + y * sd + sc, x * sb + y * se + sf)
+                seq[i] = (x * sa + y * sb + sc, x * sd + y * se + sf)
 
     def __invert__(self):
         """Return the inverse transform.

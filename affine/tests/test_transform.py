@@ -388,6 +388,13 @@ class PyAffineTestCase(unittest.TestCase):
         assert r is None, r
         assert pts == [(-8, -2), (2, 0), (-6, -4)]
 
+        A = Affine.rotation(33)
+        pts = [(4, 1), (-1, 0), (3, 2)]
+        pts_expect = [A*pt for pt in pts]
+        r = A.itransform(pts)
+        assert r is None
+        assert pts == pts_expect
+
     def test_mul_wrong_type(self):
         with pytest.raises(TypeError):
             Affine(1, 2, 3, 4, 5, 6) * None
