@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+2.2.2 (2018-12-20)
+------------------
+- Affine.itransform computed the wrong results for arrays with rotation or
+  shear (#40). This is fixed (#41).
+
 2.2.1 (2018-06-04)
 ------------------
 - Docstring improvements (#37).
