@@ -7,3 +7,4 @@ Authors
 - Kevin Wurster <wursterk@gmail.com>
 - Todd Small <todd_small@icloud.com>
 - Juan Luis Cano Rodríguez <juanlu@satellogic.com>
+- Kirill Kouzoubov
