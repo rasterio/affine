@@ -18,4 +18,4 @@ deploy:
     tags: true
   provider: pypi
   distributions: "sdist bdist_wheel"
-  user: seang
+  user: __token__
