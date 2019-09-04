@@ -145,20 +145,16 @@ class Affine(
     """
     precision = EPSILON
 
-    def __new__(cls, *members):
+    def __new__(cls, a, b, c, d, e, f):
         """Create a new object
 
         Parameters
         ----------
-        members : list of float
-            Affine matrix members a, b, c, d, e, f
+        a, b, c, d, e, f : float
+            Elements of an augmented affine transformation matrix.
         """
-        if len(members) == 6:
-            mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
-            return tuple.__new__(cls, mat3x3)
-        else:
-            raise TypeError(
-                "Expected 6 coefficients, found %d" % len(members))
+        mat3x3 = [x * 1.0 for x in [a, b, c, d, e, f]] + [0.0, 0.0, 1.0]
+        return tuple.__new__(cls, mat3x3)
 
     @classmethod
     def from_gdal(cls, c, a, b, f, d, e):
