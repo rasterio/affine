@@ -1,6 +1,19 @@
 CHANGES
 =======
 
+2.3.0 (2019-09-04)
+------------------
+
+Deprecations:
+
+- Right multiplication like vector * matrix is deprecated and will raise
+  AffineError in version 3.0.0.
+
+Bug fixes:
+
+- Change signature of Affine constructor to help users of PyCharm (#45).
+- The Affine class docstring has been improved.
+
 2.2.2 (2018-12-20)
 ------------------
 - Affine.itransform computed the wrong results for arrays with rotation or

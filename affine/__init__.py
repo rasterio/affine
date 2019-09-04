@@ -1,12 +1,5 @@
 """Affine transformation matrices
 
-The 3x3 augmented affine transformation matrix for transformations in two
-dimensions is illustrated below.
-
-  | x' |   | a  b  c | | x |
-  | y' | = | d  e  f | | y |
-  | 1  |   | 0  0  1 | | 1 |
-
 The Affine package is derived from Casey Duncan's Planar package. See the
 copyright statement below.
 """
@@ -43,11 +36,12 @@ from __future__ import division
 
 from collections import namedtuple
 import math
+import warnings
 
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "2.2.2"
+__version__ = "2.3dev"
 
 EPSILON = 1e-5
 
@@ -123,10 +117,36 @@ class Affine(
         namedtuple('Affine', ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'))):
     """Two dimensional affine transform for 2D linear mapping.
 
-    Parallel lines are preserved by these transforms. Affine transforms
-    can perform any combination of translations, scales/flips, shears,
-    and rotations.  Class methods are provided to conveniently compose
-    transforms from these operations.
+    Parameters
+    ----------
+    a, b, c, d, e, f : float
+        Coefficients of an augmented affine transformation matrix
+
+        | x' |   | a  b  c | | x |
+        | y' | = | d  e  f | | y |
+        | 1  |   | 0  0  1 | | 1 |
+
+        `a`, `b`, and `c` are the elements of the first row of the
+        matrix. `d`, `e`, and `f` are the elements of the second row.
+
+    Attributes
+    ----------
+    a, b, c, d, e, f, g, h, i : float
+        The coefficients of the 3x3 augumented affine transformation
+        matrix
+
+        | x' |   | a  b  c | | x |
+        | y' | = | d  e  f | | y |
+        | 1  |   | g  h  i | | 1 |
+
+        `g`, `h`, and `i` are always 0, 0, and 1.
+
+    The Affine package is derived from Casey Duncan's Planar package.
+    See the copyright statement below.  Parallel lines are preserved by
+    these transforms. Affine transforms can perform any combination of
+    translations, scales/flips, shears, and rotations.  Class methods
+    are provided to conveniently compose transforms from these
+    operations.
 
     Internally the transform is stored as a 3x3 transformation matrix.
     The transform may be constructed directly by specifying the first
@@ -140,8 +160,6 @@ class Affine(
     matrices and vectors in general, but provides a convenience for
     users of this class.
 
-    :param members: 6 floats for the first two matrix rows.
-    :type members: float
     """
     precision = EPSILON
 
@@ -261,7 +279,10 @@ class Affine(
 
     @classmethod
     def permutation(cls, *scaling):
-        """Create the permutation transform. For 2x2 matrices, there is only one permutation matrix that is not the identity.
+        """Create the permutation transform
+
+        For 2x2 matrices, there is only one permutation matrix that is
+        not the identity.
 
         :rtype: Affine
         """
@@ -487,12 +508,17 @@ class Affine(
     def __rmul__(self, other):
         """Right hand multiplication
 
+        .. deprecated:: 2.3.0
+            Right multiplication will be prohibited in version 3.0. This method
+            will raise AffineError.
+
         Notes
         -----
         We should not be called if other is an affine instance This is
         just a guarantee, since we would potentially return the wrong
         answer in that case.
         """
+        warnings.warn("Right multiplication will be prohibited in version 3.0", DeprecationWarning, stacklevel=2)
         assert not isinstance(other, Affine)
         return self.__mul__(other)
 
