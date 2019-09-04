@@ -499,8 +499,9 @@ def test_mul_tuple():
 
 
 def test_rmul_tuple():
-    t = Affine(1, 2, 3, 4, 5, 6)
-    (2.0, 2.0) * t
+    with pytest.warns(DeprecationWarning):
+        t = Affine(1, 2, 3, 4, 5, 6)
+        (2.0, 2.0) * t
 
 
 def test_transform_precision():
