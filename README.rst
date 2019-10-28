@@ -71,7 +71,7 @@ Usage with GIS data packages
 Georeferenced raster datasets use affine transformations to map from image
 coordinates to world coordinates. The ``affine.Affine.from_gdal()`` class
 method helps convert `GDAL GeoTransform
-<http://www.gdal.org/classGDALDataset.html#af9593cc241e7d140f5f3c4798a43a668>`__,
+<https://gdal.org/user/raster_data_model.html#affine-geotransform>`__,
 sequences of 6 numbers in which the first and fourth are the x and y offsets
 and the second and sixth are the x and y pixel sizes.
 
