@@ -128,8 +128,8 @@ class PyAffineTestCase(unittest.TestCase):
             (0, 1, 0,
              1, 0, 0,
              0, 0, 1)
-        assert (perm*perm).is_identity        
-        
+        assert (perm*perm).is_identity
+
     def test_translation_constructor(self):
         trans = Affine.translation(2, -5)
         assert isinstance(trans, Affine)
@@ -483,6 +483,11 @@ def test_gdal():
     assert t.e == -425.0
     assert tuple(t) == (425.0, 0.0, -237481.5, 0.0, -425.0, 237536.4, 0, 0, 1.0)
     assert t.to_gdal() == (-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
+
+
+def test_shapely():
+    t = Affine(425.0, 0.0, -237481.5, 0.0, -425.0, 237536.4)
+    assert t.to_shapely() == (425.0, 0.0, 0.0, -425, -237481.5, 237536.4)
 
 
 def test_imul_number():
