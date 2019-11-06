@@ -528,7 +528,8 @@ class Affine(
         just a guarantee, since we would potentially return the wrong
         answer in that case.
         """
-        warnings.warn("Right multiplication will be prohibited in version 3.0", DeprecationWarning, stacklevel=2)
+        warnings.warn("Right multiplication will be prohibited in version 3.0",
+                      DeprecationWarning, stacklevel=2)
         assert not isinstance(other, Affine)
         return self.__mul__(other)
 

@@ -6,11 +6,12 @@ python:
   - 3.6
   - 3.7
 install:
-  - pip install -r requirements.txt
+  - pip install flake8 pydocstyle
   - pip install .[test]
 script:
-  - python -m pytest --cov affine --cov-report term-missing
+  - flake8
   - python -m pydocstyle affine
+  - python -m pytest --cov affine --cov-report term-missing
 after_success:
   - coveralls
 deploy:
