@@ -18,7 +18,7 @@ Usage
 The 3x3 augmented affine transformation matrix for transformations in two
 dimensions is illustrated below.
 
-.. ::
+::
 
   | x' |   | a  b  c | | x |
   | y' | = | d  e  f | | y |
