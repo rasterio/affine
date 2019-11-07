@@ -30,5 +30,6 @@ setup(
     packages=find_packages(exclude=["ez_setup", "examples", "tests"]),
     include_package_data=True,
     zip_safe=True,
-    extras_require={"test": ["pytest>=3.0", "pytest-cov", "pydocstyle", "coveralls"]},
+    extras_require={"test": ["pytest>=3.0", "pytest-cov", "pydocstyle",
+                             "flake8", "coveralls"]},
 )

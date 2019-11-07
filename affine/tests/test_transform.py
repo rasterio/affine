@@ -30,10 +30,9 @@
 
 from __future__ import division
 
-import os
 import math
 import unittest
-import textwrap
+from textwrap import dedent
 
 import pytest
 
@@ -101,14 +100,17 @@ class PyAffineTestCase(unittest.TestCase):
             t['foobar']
 
     def test_str(self):
-        assert \
-            str(Affine(1.111, 2.222, 3.333, -4.444, -5.555, 6.666)) \
-            == "| 1.11, 2.22, 3.33|\n|-4.44,-5.55, 6.67|\n| 0.00, 0.00, 1.00|"
+        t = Affine(1.111, 2.222, 3.333, -4.444, -5.555, 6.666)
+        assert str(t) == dedent("""\
+            | 1.11, 2.22, 3.33|
+            |-4.44,-5.55, 6.67|
+            | 0.00, 0.00, 1.00|""")
 
     def test_repr(self):
-        assert \
-            repr(Affine(1.111, 2.222, 3.456, 4.444, 5.5, 6.25)) == \
-            os.linesep.join(["Affine(1.111, 2.222, 3.456,", "       4.444, 5.5, 6.25)"])
+        t = Affine(1.111, 2.222, 3.456, 4.444, 5.5, 6.25)
+        assert repr(t) == dedent("""\
+            Affine(1.111, 2.222, 3.456,
+                   4.444, 5.5, 6.25)""")
 
     def test_identity_constructor(self):
         ident = Affine.identity()
@@ -247,7 +249,8 @@ class PyAffineTestCase(unittest.TestCase):
              0, 0, 1)
 
     def test_rotation_constructor_with_pivot(self):
-        assert tuple(Affine.rotation(60)) == tuple(Affine.rotation(60, pivot=(0, 0)))
+        assert tuple(Affine.rotation(60)) == \
+            tuple(Affine.rotation(60, pivot=(0, 0)))
         rot = Affine.rotation(27, pivot=(2, -4))
         r = math.radians(27)
         s, c = math.sin(r), math.cos(r)
@@ -452,7 +455,7 @@ class PyAffineTestCase(unittest.TestCase):
         assert affine.dumpsw(a) == s
 
     def test_real_world(self):
-        s = textwrap.dedent('''\
+        s = dedent('''\
                  39.9317755024
                  30.0907511581
                  30.0907511576
@@ -481,7 +484,7 @@ def test_gdal():
     assert t.f == t.yoff == 237536.4
     assert t.d == 0.0
     assert t.e == -425.0
-    assert tuple(t) == (425.0, 0.0, -237481.5, 0.0, -425.0, 237536.4, 0, 0, 1.0)
+    assert tuple(t) == (425.0, 0.0, -237481.5, 0.0, -425.0, 237536.4, 0, 0, 1)
     assert t.to_gdal() == (-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
 
 
@@ -539,7 +542,7 @@ def test_roundtrip():
 def test_eccentricity():
     assert Affine.identity().eccentricity == 0.0
     assert Affine.scale(2).eccentricity == 0.0
-    #assert_equal(Affine.scale(0).eccentricity, ?)
+    # assert_equal(Affine.scale(0).eccentricity, ?)
     assert Affine.scale(2, 1).eccentricity == pytest.approx(math.sqrt(3) / 2)
     assert Affine.scale(2, 3).eccentricity == pytest.approx(math.sqrt(5) / 3)
     assert Affine.scale(1, 0).eccentricity == 1.0
@@ -556,7 +559,9 @@ def test_eccentricity_complex():
         (Affine.rotation(77) * Affine.scale(2, 3)).eccentricity == \
         pytest.approx(math.sqrt(5) / 3)
     assert \
-        (Affine.translation(32, -47) * Affine.rotation(77) * Affine.scale(2, 3)).eccentricity == \
+        (Affine.translation(32, -47) *
+         Affine.rotation(77) *
+         Affine.scale(2, 3)).eccentricity == \
         pytest.approx(math.sqrt(5) / 3)
 
 
