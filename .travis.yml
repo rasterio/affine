@@ -5,6 +5,7 @@ python:
   - 2.7
   - 3.6
   - 3.7
+  - pypy3
 install:
   - pip install flake8 pydocstyle
   - pip install .[test]
