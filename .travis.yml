@@ -1,11 +1,18 @@
 dist: xenial
 language: python
+arch:
+  - amd64
+  - ppc64le
 cache: pip
 python:
   - 2.7
   - 3.6
   - 3.7
   - pypy3
+jobs:
+  exclude:
+   - arch: ppc64le
+     python: pypy3
 install:
   - pip install flake8 pydocstyle
   - pip install .[test]
