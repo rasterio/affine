@@ -12,6 +12,10 @@ Matrices describing affine transformation of the plane.
 The Affine package is derived from Casey Duncan's Planar package. Please see
 the copyright statement in `affine/__init__.py <affine/__init__.py>`__.
 
+Documentation
+-------------
+https://docs.contour.so/sgillies/affine/getting-started
+
 Usage
 -----
 
