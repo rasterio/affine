@@ -510,6 +510,17 @@ class Affine(
                  0.0, 0.0, 1.0))
         else:
             try:
+                if hasattr(other, 'copy'):
+                    other_copy = other.copy()
+                elif hasattr(other, 'clone'):
+                    other_copy = other.clone()
+                other_copy[..., 0] = other[..., 0] * sa + other[..., 1] * sb + sc
+                other_copy[..., 1] = other[..., 0] * sd + other[..., 1] * se + sf
+                return other_copy
+            except Exception as e:
+                pass
+
+            try:
                 vx, vy = other
             except Exception:
                 return NotImplemented
