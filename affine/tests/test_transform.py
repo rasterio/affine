@@ -592,7 +592,7 @@ def test_mul_fallback_unpack():
 
 
 # See gh-71 for bug report motivating this test.
-def test_mul_fallback_unpack():
+def test_mul_fallback_type_error():
     """Support fallback in case that other is an unexpected type."""
 
     class TextPoint:
