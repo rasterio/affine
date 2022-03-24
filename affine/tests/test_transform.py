@@ -584,6 +584,7 @@ def test_mul_fallback_unpack():
     """Support fallback in case that other is a single object."""
 
     class TextPoint:
+        """Not iterable, will trigger ValueError in Affine.__mul__."""
         def __rmul__(self, other):
             return other * (1, 2)
 
@@ -595,6 +596,7 @@ def test_mul_fallback_unpack():
     """Support fallback in case that other is an unexpected type."""
 
     class TextPoint:
+        """Iterable, but values trigger TypeError in Affine.__mul__."""
         def __iter__(self):
             return ("1", "2")
 
