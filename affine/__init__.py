@@ -41,7 +41,7 @@ import warnings
 
 __all__ = ['Affine']
 __author__ = "Sean Gillies"
-__version__ = "2.3.0"
+__version__ = "2.3.1dev"
 
 EPSILON = 1e-5
 
@@ -511,9 +511,9 @@ class Affine(
         else:
             try:
                 vx, vy = other
-            except Exception:
+                return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
+            except (ValueError, TypeError):
                 return NotImplemented
-            return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
 
     def __rmul__(self, other):
         """Right hand multiplication

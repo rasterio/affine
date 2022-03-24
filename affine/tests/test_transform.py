@@ -579,5 +579,30 @@ def test_rotation_improper():
         Affine.scale(-1, 1).rotation_angle
 
 
+# See gh-71 for bug report motivating this test.
+def test_mul_fallback_unpack():
+    """Support fallback in case that other is a single object."""
+
+    class TextPoint:
+        def __rmul__(self, other):
+            return other * (1, 2)
+
+    assert Affine.identity() * TextPoint() == (1, 2)
+
+
+# See gh-71 for bug report motivating this test.
+def test_mul_fallback_unpack():
+    """Support fallback in case that other is an unexpected type."""
+
+    class TextPoint:
+        def __iter__(self):
+            return ("1", "2")
+
+        def __rmul__(self, other):
+            return other * (1, 2)
+
+    assert Affine.identity() * TextPoint() == (1, 2)
+
+
 if __name__ == '__main__':
     unittest.main()
