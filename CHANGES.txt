@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+2.3.1 (2022-03-24)
+------------------
+
+Bug fixes:
+
+- Return NotImplemented for both ValueError and TypeError in __mul__ to support
+  fallback to __rmul__ in more cases (gh-71).
+
 2.3.0 (2019-09-04)
 ------------------
 
