@@ -384,7 +384,8 @@ class Affine(
         assuming it is in the form M = R S, where R is a rotation and S is a
         scaling.
 
-        Raises UndefinedRotationError for improper and degenerate transformations.
+        Raises UndefinedRotationError for improper and degenerate
+        transformations.
         """
         a, b, _, c, d, _, _, _, _ = self
         if self.is_proper or self.is_degenerate:
