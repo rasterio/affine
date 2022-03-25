@@ -39,7 +39,7 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          flag-name: ${{ matrix.platform }}-python${{ matrix.python-version }}
+          flag-name: run-python${{ matrix.python-version }}
           parallel: true
 
   finish:
