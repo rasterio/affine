@@ -1,0 +1,43 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "affine"
+description = "Matrices describing affine transformation of the plane"
+dynamic = ["version"]
+authors = [
+    {name = "Sean Gillies", email = "sean.gillies@gmail.com"},
+]
+readme = "README.rst"
+keywords = ["affine", "transformation", "matrix"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+license = {text = "BSD"}
+
+[project.optional-dependencies]
+test = [
+    "pytest >=4.6",
+    "pytest-cov",
+]
+dev = [
+    "pydocstyle",
+    "flake8",
+    "coveralls",
+]
+
+[project.urls]
+Source = "https://github.com/rasterio/affine"
+
+[tool.flit.sdist]
+include = [
+    "AUTHORS.txt",
+    "CHANGES.txt",
+    "LICENSE.txt",
+]
