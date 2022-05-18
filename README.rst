@@ -3,8 +3,8 @@ Affine
 
 Matrices describing affine transformation of the plane.
 
-.. image:: https://travis-ci.org/sgillies/affine.svg?branch=master
-    :target: https://travis-ci.org/sgillies/affine
+.. image:: https://github.com/rasterio/affine/actions/workflows/ci.yml/badge.svg?branch=master
+    :target: https://github.com/rasterio/affine/actions/workflows/ci.yml
 
 .. image:: https://coveralls.io/repos/sgillies/affine/badge.svg
     :target: https://coveralls.io/r/sgillies/affine
