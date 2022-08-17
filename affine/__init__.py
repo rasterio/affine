@@ -171,8 +171,11 @@ class Affine(
         a, b, c, d, e, f : float
             Elements of an augmented affine transformation matrix.
         """
-        mat3x3 = [x * 1.0 for x in [a, b, c, d, e, f]] + [0.0, 0.0, 1.0]
-        return tuple.__new__(cls, mat3x3)
+        return tuple.__new__(
+            cls,
+            (a * 1.0, b * 1.0, c * 1.0,
+             d * 1.0, e * 1.0, f * 1.0,
+             0.0,     0.0,     1.0))
 
     @classmethod
     def from_gdal(cls, c, a, b, f, d, e):
@@ -181,9 +184,7 @@ class Affine(
         :param c, a, b, f, d, e: 6 floats ordered by GDAL.
         :rtype: Affine
         """
-        members = [a, b, c, d, e, f]
-        mat3x3 = [x * 1.0 for x in members] + [0.0, 0.0, 1.0]
-        return tuple.__new__(cls, mat3x3)
+        return cls.__new__(cls, a, b, c, d, e, f)
 
     @classmethod
     def identity(cls):
