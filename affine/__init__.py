@@ -132,7 +132,7 @@ class Affine(
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
-        The coefficients of the 3x3 augumented affine transformation
+        The coefficients of the 3x3 augmented affine transformation
         matrix
 
         | x' |   | a  b  c | | x |
@@ -596,7 +596,7 @@ identity = Affine(1, 0, 0, 0, 1, 0)
 def loadsw(s):
     """Returns Affine from the contents of a world file string.
 
-    This method also translates the coefficients from from center- to
+    This method also translates the coefficients from center- to
     corner-based coordinates.
 
     :param s: str with 6 floats ordered in a world file.
@@ -615,7 +615,7 @@ def loadsw(s):
 def dumpsw(obj):
     """Return string for a world file.
 
-    This method also translates the coefficients from from corner- to
+    This method also translates the coefficients from corner- to
     center-based coordinates.
 
     :rtype: str
