@@ -1,12 +1,12 @@
 Affine
 ======
 
-Matrices describing affine transformation of the plane.
+Matrices describing 2D affine transformation of the plane.
 
-.. image:: https://github.com/rasterio/affine/actions/workflows/ci.yml/badge.svg?branch=master
+.. image:: https://github.com/rasterio/affine/actions/workflows/ci.yml/badge.svg?branch=main
     :target: https://github.com/rasterio/affine/actions/workflows/ci.yml
 
-.. image:: https://codecov.io/gh/rasterio/affine/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/rasterio/affine/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/rasterio/affine
 
 The Affine package is derived from Casey Duncan's Planar package. Please see
