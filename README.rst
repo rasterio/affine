@@ -6,8 +6,8 @@ Matrices describing affine transformation of the plane.
 .. image:: https://github.com/rasterio/affine/actions/workflows/ci.yml/badge.svg?branch=master
     :target: https://github.com/rasterio/affine/actions/workflows/ci.yml
 
-.. image:: https://coveralls.io/repos/sgillies/affine/badge.svg
-    :target: https://coveralls.io/r/sgillies/affine
+.. image:: https://codecov.io/gh/rasterio/affine/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/rasterio/affine
 
 The Affine package is derived from Casey Duncan's Planar package. Please see
 the copyright statement in `affine/__init__.py <affine/__init__.py>`__.
