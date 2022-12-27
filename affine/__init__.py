@@ -132,7 +132,7 @@ class Affine(
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
-        The coefficients of the 3x3 augumented affine transformation
+        The coefficients of the 3x3 augmented affine transformation
         matrix
 
         | x' |   | a  b  c | | x |
