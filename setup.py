@@ -28,11 +28,11 @@ setup(
     url="https://github.com/sgillies/affine",
     license="BSD",
     packages=find_packages(exclude=["ez_setup", "examples", "tests"]),
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     include_package_data=True,
     zip_safe=True,
     extras_require={
-        "test": ["pytest>=4.6", "pytest-cov"],
+        "test": ["pytest>=7.2", "pytest-cov"],
         "dev": ["pydocstyle", "flake8", "coveralls"],
     },
 )
