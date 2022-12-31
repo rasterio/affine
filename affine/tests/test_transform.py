@@ -34,7 +34,7 @@ import math
 import unittest
 from textwrap import dedent
 
-import pytest  # type: ignore
+import pytest
 
 import affine
 from affine import Affine, EPSILON
