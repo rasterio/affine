@@ -32,8 +32,6 @@ copyright statement below.
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #############################################################################
 
-from __future__ import division
-
 from collections import namedtuple
 import math
 import warnings
@@ -43,7 +41,7 @@ __all__ = ['Affine']
 __author__ = "Sean Gillies"
 __version__ = "2.3.1"
 
-EPSILON = 1e-5
+EPSILON: float = 1e-5
 
 
 class AffineError(Exception):
@@ -56,26 +54,6 @@ class TransformNotInvertibleError(AffineError):
 
 class UndefinedRotationError(AffineError):
     """The rotation angle could not be computed for this transform"""
-
-
-# Define assert_unorderable() depending on the language
-# implicit ordering rules. This keeps things consistent
-# across major Python versions
-try:
-    3 > ""
-except TypeError:  # pragma: no cover
-    # No implicit ordering (newer Python)
-    def assert_unorderable(a, b):
-        """Assert that a and b are unorderable"""
-        return NotImplemented
-else:  # pragma: no cover
-    # Implicit ordering by default (older Python)
-    # We must raise an exception ourselves
-    # To prevent nonsensical ordering
-    def assert_unorderable(a, b):
-        """Assert that a and b are unorderable"""
-        raise TypeError("unorderable types: %s and %s"
-                        % (type(a).__name__, type(b).__name__))
 
 
 def cached_property(func):
@@ -96,7 +74,7 @@ def cached_property(func):
     return property(getter, doc=doc)
 
 
-def cos_sin_deg(deg):
+def cos_sin_deg(deg: float):
     """Return the cosine and sin for the given angle in degrees.
 
     With special-case handling of multiples of 90 for perfect right
@@ -163,7 +141,8 @@ class Affine(
     """
     precision = EPSILON
 
-    def __new__(cls, a, b, c, d, e, f, g=0.0, h=0.0, i=1.0):
+    def __new__(cls, a: float, b: float, c: float, d: float, e: float,
+                f: float, g: float = 0.0, h: float = 0.0, i: float = 1.0):
         """Create a new object
 
         Parameters
@@ -175,7 +154,8 @@ class Affine(
         return tuple.__new__(cls, mat3x3)
 
     @classmethod
-    def from_gdal(cls, c, a, b, f, d, e):
+    def from_gdal(cls, c: float, a: float, b: float, f: float, d: float,
+                  e: float):
         """Use same coefficient order as GDAL's GetGeoTransform().
 
         :param c, a, b, f, d, e: 6 floats ordered by GDAL.
@@ -194,7 +174,7 @@ class Affine(
         return identity
 
     @classmethod
-    def translation(cls, xoff, yoff):
+    def translation(cls, xoff: float, yoff: float):
         """Create a translation transform from an offset vector.
 
         :param xoff: Translation x offset.
@@ -230,7 +210,7 @@ class Affine(
              0.0, 0.0, 1.0))
 
     @classmethod
-    def shear(cls, x_angle=0, y_angle=0):
+    def shear(cls, x_angle: float = 0, y_angle: float = 0):
         """Create a shear transform along one or both axes.
 
         :param x_angle: Shear angle in degrees parallel to the x-axis.
@@ -248,7 +228,7 @@ class Affine(
              0.0, 0.0, 1.0))
 
     @classmethod
-    def rotation(cls, angle, pivot=None):
+    def rotation(cls, angle: float, pivot=None):
         """Create a rotation transform at the specified angle.
 
         A pivot point other than the coordinate system origin may be
@@ -293,13 +273,13 @@ class Affine(
              1.0, 0.0, 0.0,
              0.0, 0.0, 1.0))
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Concise string representation."""
         return ("|% .2f,% .2f,% .2f|\n"
                 "|% .2f,% .2f,% .2f|\n"
                 "|% .2f,% .2f,% .2f|") % self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Precise string representation."""
         return ("Affine(%r, %r, %r,\n"
                 "       %r, %r, %r)") % self[:6]
@@ -322,17 +302,17 @@ class Affine(
         return (self.a, self.b, self.d, self.e, self.xoff, self.yoff)
 
     @property
-    def xoff(self):
+    def xoff(self) -> float:
         """Alias for 'c'"""
         return self.c
 
     @property
-    def yoff(self):
+    def yoff(self) -> float:
         """Alias for 'f'"""
         return self.f
 
     @cached_property
-    def determinant(self):
+    def determinant(self) -> float:
         """The determinant of the transform matrix.
 
         This value is equal to the area scaling factor when the
@@ -365,7 +345,7 @@ class Affine(
         return l1, l2
 
     @property
-    def eccentricity(self):
+    def eccentricity(self) -> float:
         """The eccentricity of the affine transformation.
 
         This value represents the eccentricity of an ellipse under
@@ -377,7 +357,7 @@ class Affine(
         return math.sqrt(l1 ** 2 - l2 ** 2) / l1
 
     @property
-    def rotation_angle(self):
+    def rotation_angle(self) -> float:
         """The rotation angle in degrees of the affine transformation.
 
         This is the rotation angle in degrees of the affine transformation,
@@ -396,14 +376,14 @@ class Affine(
             raise UndefinedRotationError
 
     @property
-    def is_identity(self):
+    def is_identity(self) -> bool:
         """True if this transform equals the identity matrix,
         within rounding limits.
         """
         return self is identity or self.almost_equals(identity, self.precision)
 
     @property
-    def is_rectilinear(self):
+    def is_rectilinear(self) -> bool:
         """True if the transform is rectilinear.
 
         i.e., whether a shape would remain axis-aligned, within rounding
@@ -414,7 +394,7 @@ class Affine(
                 (abs(d) < self.precision and abs(b) < self.precision))
 
     @property
-    def is_conformal(self):
+    def is_conformal(self) -> bool:
         """True if the transform is conformal.
 
         i.e., if angles between points are preserved after applying the
@@ -425,7 +405,7 @@ class Affine(
         return abs(a * b + d * e) < self.precision
 
     @property
-    def is_orthonormal(self):
+    def is_orthonormal(self) -> bool:
         """True if the transform is orthonormal.
 
         Which means that the transform represents a rigid motion, which
@@ -440,7 +420,7 @@ class Affine(
                 abs(1.0 - (b * b + e * e)) < self.precision)
 
     @cached_property
-    def is_degenerate(self):
+    def is_degenerate(self) -> bool:
         """True if this transform is degenerate.
 
         Which means that it will collapse a shape to an effective area
@@ -449,7 +429,7 @@ class Affine(
         return self.determinant == 0.0
 
     @cached_property
-    def is_proper(self):
+    def is_proper(self) -> bool:
         """True if this transform is proper.
 
         Which means that it does not include reflection.
@@ -462,7 +442,7 @@ class Affine(
         a, b, c, d, e, f, _, _, _ = self
         return (a, d), (b, e), (c, f)
 
-    def almost_equals(self, other, precision=EPSILON):
+    def almost_equals(self, other, precision: float = EPSILON) -> bool:
         """Compare transforms for approximate equality.
 
         :param other: Transform being compared.
@@ -475,8 +455,8 @@ class Affine(
                 return False
         return True
 
-    def __gt__(self, other):
-        return assert_unorderable(self, other)
+    def __gt__(self, other) -> bool:
+        return NotImplemented
 
     __ge__ = __lt__ = __le__ = __gt__
 
@@ -540,7 +520,7 @@ class Affine(
         else:
             return NotImplemented
 
-    def itransform(self, seq):
+    def itransform(self, seq) -> None:
         """Transform a sequence of points or vectors in place.
 
         :param seq: Mutable sequence of :class:`~planar.Vec2` to be
@@ -593,7 +573,7 @@ identity = Affine(1, 0, 0, 0, 1, 0)
 # Miscellaneous utilities
 
 
-def loadsw(s):
+def loadsw(s: str):
     """Returns Affine from the contents of a world file string.
 
     This method also translates the coefficients from center- to
@@ -612,7 +592,7 @@ def loadsw(s):
     return center * Affine.translation(-0.5, -0.5)
 
 
-def dumpsw(obj):
+def dumpsw(obj) -> str:
     """Return string for a world file.
 
     This method also translates the coefficients from corner- to

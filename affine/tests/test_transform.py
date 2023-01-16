@@ -28,8 +28,6 @@
 
 """Transform unit tests"""
 
-from __future__ import division
-
 import math
 import unittest
 from textwrap import dedent
