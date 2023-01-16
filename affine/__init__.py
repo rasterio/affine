@@ -456,7 +456,7 @@ class Affine(
         return True
 
     def __gt__(self, other) -> bool:
-        return assert_unorderable(self, other)
+        return NotImplemented
 
     __ge__ = __lt__ = __le__ = __gt__
 
