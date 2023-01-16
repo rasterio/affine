@@ -56,26 +56,6 @@ class UndefinedRotationError(AffineError):
     """The rotation angle could not be computed for this transform"""
 
 
-# Define assert_unorderable() depending on the language
-# implicit ordering rules. This keeps things consistent
-# across major Python versions
-try:
-    3 > ""  # type: ignore
-except TypeError:  # pragma: no cover
-    # No implicit ordering (newer Python)
-    def assert_unorderable(a, b):
-        """Assert that a and b are unorderable"""
-        return NotImplemented
-else:  # pragma: no cover
-    # Implicit ordering by default (older Python)
-    # We must raise an exception ourselves
-    # To prevent nonsensical ordering
-    def assert_unorderable(a, b):
-        """Assert that a and b are unorderable"""
-        raise TypeError("unorderable types: %s and %s"
-                        % (type(a).__name__, type(b).__name__))
-
-
 def cached_property(func):
     """Special property decorator that caches the computed
     property value in the object's instance dict the first
@@ -476,7 +456,7 @@ class Affine(
         return True
 
     def __gt__(self, other) -> bool:
-        return assert_unorderable(self, other)
+        return NotImplemented
 
     __ge__ = __lt__ = __le__ = __gt__
 
