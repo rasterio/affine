@@ -163,7 +163,7 @@ class Affine(
     """
     precision = EPSILON
 
-    def __new__(cls, a, b, c, d, e, f):
+    def __new__(cls, a, b, c, d, e, f, g=0.0, h=0.0, i=1.0):
         """Create a new object
 
         Parameters
@@ -171,7 +171,7 @@ class Affine(
         a, b, c, d, e, f : float
             Elements of an augmented affine transformation matrix.
         """
-        mat3x3 = [x * 1.0 for x in [a, b, c, d, e, f]] + [0.0, 0.0, 1.0]
+        mat3x3 = [x * 1.0 for x in [a, b, c, d, e, f, g, h, i]]
         return tuple.__new__(cls, mat3x3)
 
     @classmethod
