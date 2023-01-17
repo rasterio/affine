@@ -45,7 +45,6 @@ def seq_almost_equal(t1, t2, error=0.00001):
 
 
 class PyAffineTestCase(unittest.TestCase):
-
     def test_zero_args(self):
         with pytest.raises(TypeError):
             Affine()
@@ -95,168 +94,101 @@ class PyAffineTestCase(unittest.TestCase):
     def test_getitem_wrong_type(self):
         t = Affine(1, 2, 3, 4, 5, 6)
         with pytest.raises(TypeError):
-            t['foobar']
+            t["foobar"]
 
     def test_str(self):
         t = Affine(1.111, 2.222, 3.333, -4.444, -5.555, 6.666)
-        assert str(t) == dedent("""\
+        assert str(t) == dedent(
+            """\
             | 1.11, 2.22, 3.33|
             |-4.44,-5.55, 6.67|
-            | 0.00, 0.00, 1.00|""")
+            | 0.00, 0.00, 1.00|"""
+        )
 
     def test_repr(self):
         t = Affine(1.111, 2.222, 3.456, 4.444, 5.5, 6.25)
-        assert repr(t) == dedent("""\
+        assert repr(t) == dedent(
+            """\
             Affine(1.111, 2.222, 3.456,
-                   4.444, 5.5, 6.25)""")
+                   4.444, 5.5, 6.25)"""
+        )
 
     def test_identity_constructor(self):
         ident = Affine.identity()
         assert isinstance(ident, Affine)
-        assert \
-            tuple(ident) == \
-            (1, 0, 0,
-             0, 1, 0,
-             0, 0, 1)
+        assert tuple(ident) == (1, 0, 0, 0, 1, 0, 0, 0, 1)
         assert ident.is_identity
 
     def test_permutation_constructor(self):
         perm = Affine.permutation()
         assert isinstance(perm, Affine)
-        assert \
-            tuple(perm) == \
-            (0, 1, 0,
-             1, 0, 0,
-             0, 0, 1)
-        assert (perm*perm).is_identity
+        assert tuple(perm) == (0, 1, 0, 1, 0, 0, 0, 0, 1)
+        assert (perm * perm).is_identity
 
     def test_translation_constructor(self):
         trans = Affine.translation(2, -5)
         assert isinstance(trans, Affine)
-        assert \
-            tuple(trans) == \
-            (1, 0, 2,
-             0, 1, -5,
-             0, 0, 1)
+        assert tuple(trans) == (1, 0, 2, 0, 1, -5, 0, 0, 1)
 
     def test_scale_constructor(self):
         scale = Affine.scale(5)
         assert isinstance(scale, Affine)
-        assert \
-            tuple(scale) == \
-            (5, 0, 0,
-             0, 5, 0,
-             0, 0, 1)
+        assert tuple(scale) == (5, 0, 0, 0, 5, 0, 0, 0, 1)
         scale = Affine.scale(-1, 2)
-        assert \
-            tuple(scale) == \
-            (-1, 0, 0,
-             0, 2, 0,
-             0, 0, 1)
+        assert tuple(scale) == (-1, 0, 0, 0, 2, 0, 0, 0, 1)
         assert tuple(Affine.scale(1)) == tuple(Affine.identity())
 
     def test_shear_constructor(self):
         shear = Affine.shear(30)
         assert isinstance(shear, Affine)
         mx = math.tan(math.radians(30))
-        seq_almost_equal(
-            tuple(shear),
-            (1, mx, 0,
-             0, 1, 0,
-             0, 0, 1))
+        seq_almost_equal(tuple(shear), (1, mx, 0, 0, 1, 0, 0, 0, 1))
         shear = Affine.shear(-15, 60)
         mx = math.tan(math.radians(-15))
         my = math.tan(math.radians(60))
-        seq_almost_equal(
-            tuple(shear),
-            (1, mx, 0,
-             my, 1, 0,
-             0, 0, 1))
+        seq_almost_equal(tuple(shear), (1, mx, 0, my, 1, 0, 0, 0, 1))
         shear = Affine.shear(y_angle=45)
-        seq_almost_equal(
-            tuple(shear),
-            (1, 0, 0,
-             1, 1, 0,
-             0, 0, 1))
+        seq_almost_equal(tuple(shear), (1, 0, 0, 1, 1, 0, 0, 0, 1))
 
     def test_rotation_constructor(self):
         rot = Affine.rotation(60)
         assert isinstance(rot, Affine)
         r = math.radians(60)
         s, c = math.sin(r), math.cos(r)
-        assert \
-            tuple(rot) == \
-            (c, -s, 0,
-             s, c, 0,
-             0, 0, 1)
+        assert tuple(rot) == (c, -s, 0, s, c, 0, 0, 0, 1)
         rot = Affine.rotation(337)
         r = math.radians(337)
         s, c = math.sin(r), math.cos(r)
-        seq_almost_equal(
-            tuple(rot),
-            (c, -s, 0,
-             s, c, 0,
-             0, 0, 1))
+        seq_almost_equal(tuple(rot), (c, -s, 0, s, c, 0, 0, 0, 1))
         assert tuple(Affine.rotation(0)) == tuple(Affine.identity())
 
     def test_rotation_constructor_quadrants(self):
-        assert \
-            tuple(Affine.rotation(0)) == \
-            (1, 0, 0,
-             0, 1, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(90)) == \
-            (0, -1, 0,
-             1, 0, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(180)) == \
-            (-1, 0, 0,
-             0, -1, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(-180)) == \
-            (-1, 0, 0,
-             0, -1, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(270)) == \
-            (0, 1, 0,
-             -1, 0, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(-90)) == \
-            (0, 1, 0,
-             -1, 0, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(360)) == \
-            (1, 0, 0,
-             0, 1, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(450)) == \
-            (0, -1, 0,
-             1, 0, 0,
-             0, 0, 1)
-        assert \
-            tuple(Affine.rotation(-450)) == \
-            (0, 1, 0,
-             -1, 0, 0,
-             0, 0, 1)
+        assert tuple(Affine.rotation(0)) == (1, 0, 0, 0, 1, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(90)) == (0, -1, 0, 1, 0, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(180)) == (-1, 0, 0, 0, -1, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(-180)) == (-1, 0, 0, 0, -1, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(270)) == (0, 1, 0, -1, 0, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(-90)) == (0, 1, 0, -1, 0, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(360)) == (1, 0, 0, 0, 1, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(450)) == (0, -1, 0, 1, 0, 0, 0, 0, 1)
+        assert tuple(Affine.rotation(-450)) == (0, 1, 0, -1, 0, 0, 0, 0, 1)
 
     def test_rotation_constructor_with_pivot(self):
-        assert tuple(Affine.rotation(60)) == \
-            tuple(Affine.rotation(60, pivot=(0, 0)))
+        assert tuple(Affine.rotation(60)) == tuple(Affine.rotation(60, pivot=(0, 0)))
         rot = Affine.rotation(27, pivot=(2, -4))
         r = math.radians(27)
         s, c = math.sin(r), math.cos(r)
-        assert \
-            tuple(rot) == \
-            (c, -s, 2 - 2 * c - 4 * s,
-             s, c, -4 - 2 * s + 4 * c,
-             0, 0, 1)
+        assert tuple(rot) == (
+            c,
+            -s,
+            2 - 2 * c - 4 * s,
+            s,
+            c,
+            -4 - 2 * s + 4 * c,
+            0,
+            0,
+            1,
+        )
         assert tuple(Affine.rotation(0, (-3, 2))) == tuple(Affine.identity())
 
     def test_rotation_contructor_wrong_arg_types(self):
@@ -295,7 +227,7 @@ class PyAffineTestCase(unittest.TestCase):
         assert Affine.rotation(90).is_orthonormal
         assert Affine.rotation(-26).is_orthonormal
         assert not Affine.scale(2.5, 6.1).is_orthonormal
-        assert not Affine.scale(.5, 2).is_orthonormal
+        assert not Affine.scale(0.5, 2).is_orthonormal
         assert not Affine.shear(4, -1).is_orthonormal
 
     def test_is_degenerate(self):
@@ -391,7 +323,7 @@ class PyAffineTestCase(unittest.TestCase):
 
         A = Affine.rotation(33)
         pts = [(4, 1), (-1, 0), (3, 2)]
-        pts_expect = [A*pt for pt in pts]
+        pts_expect = [A * pt for pt in pts]
         r = A.itransform(pts)
         assert r is None
         assert pts == pts_expect
@@ -420,10 +352,8 @@ class PyAffineTestCase(unittest.TestCase):
 
     def test_inverse(self):
         seq_almost_equal(~Affine.identity(), Affine.identity())
-        seq_almost_equal(
-            ~Affine.translation(2, -3), Affine.translation(-2, 3))
-        seq_almost_equal(
-            ~Affine.rotation(-33.3), Affine.rotation(33.3))
+        seq_almost_equal(~Affine.translation(2, -3), Affine.translation(-2, 3))
+        seq_almost_equal(~Affine.rotation(-33.3), Affine.rotation(33.3))
         t = Affine(1, 2, 3, 4, 5, 6)
         seq_almost_equal(~t * t, Affine.identity())
 
@@ -435,36 +365,40 @@ class PyAffineTestCase(unittest.TestCase):
     def test_bad_type_world(self):
         """wrong type, i.e don't use readlines()"""
         with pytest.raises(TypeError):
-            affine.loadsw(['1.0', '0.0', '0.0', '1.0', '0.0', '0.0'])
+            affine.loadsw(["1.0", "0.0", "0.0", "1.0", "0.0", "0.0"])
 
     def test_bad_value_world(self):
         """Wrong number of parameters."""
         with pytest.raises(ValueError):
-            affine.loadsw('1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0')
+            affine.loadsw("1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0")
 
     def test_simple_world(self):
-        s = '1.0\n0.0\n0.0\n-1.0\n100.5\n199.5\n'
+        s = "1.0\n0.0\n0.0\n-1.0\n100.5\n199.5\n"
         a = affine.loadsw(s)
-        assert \
-            a == \
-            Affine(
-                1.0, 0.0, 100.0,
-                0.0, -1., 200.0)
+        assert a == Affine(1.0, 0.0, 100.0, 0.0, -1.0, 200.0)
         assert affine.dumpsw(a) == s
 
     def test_real_world(self):
-        s = dedent('''\
+        s = dedent(
+            """\
                  39.9317755024
                  30.0907511581
                  30.0907511576
                 -39.9317755019
             2658137.2266720217
-            5990821.7039887439''')  # no EOL
+            5990821.7039887439"""
+        )  # no EOL
         a1 = affine.loadsw(s)
         assert a1.almost_equals(
             Affine(
-                39.931775502364644, 30.090751157602412, 2658102.2154086917,
-                30.090751157602412, -39.931775502364644, 5990826.624500916))
+                39.931775502364644,
+                30.090751157602412,
+                2658102.2154086917,
+                30.090751157602412,
+                -39.931775502364644,
+                5990826.624500916,
+            )
+        )
         a1out = affine.dumpsw(a1)
         assert isinstance(a1out, str)
         a2 = affine.loadsw(a1out)
@@ -473,6 +407,7 @@ class PyAffineTestCase(unittest.TestCase):
 
 # We're using pytest for tests added after 1.0 and don't need unittest
 # test case classes.
+
 
 def test_gdal():
     t = Affine.from_gdal(-237481.5, 425.0, 0.0, 237536.4, 0.0, -425.0)
@@ -520,18 +455,18 @@ def test_transform_precision():
 
 def test_associative():
     point = (12, 5)
-    trans = Affine.translation(-10., -5.)
-    rot90 = Affine.rotation(90.)
+    trans = Affine.translation(-10.0, -5.0)
+    rot90 = Affine.rotation(90.0)
     result1 = rot90 * (trans * point)
     result2 = (rot90 * trans) * point
-    seq_almost_equal(result1, (0., 2.))
+    seq_almost_equal(result1, (0.0, 2.0))
     seq_almost_equal(result1, result2)
 
 
 def test_roundtrip():
     point = (12, 5)
     trans = Affine.translation(3, 4)
-    rot37 = Affine.rotation(37.)
+    rot37 = Affine.rotation(37.0)
     point_prime = (trans * rot37) * point
     roundtrip_point = ~(trans * rot37) * point_prime
     seq_almost_equal(point, roundtrip_point)
@@ -550,17 +485,15 @@ def test_eccentricity():
 
 
 def test_eccentricity_complex():
-    assert \
-        (Affine.scale(2, 3) * Affine.rotation(77)).eccentricity == \
-        pytest.approx(math.sqrt(5) / 3)
-    assert \
-        (Affine.rotation(77) * Affine.scale(2, 3)).eccentricity == \
-        pytest.approx(math.sqrt(5) / 3)
-    assert \
-        (Affine.translation(32, -47) *
-         Affine.rotation(77) *
-         Affine.scale(2, 3)).eccentricity == \
-        pytest.approx(math.sqrt(5) / 3)
+    assert (Affine.scale(2, 3) * Affine.rotation(77)).eccentricity == pytest.approx(
+        math.sqrt(5) / 3
+    )
+    assert (Affine.rotation(77) * Affine.scale(2, 3)).eccentricity == pytest.approx(
+        math.sqrt(5) / 3
+    )
+    assert (
+        Affine.translation(32, -47) * Affine.rotation(77) * Affine.scale(2, 3)
+    ).eccentricity == pytest.approx(math.sqrt(5) / 3)
 
 
 def test_rotation_angle():
@@ -583,6 +516,7 @@ def test_mul_fallback_unpack():
 
     class TextPoint:
         """Not iterable, will trigger ValueError in Affine.__mul__."""
+
         def __rmul__(self, other):
             return other * (1, 2)
 
@@ -595,6 +529,7 @@ def test_mul_fallback_type_error():
 
     class TextPoint:
         """Iterable, but values trigger TypeError in Affine.__mul__."""
+
         def __iter__(self):
             return ("1", "2")
 
@@ -604,5 +539,5 @@ def test_mul_fallback_type_error():
     assert Affine.identity() * TextPoint() == (1, 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

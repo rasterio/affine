@@ -35,19 +35,21 @@ def test_rotation_matrix():
 
     """
     rot = Affine.rotation(90.0)
-    assert round(rot.a, 15) == round(math.cos(math.pi/2.0), 15)
-    assert round(rot.b, 15) == round(-math.sin(math.pi/2.0), 15)
+    assert round(rot.a, 15) == round(math.cos(math.pi / 2.0), 15)
+    assert round(rot.b, 15) == round(-math.sin(math.pi / 2.0), 15)
     assert rot.c == 0.0
-    assert round(rot.d, 15) == round(math.sin(math.pi/2.0), 15)
-    assert round(rot.e, 15) == round(math.cos(math.pi/2.0), 15)
+    assert round(rot.d, 15) == round(math.sin(math.pi / 2.0), 15)
+    assert round(rot.e, 15) == round(math.cos(math.pi / 2.0), 15)
     assert rot.f == 0.0
 
 
 def test_rotation_matrix_pivot():
     """A rotation matrix with pivot has expected elements"""
     rot = Affine.rotation(90.0, pivot=(1.0, 1.0))
-    exp = (Affine.translation(1.0, 1.0)
-           * Affine.rotation(90.0)
-           * Affine.translation(-1.0, -1.0))
+    exp = (
+        Affine.translation(1.0, 1.0)
+        * Affine.rotation(90.0)
+        * Affine.translation(-1.0, -1.0)
+    )
     for r, e in zip(rot, exp):
         assert round(r, 15) == round(e, 15)

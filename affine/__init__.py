@@ -37,7 +37,7 @@ import math
 import warnings
 
 
-__all__ = ['Affine']
+__all__ = ["Affine"]
 __author__ = "Sean Gillies"
 __version__ = "2.3.1"
 
@@ -70,6 +70,7 @@ def cached_property(func):
         except KeyError:
             self.__dict__[name] = value = func(self)
             return value
+
     getter.func_name = name
     return property(getter, doc=doc)
 
@@ -91,8 +92,7 @@ def cos_sin_deg(deg: float):
     return math.cos(rad), math.sin(rad)
 
 
-class Affine(
-        namedtuple('Affine', ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'))):
+class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))):
     """Two dimensional affine transform for 2D linear mapping.
 
     Parameters
@@ -139,10 +139,21 @@ class Affine(
     users of this class.
 
     """
+
     precision = EPSILON
 
-    def __new__(cls, a: float, b: float, c: float, d: float, e: float,
-                f: float, g: float = 0.0, h: float = 0.0, i: float = 1.0):
+    def __new__(
+        cls,
+        a: float,
+        b: float,
+        c: float,
+        d: float,
+        e: float,
+        f: float,
+        g: float = 0.0,
+        h: float = 0.0,
+        i: float = 1.0,
+    ):
         """Create a new object
 
         Parameters
@@ -154,8 +165,7 @@ class Affine(
         return tuple.__new__(cls, mat3x3)
 
     @classmethod
-    def from_gdal(cls, c: float, a: float, b: float, f: float, d: float,
-                  e: float):
+    def from_gdal(cls, c: float, a: float, b: float, f: float, d: float, e: float):
         """Use same coefficient order as GDAL's GetGeoTransform().
 
         :param c, a, b, f, d, e: 6 floats ordered by GDAL.
@@ -183,11 +193,7 @@ class Affine(
         :type yoff: float
         :rtype: Affine
         """
-        return tuple.__new__(
-            cls,
-            (1.0, 0.0, xoff,
-             0.0, 1.0, yoff,
-             0.0, 0.0, 1.0))
+        return tuple.__new__(cls, (1.0, 0.0, xoff, 0.0, 1.0, yoff, 0.0, 0.0, 1.0))
 
     @classmethod
     def scale(cls, *scaling):
@@ -203,11 +209,7 @@ class Affine(
             sx = sy = float(scaling[0])
         else:
             sx, sy = scaling
-        return tuple.__new__(
-            cls,
-            (sx, 0.0, 0.0,
-             0.0, sy, 0.0,
-             0.0, 0.0, 1.0))
+        return tuple.__new__(cls, (sx, 0.0, 0.0, 0.0, sy, 0.0, 0.0, 0.0, 1.0))
 
     @classmethod
     def shear(cls, x_angle: float = 0, y_angle: float = 0):
@@ -221,11 +223,7 @@ class Affine(
         """
         mx = math.tan(math.radians(x_angle))
         my = math.tan(math.radians(y_angle))
-        return tuple.__new__(
-            cls,
-            (1.0, mx, 0.0,
-             my, 1.0, 0.0,
-             0.0, 0.0, 1.0))
+        return tuple.__new__(cls, (1.0, mx, 0.0, my, 1.0, 0.0, 0.0, 0.0, 1.0))
 
     @classmethod
     def rotation(cls, angle: float, pivot=None):
@@ -244,18 +242,23 @@ class Affine(
         """
         ca, sa = cos_sin_deg(angle)
         if pivot is None:
-            return tuple.__new__(
-                cls,
-                (ca, -sa, 0.0,
-                 sa, ca, 0.0,
-                 0.0, 0.0, 1.0))
+            return tuple.__new__(cls, (ca, -sa, 0.0, sa, ca, 0.0, 0.0, 0.0, 1.0))
         else:
             px, py = pivot
             return tuple.__new__(
                 cls,
-                (ca, -sa, px - px * ca + py * sa,
-                 sa, ca, py - px * sa - py * ca,
-                 0.0, 0.0, 1.0))
+                (
+                    ca,
+                    -sa,
+                    px - px * ca + py * sa,
+                    sa,
+                    ca,
+                    py - px * sa - py * ca,
+                    0.0,
+                    0.0,
+                    1.0,
+                ),
+            )
 
     @classmethod
     def permutation(cls, *scaling):
@@ -267,22 +270,17 @@ class Affine(
         :rtype: Affine
         """
 
-        return tuple.__new__(
-            cls,
-            (0.0, 1.0, 0.0,
-             1.0, 0.0, 0.0,
-             0.0, 0.0, 1.0))
+        return tuple.__new__(cls, (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0))
 
     def __str__(self) -> str:
         """Concise string representation."""
-        return ("|% .2f,% .2f,% .2f|\n"
-                "|% .2f,% .2f,% .2f|\n"
-                "|% .2f,% .2f,% .2f|") % self
+        return (
+            "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|"
+        ) % self
 
     def __repr__(self) -> str:
         """Precise string representation."""
-        return ("Affine(%r, %r, %r,\n"
-                "       %r, %r, %r)") % self[:6]
+        return ("Affine(%r, %r, %r,\n" "       %r, %r, %r)") % self[:6]
 
     def to_gdal(self):
         """Return same coefficient order as GDAL's SetGeoTransform().
@@ -333,10 +331,10 @@ class Affine(
         # The singular values are the square root of the eigenvalues
         # of the matrix times its transpose, M M*
         # Computing trace and determinant of M M*
-        trace = a**2 + b**2 + d**2 + e**2
-        det = (a * e - b * d)**2
+        trace = a ** 2 + b ** 2 + d ** 2 + e ** 2
+        det = (a * e - b * d) ** 2
 
-        delta = trace**2 / 4 - det
+        delta = trace ** 2 / 4 - det
         if delta < 1e-12:
             delta = 0
 
@@ -390,8 +388,9 @@ class Affine(
         limits, after applying the transform.
         """
         a, b, c, d, e, f, g, h, i = self
-        return ((abs(a) < self.precision and abs(e) < self.precision) or
-                (abs(d) < self.precision and abs(b) < self.precision))
+        return (abs(a) < self.precision and abs(e) < self.precision) or (
+            abs(d) < self.precision and abs(b) < self.precision
+        )
 
     @property
     def is_conformal(self) -> bool:
@@ -415,9 +414,11 @@ class Affine(
         always results in a congruent shape.
         """
         a, b, c, d, e, f, g, h, i = self
-        return (self.is_conformal and
-                abs(1.0 - (a * a + d * d)) < self.precision and
-                abs(1.0 - (b * b + e * e)) < self.precision)
+        return (
+            self.is_conformal
+            and abs(1.0 - (a * a + d * d)) < self.precision
+            and abs(1.0 - (b * b + e * e)) < self.precision
+        )
 
     @cached_property
     def is_degenerate(self) -> bool:
@@ -486,9 +487,18 @@ class Affine(
             oa, ob, oc, od, oe, of, _, _, _ = other
             return tuple.__new__(
                 self.__class__,
-                (sa * oa + sb * od, sa * ob + sb * oe, sa * oc + sb * of + sc,
-                 sd * oa + se * od, sd * ob + se * oe, sd * oc + se * of + sf,
-                 0.0, 0.0, 1.0))
+                (
+                    sa * oa + sb * od,
+                    sa * ob + sb * oe,
+                    sa * oc + sb * of + sc,
+                    sd * oa + se * od,
+                    sd * ob + se * oe,
+                    sd * oc + se * of + sf,
+                    0.0,
+                    0.0,
+                    1.0,
+                ),
+            )
         else:
             try:
                 vx, vy = other
@@ -509,8 +519,11 @@ class Affine(
         just a guarantee, since we would potentially return the wrong
         answer in that case.
         """
-        warnings.warn("Right multiplication will be prohibited in version 3.0",
-                      DeprecationWarning, stacklevel=2)
+        warnings.warn(
+            "Right multiplication will be prohibited in version 3.0",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         assert not isinstance(other, Affine)
         return self.__mul__(other)
 
@@ -539,8 +552,7 @@ class Affine(
             is degenerate.
         """
         if self.is_degenerate:
-            raise TransformNotInvertibleError(
-                "Cannot invert degenerate transform")
+            raise TransformNotInvertibleError("Cannot invert degenerate transform")
         idet = 1.0 / self.determinant
         sa, sb, sc, sd, se, sf, _, _, _ = self
         ra = se * idet
@@ -549,9 +561,8 @@ class Affine(
         re = sa * idet
         return tuple.__new__(
             self.__class__,
-            (ra, rb, -sc * ra - sf * rb,
-             rd, re, -sc * rd - sf * re,
-             0.0, 0.0, 1.0))
+            (ra, rb, -sc * ra - sf * rb, rd, re, -sc * rd - sf * re, 0.0, 0.0, 1.0),
+        )
 
     __hash__ = tuple.__hash__  # hash is not inherited in Py 3
 
@@ -582,7 +593,7 @@ def loadsw(s: str):
     :param s: str with 6 floats ordered in a world file.
     :rtype: Affine
     """
-    if not hasattr(s, 'split'):
+    if not hasattr(s, "split"):
         raise TypeError("Cannot split input string")
     coeffs = s.split()
     if len(coeffs) != 6:
@@ -601,4 +612,4 @@ def dumpsw(obj) -> str:
     :rtype: str
     """
     center = obj * Affine.translation(0.5, 0.5)
-    return '\n'.join(repr(getattr(center, x)) for x in list('adbecf')) + '\n'
+    return "\n".join(repr(getattr(center, x)) for x in list("adbecf")) + "\n"
