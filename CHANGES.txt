@@ -1,6 +1,16 @@
 CHANGES
 =======
 
+2.4.0 (TBD)
+-----------
+
+- Elimination of Python 2/3 compatibility code in __gt__ (#94).
+- Addition of optional keyword arguments for __new__, solving an issue with
+  Dask (#92).
+- Addition of some type hints for float arguments and return types (#87).
+- Python version support is now 3.7-3.11 (#82).
+- Faster __new__ and from_gdal methods (#78).
+
 2.3.1 (2022-03-24)
 ------------------
 
