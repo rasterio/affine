@@ -608,7 +608,7 @@ def loadsw(s: str):
     coeffs = s.split()
     if len(coeffs) != 6:
         raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
-    a, d, b, e, c, f = [float(x) for x in coeffs]
+    a, d, b, e, c, f = (float(x) for x in coeffs)
     center = tuple.__new__(Affine, [a, b, c, d, e, f, 0.0, 0.0, 1.0])
     return center * Affine.translation(-0.5, -0.5)
 
