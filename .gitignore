@@ -57,3 +57,5 @@ docs/_build/
 
 __pycache__
 *.swp
+
+.coverage.*
