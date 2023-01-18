@@ -1,8 +1,11 @@
 CHANGES
 =======
 
-2.4.0 (TBD)
------------
+2.4.0 (2023-01-19)
+------------------
+
+2.4b1 (2023-01-18)
+------------------
 
 - Elimination of Python 2/3 compatibility code in __gt__ (#94).
 - Addition of optional keyword arguments for __new__, solving an issue with
