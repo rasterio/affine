@@ -163,9 +163,18 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         """
         return tuple.__new__(
             cls,
-            (a * 1.0, b * 1.0, c * 1.0,
-             d * 1.0, e * 1.0, f * 1.0,
-             g * 1.0, h * 1.0, i * 1.0))
+            (
+                a * 1.0,
+                b * 1.0,
+                c * 1.0,
+                d * 1.0,
+                e * 1.0,
+                f * 1.0,
+                g * 1.0,
+                h * 1.0,
+                i * 1.0,
+            ),
+        )
 
     @classmethod
     def from_gdal(cls, c: float, a: float, b: float, f: float, d: float, e: float):
