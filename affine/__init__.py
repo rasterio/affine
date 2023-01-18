@@ -39,7 +39,7 @@ import warnings
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
-__version__ = "2.4.0dev"
+__version__ = "2.4b1"
 
 EPSILON: float = 1e-5
 
