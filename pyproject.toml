@@ -15,11 +15,12 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Multimedia :: Graphics :: Graphics Conversion",
     "Topic :: Scientific/Engineering :: GIS",
 ]
-license = {text = "BSD"}
+license = {text = "BSD-3-Clause"}
+requires-python = ">=3.7"
 
 [project.optional-dependencies]
 test = [
