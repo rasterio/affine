@@ -4,6 +4,9 @@ CHANGES
 2.4.0 (2023-01-19)
 ------------------
 
+- Package is marked as Python 3 only, two instances of "%" string formatting
+  are replaced by f-strings (#96).
+
 2.4b1 (2023-01-18)
 ------------------
 
