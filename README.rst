@@ -9,6 +9,10 @@ Matrices describing 2D affine transformation of the plane.
 .. image:: https://codecov.io/gh/rasterio/affine/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/rasterio/affine
 
+.. image:: https://readthedocs.org/projects/affine/badge/?version=latest
+       :target: https://affine.readthedocs.io/en/latest/?badge=latest
+       :alt: Documentation Status
+
 The Affine package is derived from Casey Duncan's Planar package. Please see
 the copyright statement in `affine/__init__.py <affine/__init__.py>`__.
 
