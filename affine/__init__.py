@@ -345,7 +345,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         det = (a * e - b * d) ** 2
 
         delta = trace ** 2 / 4 - det
-        if delta < 1e-12:
+        if delta < self.precision:
             delta = 0
 
         l1 = math.sqrt(trace / 2 + math.sqrt(delta))
