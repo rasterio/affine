@@ -1,5 +1,7 @@
 import math
 
+import pytest
+
 from affine import Affine
 
 
@@ -23,8 +25,9 @@ def test_rotation_angle():
         0----------
     """
     x, y = Affine.rotation(45.0) * (1.0, 0.0)
-    assert round(x, 14) == round(math.sqrt(2.0) / 2.0, 14)
-    assert round(y, 14) == round(math.sqrt(2.0) / 2.0, 14)
+    sqrt2div2 = math.sqrt(2.0) / 2.0
+    assert x == pytest.approx(sqrt2div2)
+    assert y == pytest.approx(sqrt2div2)
 
 
 def test_rotation_matrix():
@@ -34,12 +37,16 @@ def test_rotation_matrix():
     | sin(a)  cos(a) |
 
     """
-    rot = Affine.rotation(90.0)
-    assert round(rot.a, 15) == round(math.cos(math.pi / 2.0), 15)
-    assert round(rot.b, 15) == round(-math.sin(math.pi / 2.0), 15)
+    deg = 90.0
+    rot = Affine.rotation(deg)
+    rad = math.radians(deg)
+    cosrad = math.cos(rad)
+    sinrad = math.sin(rad)
+    assert rot.a == pytest.approx(cosrad)
+    assert rot.b == pytest.approx(-sinrad)
     assert rot.c == 0.0
-    assert round(rot.d, 15) == round(math.sin(math.pi / 2.0), 15)
-    assert round(rot.e, 15) == round(math.cos(math.pi / 2.0), 15)
+    assert rot.d == pytest.approx(sinrad)
+    assert rot.e == pytest.approx(cosrad)
     assert rot.f == 0.0
 
 
@@ -52,4 +59,4 @@ def test_rotation_matrix_pivot():
         * Affine.translation(-1.0, -1.0)
     )
     for r, e in zip(rot, exp):
-        assert round(r, 15) == round(e, 15)
+        assert r == pytest.approx(e)

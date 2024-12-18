@@ -1,4 +1,4 @@
-"""Affine transformation matrices
+"""Affine transformation matrices.
 
 The Affine package is derived from Casey Duncan's Planar package. See the
 copyright statement below.
@@ -32,10 +32,9 @@ copyright statement below.
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #############################################################################
 
-from collections import namedtuple
 import math
 import warnings
-
+from collections import namedtuple
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
@@ -49,17 +48,18 @@ class AffineError(Exception):
 
 
 class TransformNotInvertibleError(AffineError):
-    """The transform could not be inverted"""
+    """The transform could not be inverted."""
 
 
 class UndefinedRotationError(AffineError):
-    """The rotation angle could not be computed for this transform"""
+    """The rotation angle could not be computed for this transform."""
 
 
 def cached_property(func):
-    """Special property decorator that caches the computed
-    property value in the object's instance dict the first
-    time it is accessed.
+    """Cached property decorator.
+
+    This special property decorator caches the computed property value in the
+    object's instance dict the first time it is accessed.
     """
     name = func.__name__
     doc = func.__doc__
@@ -107,7 +107,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         `a`, `b`, and `c` are the elements of the first row of the
         matrix. `d`, `e`, and `f` are the elements of the second row.
 
-    Attributes
+    Attributes:
     ----------
     a, b, c, d, e, f, g, h, i : float
         The coefficients of the 3x3 augmented affine transformation
@@ -154,7 +154,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         h: float = 0.0,
         i: float = 1.0,
     ):
-        """Create a new object
+        """Create a new object.
 
         Parameters
         ----------
@@ -163,17 +163,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         """
         return tuple.__new__(
             cls,
-            (
-                a * 1.0,
-                b * 1.0,
-                c * 1.0,
-                d * 1.0,
-                e * 1.0,
-                f * 1.0,
-                g * 1.0,
-                h * 1.0,
-                i * 1.0,
-            ),
+            tuple(map(float, (a, b, c, d, e, f, g, h, i))),
         )
 
     @classmethod
@@ -255,42 +245,39 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
             return tuple.__new__(cls, (ca, -sa, 0.0, sa, ca, 0.0, 0.0, 0.0, 1.0))
         else:
             px, py = pivot
+            c = px - px * ca + py * sa
+            f = py - px * sa - py * ca
             return tuple.__new__(
                 cls,
-                (
-                    ca,
-                    -sa,
-                    px - px * ca + py * sa,
-                    sa,
-                    ca,
-                    py - px * sa - py * ca,
-                    0.0,
-                    0.0,
-                    1.0,
-                ),
+                (ca, -sa, c, sa, ca, f, 0.0, 0.0, 1.0),
             )
 
     @classmethod
     def permutation(cls, *scaling):
-        """Create the permutation transform
+        """Create the permutation transform.
 
         For 2x2 matrices, there is only one permutation matrix that is
         not the identity.
 
         :rtype: Affine
         """
-
         return tuple.__new__(cls, (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0))
 
     def __str__(self) -> str:
         """Concise string representation."""
         return (
-            "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|"
-        ) % self
+            "|{: .2f},{: .2f},{: .2f}|\n"
+            "|{: .2f},{: .2f},{: .2f}|\n"
+            "|{: .2f},{: .2f},{: .2f}|"
+        ).format(*self)
 
     def __repr__(self) -> str:
         """Precise string representation."""
-        return ("Affine(%r, %r, %r,\n" "       %r, %r, %r)") % self[:6]
+        # fmt: off
+        return ("Affine({!r}, {!r}, {!r},\n"
+                "       {!r}, {!r}, {!r})"
+        ).format(*self[:6])
+        # fmt: on
 
     def to_gdal(self):
         """Return same coefficient order as GDAL's SetGeoTransform().
@@ -300,7 +287,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         return (self.c, self.a, self.b, self.f, self.d, self.e)
 
     def to_shapely(self):
-        """Return an affine transformation matrix compatible with shapely
+        """Return an affine transformation matrix compatible with shapely.
 
         Shapely's affinity module expects an affine transformation matrix
         in (a,b,d,e,xoff,yoff) order.
@@ -311,12 +298,12 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
     @property
     def xoff(self) -> float:
-        """Alias for 'c'"""
+        """Alias for 'c'."""
         return self.c
 
     @property
     def yoff(self) -> float:
-        """Alias for 'f'"""
+        """Alias for 'f'."""
         return self.f
 
     @cached_property
@@ -342,14 +329,14 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         # of the matrix times its transpose, M M*
         # Computing trace and determinant of M M*
         trace = a**2 + b**2 + d**2 + e**2
-        det = (a * e - b * d) ** 2
+        det2 = (a * e - b * d) ** 2
 
-        delta = trace**2 / 4 - det
+        delta = trace**2 / 4.0 - det2
         if delta < 1e-12:
-            delta = 0
-
-        l1 = math.sqrt(trace / 2 + math.sqrt(delta))
-        l2 = math.sqrt(trace / 2 - math.sqrt(delta))
+            delta = 0.0
+        sqrt_delta = math.sqrt(delta)
+        l1 = math.sqrt(trace / 2.0 + sqrt_delta)
+        l2 = math.sqrt(trace / 2.0 - sqrt_delta)
         return l1, l2
 
     @property
@@ -379,15 +366,13 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         if self.is_proper or self.is_degenerate:
             l1, _ = self._scaling
             y, x = c / l1, a / l1
-            return math.atan2(y, x) * 180 / math.pi
+            return math.degrees(math.atan2(y, x))
         else:
             raise UndefinedRotationError
 
     @property
     def is_identity(self) -> bool:
-        """True if this transform equals the identity matrix,
-        within rounding limits.
-        """
+        """True if this transform equals the identity matrix, within rounding limits."""
         return self is identity or self.almost_equals(identity, self.precision)
 
     @property
@@ -449,7 +434,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
     @property
     def column_vectors(self):
-        """The values of the transform as three 2D column vectors"""
+        """The values of the transform as three 2D column vectors."""
         a, b, c, d, e, f, _, _, _ = self
         return (a, d), (b, e), (c, f)
 
@@ -481,7 +466,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     __iadd__ = __add__
 
     def __mul__(self, other):
-        """Multiplication
+        """Multiplication.
 
         Apply the transform using matrix multiplication, creating
         a resulting object of the same type.  A transform may be applied
@@ -517,13 +502,13 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
                 return NotImplemented
 
     def __rmul__(self, other):
-        """Right hand multiplication
+        """Right hand multiplication.
 
         .. deprecated:: 2.3.0
             Right multiplication will be prohibited in version 3.0. This method
             will raise AffineError.
 
-        Notes
+        Notes:
         -----
         We should not be called if other is an affine instance This is
         just a guarantee, since we would potentially return the wrong
@@ -577,9 +562,9 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     __hash__ = tuple.__hash__  # hash is not inherited in Py 3
 
     def __getnewargs__(self):
-        """Pickle protocol support
+        """Pickle protocol support.
 
-        Notes
+        Notes:
         -----
         Normal unpickling creates a situation where __new__ receives all
         9 elements rather than the 6 that are required for the
