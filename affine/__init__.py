@@ -341,10 +341,10 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         # The singular values are the square root of the eigenvalues
         # of the matrix times its transpose, M M*
         # Computing trace and determinant of M M*
-        trace = a ** 2 + b ** 2 + d ** 2 + e ** 2
+        trace = a**2 + b**2 + d**2 + e**2
         det = (a * e - b * d) ** 2
 
-        delta = trace ** 2 / 4 - det
+        delta = trace**2 / 4 - det
         if delta < 1e-12:
             delta = 0
 
@@ -362,7 +362,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         Raises NotImplementedError for improper transformations.
         """
         l1, l2 = self._scaling
-        return math.sqrt(l1 ** 2 - l2 ** 2) / l1
+        return math.sqrt(l1**2 - l2**2) / l1
 
     @property
     def rotation_angle(self) -> float:

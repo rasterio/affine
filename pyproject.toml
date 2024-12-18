@@ -28,8 +28,6 @@ test = [
     "pytest-cov",
 ]
 dev = [
-    "pydocstyle",
-    "flake8",
     "coveralls",
 ]
 
@@ -42,3 +40,17 @@ include = [
     "CHANGES.txt",
     "LICENSE.txt",
 ]
+
+[tool.ruff.lint]
+select = [
+    "D1",  # pydocstyle
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+]
+ignore = [
+    "D105",  # Missing docstring in magic method
+]
+
+[tool.ruff.lint.per-file-ignores]
+"affine/tests/**.py" = ["D"]
+"docs/**.py" = ["D"]

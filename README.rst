@@ -98,4 +98,3 @@ The reverse transformation is obtained using the ``~`` operator.
   >>> rev = ~fwd
   >>> rev * fwd * (col, row)
   (0.0, 99.99999999999999)
-
