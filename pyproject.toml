@@ -44,7 +44,7 @@ include = [
 [tool.ruff.lint]
 select = [
     "B",  # flake8-bugbear
-    "D1",  # pydocstyle
+    "D",  # pydocstyle
     "E", "W",  # pycodestyle
     "F",  # Pyflakes
     "I",  # isort
@@ -62,3 +62,6 @@ ignore = [
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
