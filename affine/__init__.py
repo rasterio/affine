@@ -32,9 +32,9 @@ copyright statement below.
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #############################################################################
 
+from collections import namedtuple
 import math
 import warnings
-from collections import namedtuple
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"

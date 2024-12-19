@@ -60,5 +60,8 @@ ignore = [
 "affine/tests/**.py" = ["B", "D"]
 "docs/**.py" = ["D"]
 
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"

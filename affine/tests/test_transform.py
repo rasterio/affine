@@ -29,8 +29,8 @@
 """Transform unit tests"""
 
 import math
-import unittest
 from textwrap import dedent
+import unittest
 
 import pytest
 
