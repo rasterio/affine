@@ -1,4 +1,4 @@
-"""Affine transformation matrices.
+"""Affine transformation matrices
 
 The Affine package is derived from Casey Duncan's Planar package. See the
 copyright statement below.
@@ -48,18 +48,17 @@ class AffineError(Exception):
 
 
 class TransformNotInvertibleError(AffineError):
-    """The transform could not be inverted."""
+    """The transform could not be inverted"""
 
 
 class UndefinedRotationError(AffineError):
-    """The rotation angle could not be computed for this transform."""
+    """The rotation angle could not be computed for this transform"""
 
 
 def cached_property(func):
-    """Cached property decorator.
-
-    This special property decorator caches the computed property value in the
-    object's instance dict the first time it is accessed.
+    """Special property decorator that caches the computed
+    property value in the object's instance dict the first
+    time it is accessed.
     """
     name = func.__name__
     doc = func.__doc__
@@ -107,7 +106,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         `a`, `b`, and `c` are the elements of the first row of the
         matrix. `d`, `e`, and `f` are the elements of the second row.
 
-    Attributes:
+    Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
         The coefficients of the 3x3 augmented affine transformation
@@ -154,12 +153,13 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         h: float = 0.0,
         i: float = 1.0,
     ):
-        """Create a new object.
+        """Create a new object
 
         Parameters
         ----------
         a, b, c, d, e, f : float
             Elements of an augmented affine transformation matrix.
+
         """
         return tuple.__new__(
             cls,
@@ -256,7 +256,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
     @classmethod
     def permutation(cls, *scaling):
-        """Create the permutation transform.
+        """Create the permutation transform
 
         For 2x2 matrices, there is only one permutation matrix that is
         not the identity.
@@ -289,7 +289,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         return (self.c, self.a, self.b, self.f, self.d, self.e)
 
     def to_shapely(self):
-        """Return an affine transformation matrix compatible with shapely.
+        """Return an affine transformation matrix compatible with shapely
 
         Shapely's affinity module expects an affine transformation matrix
         in (a,b,d,e,xoff,yoff) order.
@@ -300,12 +300,12 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
     @property
     def xoff(self) -> float:
-        """Alias for 'c'."""
+        """Alias for 'c'"""
         return self.c
 
     @property
     def yoff(self) -> float:
-        """Alias for 'f'."""
+        """Alias for 'f'"""
         return self.f
 
     @cached_property
@@ -374,7 +374,9 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
     @property
     def is_identity(self) -> bool:
-        """True if this transform equals the identity matrix, within rounding limits."""
+        """True if this transform equals the identity matrix,
+        within rounding limits.
+        """
         return self is identity or self.almost_equals(identity, self.precision)
 
     @property
@@ -436,7 +438,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
     @property
     def column_vectors(self):
-        """The values of the transform as three 2D column vectors."""
+        """The values of the transform as three 2D column vectors"""
         a, b, c, d, e, f, _, _, _ = self
         return (a, d), (b, e), (c, f)
 
@@ -468,7 +470,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     __iadd__ = __add__
 
     def __mul__(self, other):
-        """Multiplication.
+        """Multiplication
 
         Apply the transform using matrix multiplication, creating
         a resulting object of the same type.  A transform may be applied
@@ -504,17 +506,18 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
                 return NotImplemented
 
     def __rmul__(self, other):
-        """Right hand multiplication.
+        """Right hand multiplication
 
         .. deprecated:: 2.3.0
             Right multiplication will be prohibited in version 3.0. This method
             will raise AffineError.
 
-        Notes:
+        Notes
         -----
         We should not be called if other is an affine instance This is
         just a guarantee, since we would potentially return the wrong
         answer in that case.
+
         """
         warnings.warn(
             "Right multiplication will be prohibited in version 3.0",
@@ -564,13 +567,14 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     __hash__ = tuple.__hash__  # hash is not inherited in Py 3
 
     def __getnewargs__(self):
-        """Pickle protocol support.
+        """Pickle protocol support
 
-        Notes:
+        Notes
         -----
         Normal unpickling creates a situation where __new__ receives all
         9 elements rather than the 6 that are required for the
         constructor.  This method ensures that only the 6 are provided.
+
         """
         return self.a, self.b, self.c, self.d, self.e, self.f
 
