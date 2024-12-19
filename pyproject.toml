@@ -43,14 +43,22 @@ include = [
 
 [tool.ruff.lint]
 select = [
+    "B",  # flake8-bugbear
     "D1",  # pydocstyle
-    "E",  # pycodestyle
+    "E", "W",  # pycodestyle
     "F",  # Pyflakes
+    "I",  # isort
+    "PT", # flake8-pytest-style
+    "RUF", # Ruff-specific rules
+    "UP", # pyupgrade
 ]
 ignore = [
     "D105",  # Missing docstring in magic method
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"affine/tests/**.py" = ["D"]
+"affine/tests/**.py" = ["B", "D"]
 "docs/**.py" = ["D"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true

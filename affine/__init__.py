@@ -36,7 +36,6 @@ from collections import namedtuple
 import math
 import warnings
 
-
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
 __version__ = "2.4.1dev"
@@ -160,20 +159,11 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         ----------
         a, b, c, d, e, f : float
             Elements of an augmented affine transformation matrix.
+
         """
         return tuple.__new__(
             cls,
-            (
-                a * 1.0,
-                b * 1.0,
-                c * 1.0,
-                d * 1.0,
-                e * 1.0,
-                f * 1.0,
-                g * 1.0,
-                h * 1.0,
-                i * 1.0,
-            ),
+            tuple(map(float, (a, b, c, d, e, f, g, h, i))),
         )
 
     @classmethod
@@ -255,20 +245,14 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
             return tuple.__new__(cls, (ca, -sa, 0.0, sa, ca, 0.0, 0.0, 0.0, 1.0))
         else:
             px, py = pivot
+            # fmt: off
             return tuple.__new__(
                 cls,
-                (
-                    ca,
-                    -sa,
-                    px - px * ca + py * sa,
-                    sa,
-                    ca,
-                    py - px * sa - py * ca,
-                    0.0,
-                    0.0,
-                    1.0,
-                ),
+                (ca, -sa, px - px * ca + py * sa,
+                 sa, ca, py - px * sa - py * ca,
+                 0.0, 0.0, 1.0),
             )
+            # fmt: on
 
     @classmethod
     def permutation(cls, *scaling):
@@ -279,18 +263,23 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
         :rtype: Affine
         """
-
         return tuple.__new__(cls, (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0))
 
     def __str__(self) -> str:
         """Concise string representation."""
         return (
-            "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|"
-        ) % self
+            "|{: .2f},{: .2f},{: .2f}|\n"
+            "|{: .2f},{: .2f},{: .2f}|\n"
+            "|{: .2f},{: .2f},{: .2f}|"
+        ).format(*self)
 
     def __repr__(self) -> str:
         """Precise string representation."""
-        return ("Affine(%r, %r, %r,\n" "       %r, %r, %r)") % self[:6]
+        # fmt: off
+        return ("Affine({!r}, {!r}, {!r},\n"
+                "       {!r}, {!r}, {!r})"
+        ).format(*self[:6])
+        # fmt: on
 
     def to_gdal(self):
         """Return same coefficient order as GDAL's SetGeoTransform().
@@ -342,14 +331,14 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         # of the matrix times its transpose, M M*
         # Computing trace and determinant of M M*
         trace = a**2 + b**2 + d**2 + e**2
-        det = (a * e - b * d) ** 2
+        det2 = (a * e - b * d) ** 2
 
-        delta = trace**2 / 4 - det
+        delta = trace**2 / 4.0 - det2
         if delta < 1e-12:
-            delta = 0
-
-        l1 = math.sqrt(trace / 2 + math.sqrt(delta))
-        l2 = math.sqrt(trace / 2 - math.sqrt(delta))
+            delta = 0.0
+        sqrt_delta = math.sqrt(delta)
+        l1 = math.sqrt(trace / 2.0 + sqrt_delta)
+        l2 = math.sqrt(trace / 2.0 - sqrt_delta)
         return l1, l2
 
     @property
@@ -379,7 +368,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         if self.is_proper or self.is_degenerate:
             l1, _ = self._scaling
             y, x = c / l1, a / l1
-            return math.atan2(y, x) * 180 / math.pi
+            return math.degrees(math.atan2(y, x))
         else:
             raise UndefinedRotationError
 
@@ -528,6 +517,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         We should not be called if other is an affine instance This is
         just a guarantee, since we would potentially return the wrong
         answer in that case.
+
         """
         warnings.warn(
             "Right multiplication will be prohibited in version 3.0",
@@ -584,6 +574,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         Normal unpickling creates a situation where __new__ receives all
         9 elements rather than the 6 that are required for the
         constructor.  This method ensures that only the 6 are provided.
+
         """
         return self.a, self.b, self.c, self.d, self.e, self.f
 
@@ -607,7 +598,7 @@ def loadsw(s: str):
         raise TypeError("Cannot split input string")
     coeffs = s.split()
     if len(coeffs) != 6:
-        raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
+        raise ValueError(f"Expected 6 coefficients, found {len(coeffs)}")
     a, d, b, e, c, f = (float(x) for x in coeffs)
     center = tuple.__new__(Affine, [a, b, c, d, e, f, 0.0, 0.0, 1.0])
     return center * Affine.translation(-0.5, -0.5)
