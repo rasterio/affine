@@ -245,12 +245,14 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
             return tuple.__new__(cls, (ca, -sa, 0.0, sa, ca, 0.0, 0.0, 0.0, 1.0))
         else:
             px, py = pivot
-            c = px - px * ca + py * sa
-            f = py - px * sa - py * ca
+            # fmt: off
             return tuple.__new__(
                 cls,
-                (ca, -sa, c, sa, ca, f, 0.0, 0.0, 1.0),
+                (ca, -sa, px - px * ca + py * sa,
+                 sa, ca, py - px * sa - py * ca,
+                 0.0, 0.0, 1.0),
             )
+            # fmt: on
 
     @classmethod
     def permutation(cls, *scaling):
