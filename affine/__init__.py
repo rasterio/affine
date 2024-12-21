@@ -265,6 +265,39 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         """
         return tuple.__new__(cls, (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0))
 
+    def __array__(self, dtype=None, copy=None):
+        """Return a 3x3 NumPy array.
+
+        Parameters
+        ----------
+        dtype : data-type, optional
+            The desired data-type for the array.
+        copy : bool, optional
+            If None (default) or True, a copy of the array is always returned.
+            If False, a ValueError is raised as this is not supported.
+
+        Returns
+        -------
+        array
+
+        Raises
+        ------
+        ValueError
+            If ``copy=False`` is specified.
+        """
+        import numpy as np
+
+        if copy is False:
+            raise ValueError("`copy=False` isn't supported. A copy is always created.")
+        return np.array(
+            [
+                [self.a, self.b, self.c],
+                [self.d, self.e, self.f],
+                [0.0, 0.0, 1.0],
+            ],
+            dtype=dtype or float,
+        )
+
     def __str__(self) -> str:
         """Concise string representation."""
         return (

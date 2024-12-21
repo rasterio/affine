@@ -24,6 +24,7 @@ requires-python = ">=3.7"
 
 [project.optional-dependencies]
 test = [
+    "numpy",
     "pytest >=4.6",
     "pytest-cov",
 ]
@@ -48,6 +49,7 @@ select = [
     "E", "W",  # pycodestyle
     "F",  # Pyflakes
     "I",  # isort
+    "NPY", # NumPy-specific rules
     "PT", # flake8-pytest-style
     "RUF", # Ruff-specific rules
     "UP", # pyupgrade
