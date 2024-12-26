@@ -1,4 +1,4 @@
-"""Affine transformation matrices
+"""Affine transformation matrices.
 
 The Affine package is derived from Casey Duncan's Planar package. See the
 copyright statement below.
@@ -36,7 +36,6 @@ from collections import namedtuple
 import math
 import warnings
 
-
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
 __version__ = "2.4.1dev"
@@ -49,17 +48,18 @@ class AffineError(Exception):
 
 
 class TransformNotInvertibleError(AffineError):
-    """The transform could not be inverted"""
+    """The transform could not be inverted."""
 
 
 class UndefinedRotationError(AffineError):
-    """The rotation angle could not be computed for this transform"""
+    """The rotation angle could not be computed for this transform."""
 
 
 def cached_property(func):
-    """Special property decorator that caches the computed
-    property value in the object's instance dict the first
-    time it is accessed.
+    """Provide a cached property decorator.
+
+    This special property decorator caches the computed property value in the
+    object's instance dict the first time it is accessed.
     """
     name = func.__name__
     doc = func.__doc__
@@ -154,7 +154,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         h: float = 0.0,
         i: float = 1.0,
     ):
-        """Create a new object
+        """Create a new object.
 
         Parameters
         ----------
@@ -163,25 +163,21 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         """
         return tuple.__new__(
             cls,
-            (
-                a * 1.0,
-                b * 1.0,
-                c * 1.0,
-                d * 1.0,
-                e * 1.0,
-                f * 1.0,
-                g * 1.0,
-                h * 1.0,
-                i * 1.0,
-            ),
+            tuple(map(float, (a, b, c, d, e, f, g, h, i))),
         )
 
     @classmethod
     def from_gdal(cls, c: float, a: float, b: float, f: float, d: float, e: float):
         """Use same coefficient order as GDAL's GetGeoTransform().
 
-        :param c, a, b, f, d, e: 6 floats ordered by GDAL.
-        :rtype: Affine
+        Parameters
+        ----------
+        c, a, b, f, d, e : float
+            Parameters ordered by GDAL's GeoTransform.
+
+        Returns
+        -------
+        Affine
         """
         return cls.__new__(cls, a, b, c, d, e, f)
 
@@ -189,7 +185,9 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     def identity(cls):
         """Return the identity transform.
 
-        :rtype: Affine
+        Returns
+        -------
+        Affine
         """
         return identity
 
@@ -197,11 +195,14 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     def translation(cls, xoff: float, yoff: float):
         """Create a translation transform from an offset vector.
 
-        :param xoff: Translation x offset.
-        :type xoff: float
-        :param yoff: Translation y offset.
-        :type yoff: float
-        :rtype: Affine
+        Parameters
+        ----------
+        xoff, yoff : float
+            Translation offsets in x and y directions.
+
+        Returns
+        -------
+        Affine
         """
         return tuple.__new__(cls, (1.0, 0.0, xoff, 0.0, 1.0, yoff, 0.0, 0.0, 1.0))
 
@@ -209,11 +210,16 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     def scale(cls, *scaling):
         """Create a scaling transform from a scalar or vector.
 
-        :param scaling: The scaling factor. A scalar value will
-            scale in both dimensions equally. A vector scaling
-            value scales the dimensions independently.
-        :type scaling: float or sequence
-        :rtype: Affine
+        Parameters
+        ----------
+        *scaling : float or sequence of two floats
+            One or two scaling factors. A scalar value will scale in both
+            dimensions equally. A vector scaling value scales the dimensions
+            independently.
+
+        Returns
+        -------
+        Affine
         """
         if len(scaling) == 1:
             sx = sy = float(scaling[0])
@@ -225,11 +231,14 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     def shear(cls, x_angle: float = 0, y_angle: float = 0):
         """Create a shear transform along one or both axes.
 
-        :param x_angle: Shear angle in degrees parallel to the x-axis.
-        :type x_angle: float
-        :param y_angle: Shear angle in degrees parallel to the y-axis.
-        :type y_angle: float
-        :rtype: Affine
+        Parameters
+        ----------
+        x_angle, y_angle : float
+            Shear angles in degrees parallel to the x- and y-axis.
+
+        Returns
+        -------
+        Affine
         """
         mx = math.tan(math.radians(x_angle))
         my = math.tan(math.radians(y_angle))
@@ -239,92 +248,106 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     def rotation(cls, angle: float, pivot=None):
         """Create a rotation transform at the specified angle.
 
-        A pivot point other than the coordinate system origin may be
-        optionally specified.
+        Parameters
+        ----------
+        angle : float
+            Rotation angle in degrees, counter-clockwise about the pivot point.
+        pivot : sequence of float (px, py), optional
+            Pivot point coordinates to rotate around. If None (default), the
+            pivot point is the coordinate system origin (0.0, 0.0).
 
-        :param angle: Rotation angle in degrees, counter-clockwise
-            about the pivot point.
-        :type angle: float
-        :param pivot: Point to rotate about, if omitted the rotation is
-            about the origin.
-        :type pivot: sequence
-        :rtype: Affine
+        Returns
+        -------
+        Affine
         """
         ca, sa = cos_sin_deg(angle)
         if pivot is None:
             return tuple.__new__(cls, (ca, -sa, 0.0, sa, ca, 0.0, 0.0, 0.0, 1.0))
         else:
             px, py = pivot
+            # fmt: off
             return tuple.__new__(
                 cls,
-                (
-                    ca,
-                    -sa,
-                    px - px * ca + py * sa,
-                    sa,
-                    ca,
-                    py - px * sa - py * ca,
-                    0.0,
-                    0.0,
-                    1.0,
-                ),
+                (ca, -sa, px - px * ca + py * sa,
+                 sa, ca, py - px * sa - py * ca,
+                 0.0, 0.0, 1.0),
             )
+            # fmt: on
 
     @classmethod
     def permutation(cls, *scaling):
-        """Create the permutation transform
+        """Create the permutation transform.
 
         For 2x2 matrices, there is only one permutation matrix that is
         not the identity.
 
-        :rtype: Affine
-        """
+        Parameters
+        ----------
+        *scaling : any
+            Ignored.
 
+        Returns
+        -------
+        Affine
+        """
         return tuple.__new__(cls, (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0))
 
     def __str__(self) -> str:
         """Concise string representation."""
         return (
-            "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|\n" "|% .2f,% .2f,% .2f|"
-        ) % self
+            "|{: .2f},{: .2f},{: .2f}|\n"
+            "|{: .2f},{: .2f},{: .2f}|\n"
+            "|{: .2f},{: .2f},{: .2f}|"
+        ).format(*self)
 
     def __repr__(self) -> str:
         """Precise string representation."""
-        return ("Affine(%r, %r, %r,\n" "       %r, %r, %r)") % self[:6]
+        # fmt: off
+        return ("Affine({!r}, {!r}, {!r},\n"
+                "       {!r}, {!r}, {!r})"
+        ).format(*self[:6])
+        # fmt: on
 
     def to_gdal(self):
-        """Return same coefficient order as GDAL's SetGeoTransform().
+        """Return same coefficient order expected by GDAL's SetGeoTransform().
 
-        :rtype: tuple
+        Returns
+        -------
+        tuple
+            Ordered: c, a, b, f, d, e.
         """
         return (self.c, self.a, self.b, self.f, self.d, self.e)
 
     def to_shapely(self):
-        """Return an affine transformation matrix compatible with shapely
+        """Return affine transformation parameters for shapely's affinity module.
 
-        Shapely's affinity module expects an affine transformation matrix
-        in (a,b,d,e,xoff,yoff) order.
-
-        :rtype: tuple
+        Returns
+        -------
+        tuple
+            Ordered: a, b, d, e, c, f.
         """
-        return (self.a, self.b, self.d, self.e, self.xoff, self.yoff)
+        return (self.a, self.b, self.d, self.e, self.c, self.f)
 
     @property
     def xoff(self) -> float:
-        """Alias for 'c'"""
+        """Alias for 'c'."""
         return self.c
 
     @property
     def yoff(self) -> float:
-        """Alias for 'f'"""
+        """Alias for 'f'."""
         return self.f
 
     @cached_property
     def determinant(self) -> float:
-        """The determinant of the transform matrix.
+        """Evaluate the determinant of the transform matrix.
 
         This value is equal to the area scaling factor when the
         transform is applied to a shape.
+
+        Returns
+        -------
+        float
         """
         a, b, c, d, e, f, g, h, i = self
         return a * e - b * d
@@ -341,15 +364,16 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         # The singular values are the square root of the eigenvalues
         # of the matrix times its transpose, M M*
         # Computing trace and determinant of M M*
-        trace = a ** 2 + b ** 2 + d ** 2 + e ** 2
-        det = (a * e - b * d) ** 2
+        trace = a**2 + b**2 + d**2 + e**2
+        det2 = (a * e - b * d) ** 2
 
-        delta = trace ** 2 / 4 - det
+        delta = trace**2 / 4.0 - det2
         if delta < self.precision:
-            delta = 0
+            delta = 0.0
 
-        l1 = math.sqrt(trace / 2 + math.sqrt(delta))
-        l2 = math.sqrt(trace / 2 - math.sqrt(delta))
+        sqrt_delta = math.sqrt(delta)
+        l1 = math.sqrt(trace / 2.0 + sqrt_delta)
+        l2 = math.sqrt(trace / 2.0 - sqrt_delta)
         return l1, l2
 
     @property
@@ -359,10 +383,13 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         This value represents the eccentricity of an ellipse under
         this affine transformation.
 
-        Raises NotImplementedError for improper transformations.
+        Raises
+        ------
+        NotImplementedError
+            For improper transformations.
         """
         l1, l2 = self._scaling
-        return math.sqrt(l1 ** 2 - l2 ** 2) / l1
+        return math.sqrt(l1**2 - l2**2) / l1
 
     @property
     def rotation_angle(self) -> float:
@@ -372,22 +399,22 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         assuming it is in the form M = R S, where R is a rotation and S is a
         scaling.
 
-        Raises UndefinedRotationError for improper and degenerate
-        transformations.
+        Raises
+        ------
+        UndefinedRotationError
+            For improper and degenerate transformations.
         """
         a, b, _, c, d, _, _, _, _ = self
         if self.is_proper or self.is_degenerate:
             l1, _ = self._scaling
             y, x = c / l1, a / l1
-            return math.atan2(y, x) * 180 / math.pi
+            return math.degrees(math.atan2(y, x))
         else:
             raise UndefinedRotationError
 
     @property
     def is_identity(self) -> bool:
-        """True if this transform equals the identity matrix,
-        within rounding limits.
-        """
+        """True if this transform equals the identity matrix, within rounding limits."""
         return self is identity or self.almost_equals(identity, self.precision)
 
     @property
@@ -432,34 +459,57 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
 
     @cached_property
     def is_degenerate(self) -> bool:
-        """True if this transform is degenerate.
+        """Return True if this transform is degenerate.
 
-        Which means that it will collapse a shape to an effective area
-        of zero. Degenerate transforms cannot be inverted.
+        A degenerate transform will collapse a shape to an effective area
+        of zero, and cannot be inverted.
+
+        Returns
+        -------
+        bool
         """
         return self.determinant == 0.0
 
     @cached_property
     def is_proper(self) -> bool:
-        """True if this transform is proper.
+        """Return True if this transform is proper.
 
-        Which means that it does not include reflection.
+        A proper transform (with a positive determinant) does not include
+        reflection.
+
+        Returns
+        -------
+        bool
         """
         return self.determinant > 0.0
 
     @property
     def column_vectors(self):
-        """The values of the transform as three 2D column vectors"""
+        """The values of the transform as three 2D column vectors.
+
+        Returns
+        -------
+        tuple of three tuple pairs
+            Ordered (a, d), (b, e), (c, f).
+        """
         a, b, c, d, e, f, _, _, _ = self
         return (a, d), (b, e), (c, f)
 
     def almost_equals(self, other, precision: float = EPSILON) -> bool:
         """Compare transforms for approximate equality.
 
-        :param other: Transform being compared.
-        :type other: Affine
-        :return: True if absolute difference between each element
-            of each respective transform matrix < ``self.precision``.
+        Parameters
+        ----------
+        other : Affine
+            Transform being compared.
+        precision : float, default EPSILON
+            Precision to use to evaluate equality.
+
+        Returns
+        -------
+        bool
+            True if absolute difference between each element
+            of each respective transform matrix < ``precision``.
         """
         for i in (0, 1, 2, 3, 4, 5):
             if abs(self[i] - other[i]) >= precision:
@@ -481,34 +531,33 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     __iadd__ = __add__
 
     def __mul__(self, other):
-        """Multiplication
+        """Multiplication.
 
         Apply the transform using matrix multiplication, creating
         a resulting object of the same type.  A transform may be applied
         to another transform, a vector, vector array, or shape.
 
-        :param other: The object to transform.
-        :type other: Affine, :class:`~planar.Vec2`,
-            :class:`~planar.Vec2Array`, :class:`~planar.Shape`
-        :rtype: Same as ``other``
+        Parameters
+        ----------
+        other : Affine or iterable of (vx, vy)
+
+        Returns
+        -------
+        Affine or a tuple of two floats
         """
         sa, sb, sc, sd, se, sf, _, _, _ = self
         if isinstance(other, Affine):
             oa, ob, oc, od, oe, of, _, _, _ = other
+            # fmt: off
             return tuple.__new__(
                 self.__class__,
                 (
-                    sa * oa + sb * od,
-                    sa * ob + sb * oe,
-                    sa * oc + sb * of + sc,
-                    sd * oa + se * od,
-                    sd * ob + se * oe,
-                    sd * oc + se * of + sf,
-                    0.0,
-                    0.0,
-                    1.0,
+                    sa * oa + sb * od, sa * ob + sb * oe, sa * oc + sb * of + sc,
+                    sd * oa + se * od, sd * ob + se * oe, sd * oc + se * of + sf,
+                    0.0, 0.0, 1.0,
                 ),
             )
+            # fmt: on
         else:
             try:
                 vx, vy = other
@@ -517,11 +566,19 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
                 return NotImplemented
 
     def __rmul__(self, other):
-        """Right hand multiplication
+        """Right hand multiplication.
 
         .. deprecated:: 2.3.0
             Right multiplication will be prohibited in version 3.0. This method
             will raise AffineError.
+
+        Parameters
+        ----------
+        other : Affine or iterable of (vx, vy)
+
+        Returns
+        -------
+        Affine
 
         Notes
         -----
@@ -538,17 +595,23 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
         return self.__mul__(other)
 
     def __imul__(self, other):
+        """Provide wrapper for `__mul__`, however `other` is not modified in-place."""
         if isinstance(other, Affine) or isinstance(other, tuple):
             return self.__mul__(other)
         else:
             return NotImplemented
 
     def itransform(self, seq) -> None:
-        """Transform a sequence of points or vectors in place.
+        """Transform a sequence of points or vectors in-place.
 
-        :param seq: Mutable sequence of :class:`~planar.Vec2` to be
-            transformed.
-        :returns: None, the input sequence is mutated in place.
+        Parameters
+        ----------
+        seq : mutable sequence
+
+        Returns
+        -------
+        None
+            The input sequence is mutated in-place.
         """
         if self is not identity and self != identity:
             sa, sb, sc, sd, se, sf, _, _, _ = self
@@ -558,8 +621,10 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     def __invert__(self):
         """Return the inverse transform.
 
-        :raises: :except:`TransformNotInvertible` if the transform
-            is degenerate.
+        Raises
+        ------
+        TransformNotInvertible
+            If the transform is degenerate.
         """
         if self.is_degenerate:
             raise TransformNotInvertibleError("Cannot invert degenerate transform")
@@ -577,7 +642,7 @@ class Affine(namedtuple("Affine", ("a", "b", "c", "d", "e", "f", "g", "h", "i"))
     __hash__ = tuple.__hash__  # hash is not inherited in Py 3
 
     def __getnewargs__(self):
-        """Pickle protocol support
+        """Pickle protocol support.
 
         Notes
         -----
@@ -595,19 +660,25 @@ identity = Affine(1, 0, 0, 0, 1, 0)
 
 
 def loadsw(s: str):
-    """Returns Affine from the contents of a world file string.
+    """Return Affine from the contents of a world file string.
 
     This method also translates the coefficients from center- to
     corner-based coordinates.
 
-    :param s: str with 6 floats ordered in a world file.
-    :rtype: Affine
+    Parameters
+    ----------
+    s : str
+        String with 6 floats ordered in a world file.
+
+    Returns
+    -------
+    Affine
     """
     if not hasattr(s, "split"):
         raise TypeError("Cannot split input string")
     coeffs = s.split()
     if len(coeffs) != 6:
-        raise ValueError("Expected 6 coefficients, found %d" % len(coeffs))
+        raise ValueError(f"Expected 6 coefficients, found {len(coeffs)}")
     a, d, b, e, c, f = (float(x) for x in coeffs)
     center = tuple.__new__(Affine, [a, b, c, d, e, f, 0.0, 0.0, 1.0])
     return center * Affine.translation(-0.5, -0.5)
@@ -619,7 +690,9 @@ def dumpsw(obj) -> str:
     This method also translates the coefficients from corner- to
     center-based coordinates.
 
-    :rtype: str
+    Returns
+    -------
+    str
     """
     center = obj * Affine.translation(0.5, 0.5)
     return "\n".join(repr(getattr(center, x)) for x in list("adbecf")) + "\n"

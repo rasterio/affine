@@ -29,13 +29,13 @@
 """Transform unit tests"""
 
 import math
-import unittest
 from textwrap import dedent
+import unittest
 
 import pytest
 
 import affine
-from affine import Affine, EPSILON
+from affine import EPSILON, Affine
 
 
 def seq_almost_equal(t1, t2, error=0.00001):
@@ -369,7 +369,7 @@ class PyAffineTestCase(unittest.TestCase):
 
     def test_bad_value_world(self):
         """Wrong number of parameters."""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Expected 6 coefficients"):
             affine.loadsw("1.0\n0.0\n0.0\n1.0\n0.0\n0.0\n0.0")
 
     def test_simple_world(self):

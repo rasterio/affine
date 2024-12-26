@@ -2,9 +2,8 @@
 Validate that instances of `affine.Affine()` can be pickled and unpickled.
 """
 
-
-import pickle
 from multiprocessing import Pool
+import pickle
 
 import affine
 

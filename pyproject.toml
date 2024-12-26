@@ -28,8 +28,6 @@ test = [
     "pytest-cov",
 ]
 dev = [
-    "pydocstyle",
-    "flake8",
     "coveralls",
 ]
 
@@ -42,3 +40,28 @@ include = [
     "CHANGES.txt",
     "LICENSE.txt",
 ]
+
+[tool.ruff.lint]
+select = [
+    "B",  # flake8-bugbear
+    "D",  # pydocstyle
+    "E", "W",  # pycodestyle
+    "F",  # Pyflakes
+    "I",  # isort
+    "PT", # flake8-pytest-style
+    "RUF", # Ruff-specific rules
+    "UP", # pyupgrade
+]
+ignore = [
+    "D105",  # Missing docstring in magic method
+]
+
+[tool.ruff.lint.per-file-ignores]
+"affine/tests/**.py" = ["B", "D"]
+"docs/**.py" = ["D"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
