@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+3.0a1 (2024-12-27)
+------------------
+
+- Source was moved to src/ and Python version support was changed to 3.9+ (#).
+
 2.4.0 (2023-01-19)
 ------------------
 
