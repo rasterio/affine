@@ -34,6 +34,7 @@ copyright statement below.
 
 from functools import cached_property
 import math
+from typing import Optional
 import warnings
 
 from attrs import astuple, define, field
@@ -501,7 +502,7 @@ class Affine:
         """
         return (self.a, self.d), (self.b, self.e), (self.c, self.f)
 
-    def almost_equals(self, other, precision: float = None) -> bool:
+    def almost_equals(self, other, precision: Optional[float] = None) -> bool:
         """Compare transforms for approximate equality.
 
         Parameters
