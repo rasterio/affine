@@ -501,7 +501,7 @@ class Affine:
         """
         return (self.a, self.d), (self.b, self.e), (self.c, self.f)
 
-    def almost_equals(self, other, precision: float = EPSILON) -> bool:
+    def almost_equals(self, other, precision: float = None) -> bool:
         """Compare transforms for approximate equality.
 
         Parameters
@@ -517,16 +517,18 @@ class Affine:
             True if absolute difference between each element
             of each respective transform matrix < ``precision``.
         """
-        for attr in "abcdef":
-            if abs(getattr(self, attr) - getattr(other, attr)) >= precision:
-                return False
-        return True
+        precision = precision or self.precision
+        return all(abs(sv - ov) < precision for sv, ov in zip(self, other))
+
+    @cached_property
+    def _astuple(self):
+        return astuple(self)
 
     def __getitem__(self, index):
-        return astuple(self)[index]
+        return self._astuple[index]
 
     def __iter__(self):
-        return iter(astuple(self))
+        return iter(self._astuple)
 
     def __len__(self):
         return 9
