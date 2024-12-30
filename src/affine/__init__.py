@@ -44,6 +44,7 @@ __author__ = "Sean Gillies"
 __version__ = "3.0dev"
 
 EPSILON: float = 1e-5
+EPSILON2: float = 1e-10
 
 
 class AffineError(Exception):
@@ -133,11 +134,6 @@ class Affine:
     g: float = field(default=0.0, converter=float)
     h: float = field(default=0.0, converter=float)
     i: float = field(default=1.0, converter=float)
-
-    def __attrs_post_init__(self):
-        # Prevent property from changing between initialization and
-        # computation. precision is a cached property.
-        _ = self.precision
 
     @classmethod
     def from_gdal(cls, c: float, a: float, b: float, f: float, d: float, e: float):
@@ -315,11 +311,6 @@ class Affine:
             f"       {self.d!r}, {self.e!r}, {self.f!r})"
         )
 
-    @cached_property
-    def precision(self):
-        """Numerical precision of comparison methods."""
-        return EPSILON
-
     def to_gdal(self):
         """Return same coefficient order expected by GDAL's SetGeoTransform().
 
@@ -379,7 +370,7 @@ class Affine:
         det2 = (a * e - b * d) ** 2
 
         delta = trace**2 / 4.0 - det2
-        if delta < self.precision:
+        if delta < EPSILON2:
             delta = 0.0
 
         sqrt_delta = math.sqrt(delta)
@@ -425,7 +416,7 @@ class Affine:
     @property
     def is_identity(self) -> bool:
         """True if this transform equals the identity matrix, within rounding limits."""
-        return self is identity or self.almost_equals(identity, self.precision)
+        return self is identity or self.almost_equals(identity, EPSILON)
 
     @property
     def is_rectilinear(self) -> bool:
@@ -434,8 +425,8 @@ class Affine:
         i.e., whether a shape would remain axis-aligned, within rounding
         limits, after applying the transform.
         """
-        return (abs(self.a) < self.precision and abs(self.e) < self.precision) or (
-            abs(self.d) < self.precision and abs(self.b) < self.precision
+        return (abs(self.a) < EPSILON and abs(self.e) < EPSILON) or (
+            abs(self.d) < EPSILON and abs(self.b) < EPSILON
         )
 
     @property
@@ -446,7 +437,7 @@ class Affine:
         transform, within rounding limits.  This implies that the
         transform has no effective shear.
         """
-        return abs(self.a * self.b + self.d * self.e) < self.precision
+        return abs(self.a * self.b + self.d * self.e) < EPSILON
 
     @property
     def is_orthonormal(self) -> bool:
@@ -461,8 +452,8 @@ class Affine:
         a, b, d, e = self.a, self.b, self.d, self.e
         return (
             self.is_conformal
-            and abs(1.0 - (a * a + d * d)) < self.precision
-            and abs(1.0 - (b * b + e * e)) < self.precision
+            and abs(1.0 - (a * a + d * d)) < EPSILON
+            and abs(1.0 - (b * b + e * e)) < EPSILON
         )
 
     @cached_property
@@ -518,7 +509,7 @@ class Affine:
             True if absolute difference between each element
             of each respective transform matrix < ``precision``.
         """
-        precision = precision or self.precision
+        precision = precision or EPSILON
         return all(abs(sv - ov) < precision for sv, ov in zip(self, other))
 
     @cached_property
@@ -721,3 +712,34 @@ def dumpsw(obj) -> str:
     """
     center = obj * Affine.translation(0.5, 0.5)
     return "\n".join(repr(getattr(center, x)) for x in list("adbecf")) + "\n"
+
+
+def set_epsilon(epsilon: float) -> None:
+    """Set the global absolute error value and rounding limit.
+
+    This value is accessible via the affine.EPSILON global variable.
+
+    Parameters
+    ----------
+    epsilon : float
+        The global absolute error value and rounding limit for
+        approximate floating point comparison operations.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    The default value of ``0.00001`` is suitable for values that are in
+    the "countable range". You may need a larger epsilon when using
+    large absolute values, and a smaller value for very small values
+    close to zero. Otherwise approximate comparison operations will not
+    behave as expected.
+    """
+    global EPSILON, EPSILON2
+    EPSILON = float(epsilon)
+    EPSILON2 = EPSILON**2
+
+
+set_epsilon(1e-5)

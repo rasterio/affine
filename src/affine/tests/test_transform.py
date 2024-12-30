@@ -35,7 +35,7 @@ import unittest
 import pytest
 
 import affine
-from affine import EPSILON, Affine
+from affine import Affine
 
 
 def seq_almost_equal(t1, t2, error=0.00001):
@@ -443,11 +443,6 @@ def test_rmul_tuple():
     with pytest.warns(DeprecationWarning):
         t = Affine(1, 2, 3, 4, 5, 6)
         (2.0, 2.0) * t
-
-
-def test_transform_precision():
-    t = Affine.rotation(45.0)
-    assert t.precision == EPSILON
 
 
 def test_associative():
