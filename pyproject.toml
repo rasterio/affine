@@ -20,7 +20,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
 ]
 license = {text = "BSD-3-Clause"}
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 
 [project.optional-dependencies]
 test = [
@@ -59,7 +59,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"affine/tests/**.py" = ["B", "D"]
+"src/affine/tests/**.py" = ["B", "D"]
 "docs/**.py" = ["D"]
 
 [tool.ruff.lint.isort]
