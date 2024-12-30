@@ -14,7 +14,7 @@ Matrices describing 2D affine transformation of the plane.
        :alt: Documentation Status
 
 The Affine package is derived from Casey Duncan's Planar package. Please see
-the copyright statement in `affine/__init__.py <affine/__init__.py>`__.
+the copyright statement in `src/affine/__init__.py <src/affine/__init__.py>`__.
 
 Usage
 -----
