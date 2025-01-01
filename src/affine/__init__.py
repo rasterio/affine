@@ -75,7 +75,7 @@ def cos_sin_deg(deg: float):
     return math.cos(rad), math.sin(rad)
 
 
-@define(frozen=True, slots=False)
+@define(frozen=True)
 class Affine:
     """Two dimensional affine transform for 2D linear mapping.
 
