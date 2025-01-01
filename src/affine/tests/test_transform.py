@@ -116,19 +116,19 @@ class PyAffineTestCase(unittest.TestCase):
     def test_identity_constructor(self):
         ident = Affine.identity()
         assert isinstance(ident, Affine)
-        assert tuple(ident) == (1, 0, 0, 0, 1, 0, 0, 0, 1)
+        assert tuple(ident) == (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
         assert ident.is_identity
 
     def test_permutation_constructor(self):
         perm = Affine.permutation()
         assert isinstance(perm, Affine)
-        assert tuple(perm) == (0, 1, 0, 1, 0, 0, 0, 0, 1)
+        assert tuple(perm) == (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
         assert (perm * perm).is_identity
 
     def test_translation_constructor(self):
         trans = Affine.translation(2, -5)
         assert isinstance(trans, Affine)
-        assert tuple(trans) == (1, 0, 2, 0, 1, -5, 0, 0, 1)
+        assert tuple(trans) == (1.0, 0.0, 2.0, 0.0, 1.0, -5.0, 0.0, 0.0, 1.0)
 
     def test_scale_constructor(self):
         scale = Affine.scale(5)
@@ -448,9 +448,6 @@ def test_rmul_tuple():
 def test_transform_precision():
     t = Affine.rotation(45.0)
     assert t.precision == EPSILON
-    t.precision = 1e-10
-    assert t.precision == 1e-10
-    assert Affine.rotation(0.0).precision == EPSILON
 
 
 def test_associative():

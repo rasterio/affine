@@ -21,6 +21,9 @@ classifiers = [
 ]
 license = {text = "BSD-3-Clause"}
 requires-python = ">=3.9"
+dependencies = [
+    "attrs",
+]
 
 [project.optional-dependencies]
 test = [
