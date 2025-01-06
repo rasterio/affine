@@ -43,6 +43,8 @@ include = [
     "AUTHORS.txt",
     "CHANGES.txt",
     "LICENSE.txt",
+    "docs/",
+    "tests/",
 ]
 
 [tool.ruff.lint]
@@ -62,7 +64,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"src/affine/tests/**.py" = ["B", "D"]
+"tests/**.py" = ["B", "D"]
 "docs/**.py" = ["D"]
 
 [tool.ruff.lint.isort]
