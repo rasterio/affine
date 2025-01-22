@@ -82,27 +82,23 @@ class Affine:
 
     Parameters
     ----------
-    a, b, c, d, e, f : float
-        Coefficients of an augmented affine transformation matrix
-
-        | x' |   | a  b  c | | x |
-        | y' | = | d  e  f | | y |
-        | 1  |   | 0  0  1 | | 1 |
-
+    a, b, c, d, e, f, [g, h, i] : float
+        Coefficients of the 3x3 augmented affine transformation matrix.
         `a`, `b`, and `c` are the elements of the first row of the
         matrix. `d`, `e`, and `f` are the elements of the second row.
+        Defaults for `g`, `h`, and `i` are 0, 0, and 1.
 
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
         The coefficients of the 3x3 augmented affine transformation
-        matrix
+        matrix::
 
-        | x' |   | a  b  c | | x |
-        | y' | = | d  e  f | | y |
-        | 1  |   | g  h  i | | 1 |
+            | x' |   | a  b  c | | x |
+            | y' | = | d  e  f | | y |
+            | 1  |   | g  h  i | | 1 |
 
-        `g`, `h`, and `i` are always 0, 0, and 1.
+        `g`, `h`, and `i` should be 0, 0, and 1.
 
     The Affine package is derived from Casey Duncan's Planar package.
     See the copyright statement below.  Parallel lines are preserved by
@@ -291,7 +287,7 @@ class Affine:
             [
                 [self.a, self.b, self.c],
                 [self.d, self.e, self.f],
-                [0.0, 0.0, 1.0],
+                [self.g, self.h, self.i],
             ],
             dtype=dtype or float,
         )
@@ -306,10 +302,14 @@ class Affine:
 
     def __repr__(self) -> str:
         """Precise string representation."""
-        return (
+        ret = (
             f"Affine({self.a!r}, {self.b!r}, {self.c!r},\n"
-            f"       {self.d!r}, {self.e!r}, {self.f!r})"
+            f"       {self.d!r}, {self.e!r}, {self.f!r}"
         )
+        if self.g != 0.0 or self.h != 0.0 or self.i != 1.0:
+            # only show last row if any are not default values
+            ret += f",\n       {self.g!r}, {self.h!r}, {self.i!r}"
+        return ret + ")"
 
     def to_gdal(self):
         """Return same coefficient order expected by GDAL's SetGeoTransform().
@@ -347,6 +347,8 @@ class Affine:
 
         This value is equal to the area scaling factor when the
         transform is applied to a shape.
+
+        This method assumes that `g`, `h`, and `i` are 0, 0, and 1.
 
         Returns
         -------

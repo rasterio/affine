@@ -9,8 +9,11 @@ import affine
 
 
 def test_pickle():
-    a = affine.Affine(1, 2, 3, 4, 5, 6)
-    assert pickle.loads(pickle.dumps(a)) == a
+    a1 = affine.Affine(1, 2, 3, 4, 5, 6)
+    assert pickle.loads(pickle.dumps(a1)) == a1
+    # specify different g, h, i values than defaults
+    a2 = affine.Affine(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    assert pickle.loads(pickle.dumps(a2)) == a2
 
 
 def _mp_proc(x):

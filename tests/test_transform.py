@@ -77,6 +77,39 @@ def test_slice_last_row():
     t = Affine(1, 2, 3, 4, 5, 6)
     assert t[-3:] == (0, 0, 1)
 
+    # abnormal use, since g, h, i are normally 0, 0, and 1
+    t = Affine(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    assert t[-3:] == (7, 8, 9)
+
+
+def test_members():
+    t = Affine(1, 2, 3, 4, 5, 6)
+    assert t.a == 1
+    assert t.b == 2
+    assert t.c == 3
+    assert t.d == 4
+    assert t.e == 5
+    assert t.f == 6
+    assert t.g == 0
+    assert t.h == 0
+    assert t.i == 1
+    assert t.c is t.xoff
+    assert t.f is t.yoff
+
+    # abnormal use, since g, h, i are normally 0, 0, and 1
+    t = Affine(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    assert t.a == 1
+    assert t.b == 2
+    assert t.c == 3
+    assert t.d == 4
+    assert t.e == 5
+    assert t.f == 6
+    assert t.g == 7
+    assert t.h == 8
+    assert t.i == 9
+    assert t.c is t.xoff
+    assert t.f is t.yoff
+
 
 def test_members_are_floats():
     t = Affine(1, 2, 3, 4, 5, 6)
@@ -97,6 +130,19 @@ def test_getitem():
     assert t[8] == 1
     assert t[-1] == 1
 
+    # abnormal use, since g, h, i are normally 0, 0, and 1
+    t = Affine(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    assert t[0] == 1
+    assert t[1] == 2
+    assert t[2] == 3
+    assert t[3] == 4
+    assert t[4] == 5
+    assert t[5] == 6
+    assert t[6] == 7
+    assert t[7] == 8
+    assert t[8] == 9
+    assert t[-1] == 9
+
 
 def test_getitem_wrong_type():
     t = Affine(1, 2, 3, 4, 5, 6)
@@ -113,6 +159,15 @@ def test_str():
         | 0.00, 0.00, 1.00|"""
     )
 
+    # abnormal use, since g, h, i are normally 0, 0, and 1
+    t = Affine(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    assert str(t) == dedent(
+        """\
+        | 1.00, 2.00, 3.00|
+        | 4.00, 5.00, 6.00|
+        | 7.00, 8.00, 9.00|"""
+    )
+
 
 def test_repr():
     t = Affine(1.111, 2.222, 3.456, 4.444, 5.5, 6.25)
@@ -120,6 +175,22 @@ def test_repr():
         """\
         Affine(1.111, 2.222, 3.456,
                4.444, 5.5, 6.25)"""
+    )
+
+    # abnormal use, since g, h, i are normally 0, 0, and 1
+    t = Affine(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    assert repr(t) == dedent(
+        """\
+        Affine(1.0, 2.0, 3.0,
+               4.0, 5.0, 6.0,
+               7.0, 8.0, 9.0)"""
+    )
+    t = Affine(1.111, 2.222, 3.456, 4.444, 5.5, 6.25, i=0.001)
+    assert repr(t) == dedent(
+        """\
+        Affine(1.111, 2.222, 3.456,
+               4.444, 5.5, 6.25,
+               0.0, 0.0, 0.001)"""
     )
 
 
