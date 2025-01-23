@@ -564,3 +564,18 @@ def test_mul_fallback_type_error():
             return other * (1, 2)
 
     assert Affine.identity() * TextPoint() == (1, 2)
+
+
+def test_init_invalid_g():
+    with pytest.raises(ValueError, match="g must"):
+        Affine(0, 0, 0, 0, 0, 0, 1)
+
+
+def test_init_invalid_h():
+    with pytest.raises(ValueError, match="h must"):
+        Affine(0, 0, 0, 0, 0, 0, 0, 1)
+
+
+def test_init_invalid_i():
+    with pytest.raises(ValueError, match="i must"):
+        Affine(0, 0, 0, 0, 0, 0, 0, 0, 0)
