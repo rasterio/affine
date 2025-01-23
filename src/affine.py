@@ -76,31 +76,37 @@ def cos_sin_deg(deg: float):
     return math.cos(rad), math.sin(rad)
 
 
+def validate_zero(instance, attribute, value):
+    if value != 0.0:
+        raise ValueError(f"{attribute.name} must be 0.0; found {value}")
+
+
+def validate_one(instance, attribute, value):
+    if value != 1.0:
+        raise ValueError(f"{attribute.name} must be 1.0; found {value}")
+
+
 @define(frozen=True)
 class Affine:
     """Two dimensional affine transform for 2D linear mapping.
 
     Parameters
     ----------
-    a, b, c, d, e, f : float
-        Coefficients of an augmented affine transformation matrix
-
-        | x' |   | a  b  c | | x |
-        | y' | = | d  e  f | | y |
-        | 1  |   | 0  0  1 | | 1 |
-
+    a, b, c, d, e, f, [g, h, i] : float
+        Coefficients of the 3x3 augmented affine transformation matrix.
         `a`, `b`, and `c` are the elements of the first row of the
         matrix. `d`, `e`, and `f` are the elements of the second row.
+        Defaults for `g`, `h`, and `i` are 0, 0, and 1.
 
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
         The coefficients of the 3x3 augmented affine transformation
-        matrix
+        matrix::
 
-        | x' |   | a  b  c | | x |
-        | y' | = | d  e  f | | y |
-        | 1  |   | g  h  i | | 1 |
+            | x' |   | a  b  c | | x |
+            | y' | = | d  e  f | | y |
+            | 1  |   | g  h  i | | 1 |
 
         `g`, `h`, and `i` are always 0, 0, and 1.
 
@@ -131,9 +137,9 @@ class Affine:
     d: float = field(converter=float)
     e: float = field(converter=float)
     f: float = field(converter=float)
-    g: float = field(default=0.0, converter=float)
-    h: float = field(default=0.0, converter=float)
-    i: float = field(default=1.0, converter=float)
+    g: float = field(default=0.0, converter=float, validator=validate_zero)
+    h: float = field(default=0.0, converter=float, validator=validate_zero)
+    i: float = field(default=1.0, converter=float, validator=validate_one)
 
     @classmethod
     def from_gdal(cls, c: float, a: float, b: float, f: float, d: float, e: float):
@@ -291,7 +297,7 @@ class Affine:
             [
                 [self.a, self.b, self.c],
                 [self.d, self.e, self.f],
-                [0.0, 0.0, 1.0],
+                [self.g, self.h, self.i],
             ],
             dtype=dtype or float,
         )
@@ -347,6 +353,8 @@ class Affine:
 
         This value is equal to the area scaling factor when the
         transform is applied to a shape.
+
+        This method assumes that `g`, `h`, and `i` are 0, 0, and 1.
 
         Returns
         -------

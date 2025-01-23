@@ -68,6 +68,15 @@ def test_args_members_wrong_type():
         Affine(0, 2, 3, None, None, "")
 
 
+def test_args_wrong_value():
+    with pytest.raises(ValueError, match="g must be 0.0; found 7.0"):
+        Affine(1, 2, 3, 4, 5, 6, 7)
+    with pytest.raises(ValueError, match="h must be 0.0; found 8.0"):
+        Affine(1, 2, 3, 4, 5, 6, h=8)
+    with pytest.raises(ValueError, match="i must be 1.0; found 9.0"):
+        Affine(1, 2, 3, 4, 5, 6, i=9)
+
+
 def test_len():
     t = Affine(1, 2, 3, 4, 5, 6)
     assert len(t) == 9
@@ -76,6 +85,21 @@ def test_len():
 def test_slice_last_row():
     t = Affine(1, 2, 3, 4, 5, 6)
     assert t[-3:] == (0, 0, 1)
+
+
+def test_members():
+    t = Affine(1, 2, 3, 4, 5, 6)
+    assert t.a == 1
+    assert t.b == 2
+    assert t.c == 3
+    assert t.d == 4
+    assert t.e == 5
+    assert t.f == 6
+    assert t.g == 0
+    assert t.h == 0
+    assert t.i == 1
+    assert t.c is t.xoff
+    assert t.f is t.yoff
 
 
 def test_members_are_floats():

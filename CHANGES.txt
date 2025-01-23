@@ -11,6 +11,7 @@ CHANGES
 - Source was moved to a single-module affine.py in the src directory (#112,
   #117).
 - Add numpy __array__ interface (#108).
+- Validate bottom row [g, h, i] to always be [0, 0, 1] (#118)
 
 2.4.0 (2023-01-19)
 ------------------
