@@ -138,18 +138,21 @@ class Affine:
     # tuple form of another, like Affine(*Affine.identity()).
 
     g: float = field(default=0.0, converter=float)
+
     @g.validator
     def _check_g(self, attribute, value):
         if value != 0.0:
             raise ValueError("g must be equal to 0.0")
 
     h: float = field(default=0.0, converter=float)
+
     @h.validator
     def _check_h(self, attribute, value):
         if value != 0.0:
             raise ValueError("h must be equal to 0.0")
 
     i: float = field(default=1.0, converter=float)
+
     @i.validator
     def _check_i(self, attribute, value):
         if value != 1.0:
