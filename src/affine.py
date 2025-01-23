@@ -82,8 +82,8 @@ class Affine:
 
     Parameters
     ----------
-    a, b, c, d, e, f : float
-        Coefficients of an augmented affine transformation matrix
+    a, b, c, d, e, f, [g, h, i] : float
+        Coefficients of the 3 x 3 augmented affine transformation matrix.
 
         | x' |   | a  b  c | | x |
         | y' | = | d  e  f | | y |
@@ -95,12 +95,12 @@ class Affine:
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
-        The coefficients of the 3x3 augmented affine transformation
-        matrix
+        The coefficients of the 3 x 3 augmented affine transformation
+        matrix::
 
-        | x' |   | a  b  c | | x |
-        | y' | = | d  e  f | | y |
-        | 1  |   | g  h  i | | 1 |
+            | x' |   | a  b  c | | x |
+            | y' | = | d  e  f | | y |
+            | 1  |   | g  h  i | | 1 |
 
         `g`, `h`, and `i` are always 0, 0, and 1.
 
@@ -310,14 +310,7 @@ class Affine:
 
         if copy is False:
             raise ValueError("`copy=False` isn't supported. A copy is always created.")
-        return np.array(
-            [
-                [self.a, self.b, self.c],
-                [self.d, self.e, self.f],
-                [0.0, 0.0, 1.0],
-            ],
-            dtype=dtype or float,
-        )
+        return np.array(self._astuple, dtype=(dtype or float)).reshape((3, 3))
 
     def __str__(self) -> str:
         """Concise string representation."""
