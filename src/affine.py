@@ -82,8 +82,8 @@ class Affine:
 
     Parameters
     ----------
-    a, b, c, d, e, f : float
-        Coefficients of an augmented affine transformation matrix
+    a, b, c, d, e, f, [g, h, i] : float
+        Coefficients of the 3 x 3 augmented affine transformation matrix.
 
         | x' |   | a  b  c | | x |
         | y' | = | d  e  f | | y |
@@ -95,12 +95,12 @@ class Affine:
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
-        The coefficients of the 3x3 augmented affine transformation
-        matrix
+        The coefficients of the 3 x 3 augmented affine transformation
+        matrix::
 
-        | x' |   | a  b  c | | x |
-        | y' | = | d  e  f | | y |
-        | 1  |   | g  h  i | | 1 |
+            | x' |   | a  b  c | | x |
+            | y' | = | d  e  f | | y |
+            | 1  |   | g  h  i | | 1 |
 
         `g`, `h`, and `i` are always 0, 0, and 1.
 
@@ -131,9 +131,32 @@ class Affine:
     d: float = field(converter=float)
     e: float = field(converter=float)
     f: float = field(converter=float)
+
+    # The class has 3 attributes that don't have to be specified: g, h,
+    # and i. If they are, the given value has to be the same as the
+    # default value. This allows a new instances to be created from the
+    # tuple form of another, like Affine(*Affine.identity()).
+
     g: float = field(default=0.0, converter=float)
+
+    @g.validator
+    def _check_g(self, attribute, value):
+        if value != 0.0:
+            raise ValueError("g must be equal to 0.0")
+
     h: float = field(default=0.0, converter=float)
+
+    @h.validator
+    def _check_h(self, attribute, value):
+        if value != 0.0:
+            raise ValueError("h must be equal to 0.0")
+
     i: float = field(default=1.0, converter=float)
+
+    @i.validator
+    def _check_i(self, attribute, value):
+        if value != 1.0:
+            raise ValueError("i must be equal to 1.0")
 
     @classmethod
     def from_gdal(cls, c: float, a: float, b: float, f: float, d: float, e: float):
@@ -287,14 +310,7 @@ class Affine:
 
         if copy is False:
             raise ValueError("`copy=False` isn't supported. A copy is always created.")
-        return np.array(
-            [
-                [self.a, self.b, self.c],
-                [self.d, self.e, self.f],
-                [0.0, 0.0, 1.0],
-            ],
-            dtype=dtype or float,
-        )
+        return np.array(self._astuple, dtype=(dtype or float)).reshape((3, 3))
 
     def __str__(self) -> str:
         """Concise string representation."""
