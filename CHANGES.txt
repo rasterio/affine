@@ -1,14 +1,15 @@
 CHANGES
 =======
 
-3.0a1 (2024-12-27)
-------------------
+3.0a1 (TBD)
+-----------
 
 - Python version support was changed to 3.9+ (#110).
 - Switch from namedtuple to attrs for implementation of the Affine class and
   use functools.cached_property(), which absolutely requires Python 3.8+
   (#111).
-- Source was moved to a single-module affine.py (#112).
+- Source was moved to a single-module affine.py in the src directory (#112,
+  #117).
 - Add numpy __array__ interface (#108).
 
 2.4.0 (2023-01-19)
