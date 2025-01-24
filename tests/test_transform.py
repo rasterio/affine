@@ -78,6 +78,22 @@ def test_slice_last_row():
     assert t[-3:] == (0, 0, 1)
 
 
+def test_members():
+    t = Affine(1, 2, 3, 4, 5, 6)
+    assert t.a == 1
+    assert t.b == 2
+    assert t.c == 3
+    assert t.d == 4
+    assert t.e == 5
+    assert t.f == 6
+    assert t.g == 0
+    assert t.h == 0
+    assert t.i == 1
+    # these are aliases
+    assert t.c is t.xoff
+    assert t.f is t.yoff
+
+
 def test_members_are_floats():
     t = Affine(1, 2, 3, 4, 5, 6)
     for m in t:
@@ -463,15 +479,13 @@ def test_shapely():
 
 def test_imul_number():
     t = Affine(1, 2, 3, 4, 5, 6)
-    try:
+    with pytest.raises(TypeError):
         t *= 2.0
-    except TypeError:
-        assert True
 
 
 def test_mul_tuple():
     t = Affine(1, 2, 3, 4, 5, 6)
-    t * (2.0, 2.0)
+    assert t * (2, 2) == (9, 24)
 
 
 def test_rmul_tuple():

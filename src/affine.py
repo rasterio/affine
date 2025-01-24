@@ -68,9 +68,9 @@ def cos_sin_deg(deg: float):
     deg = deg % 360.0
     if deg == 90.0:
         return 0.0, 1.0
-    elif deg == 180.0:
+    if deg == 180.0:
         return -1.0, 0
-    elif deg == 270.0:
+    if deg == 270.0:
         return 0, -1.0
     rad = math.radians(deg)
     return math.cos(rad), math.sin(rad)
@@ -255,18 +255,13 @@ class Affine:
         ca, sa = cos_sin_deg(angle)
         if pivot is None:
             return cls(ca, -sa, 0.0, sa, ca, 0.0)
-        else:
-            px, py = pivot
-            # fmt: off
-            return cls(
-                ca,
-                -sa,
-                px - px * ca + py * sa,
-                sa,
-                ca,
-                py - px * sa - py * ca,
-            )
-            # fmt: on
+        px, py = pivot
+        # fmt: off
+        return cls(
+            ca, -sa, px - px * ca + py * sa,
+            sa, ca, py - px * sa - py * ca,
+        )
+        # fmt: on
 
     @classmethod
     def permutation(cls, *scaling):
@@ -426,8 +421,7 @@ class Affine:
             l1, _ = self._scaling
             y, x = self.d / l1, self.a / l1
             return math.degrees(math.atan2(y, x))
-        else:
-            raise UndefinedRotationError
+        raise UndefinedRotationError
 
     @property
     def is_identity(self) -> bool:
@@ -570,16 +564,9 @@ class Affine:
         -------
         Affine or a tuple of two floats
         """
-        sa, sb, sc, sd, se, sf = self.a, self.b, self.c, self.d, self.e, self.f
+        sa, sb, sc, sd, se, sf = self[:6]
         if isinstance(other, Affine):
-            oa, ob, oc, od, oe, of = (
-                other.a,
-                other.b,
-                other.c,
-                other.d,
-                other.e,
-                other.f,
-            )
+            oa, ob, oc, od, oe, of = other[:6]
             return self.__class__(
                 sa * oa + sb * od,
                 sa * ob + sb * oe,
@@ -588,12 +575,11 @@ class Affine:
                 sd * ob + se * oe,
                 sd * oc + se * of + sf,
             )
-        else:
-            try:
-                vx, vy = other
-                return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
-            except (ValueError, TypeError):
-                return NotImplemented
+        try:
+            vx, vy = other
+            return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
+        except (ValueError, TypeError):
+            return NotImplemented
 
     def __rmul__(self, other):
         """Right hand multiplication.
@@ -608,7 +594,7 @@ class Affine:
 
         Returns
         -------
-        Affine
+        tuple of two floats
 
         Notes
         -----
@@ -626,10 +612,9 @@ class Affine:
 
     def __imul__(self, other):
         """Provide wrapper for `__mul__`, however `other` is not modified in-place."""
-        if isinstance(other, Affine) or isinstance(other, tuple):
+        if isinstance(other, (Affine, tuple)):
             return self.__mul__(other)
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def itransform(self, seq) -> None:
         """Transform a sequence of points or vectors in-place.
@@ -644,7 +629,7 @@ class Affine:
             The input sequence is mutated in-place.
         """
         if self is not identity and self != identity:
-            sa, sb, sc, sd, se, sf = self.a, self.b, self.c, self.d, self.e, self.f
+            sa, sb, sc, sd, se, sf = self[:6]
             for i, (x, y) in enumerate(seq):
                 seq[i] = (x * sa + y * sb + sc, x * sd + y * se + sf)
 
@@ -659,19 +644,17 @@ class Affine:
         if self.is_degenerate:
             raise TransformNotInvertibleError("Cannot invert degenerate transform")
         idet = 1.0 / self.determinant
-        sa, sb, sc, sd, se, sf = self.a, self.b, self.c, self.d, self.e, self.f
+        sa, sb, sc, sd, se, sf = self[:6]
         ra = se * idet
         rb = -sb * idet
         rd = -sd * idet
         re = sa * idet
+        # fmt: off
         return self.__class__(
-            ra,
-            rb,
-            -sc * ra - sf * rb,
-            rd,
-            re,
-            -sc * rd - sf * re,
+            ra, rb, -sc * ra - sf * rb,
+            rd, re, -sc * rd - sf * re,
         )
+        # fmt: on
 
     def __getnewargs__(self):
         """Pickle protocol support.
@@ -682,7 +665,7 @@ class Affine:
         9 elements rather than the 6 that are required for the
         constructor.  This method ensures that only the 6 are provided.
         """
-        return self.a, self.b, self.c, self.d, self.e, self.f
+        return self[:6]
 
 
 identity = Affine(1, 0, 0, 0, 1, 0)
