@@ -47,6 +47,10 @@ include = [
     "tests/",
 ]
 
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = ["tests"]
+
 [tool.ruff.lint]
 select = [
     "B",  # flake8-bugbear
@@ -56,7 +60,9 @@ select = [
     "I",  # isort
     "NPY", # NumPy-specific rules
     "PT", # flake8-pytest-style
+    "RET", # flake8-return
     "RUF", # Ruff-specific rules
+    "SIM", # flake8-simplify
     "UP", # pyupgrade
 ]
 ignore = [
