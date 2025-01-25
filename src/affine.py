@@ -32,10 +32,11 @@ copyright statement below.
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #############################################################################
 
+from __future__ import annotations
+
 from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
-from typing import Optional
 
 from attrs import astuple, define, field
 
@@ -155,7 +156,7 @@ class Affine:
     @classmethod
     def from_gdal(
         cls, c: float, a: float, b: float, f: float, d: float, e: float
-    ) -> "Affine":
+    ) -> Affine:
         """Use same coefficient order as GDAL's GetGeoTransform().
 
         Parameters
@@ -170,7 +171,7 @@ class Affine:
         return cls(a, b, c, d, e, f)
 
     @classmethod
-    def identity(cls) -> "Affine":
+    def identity(cls) -> Affine:
         """Return the identity transform.
 
         Returns
@@ -180,7 +181,7 @@ class Affine:
         return identity
 
     @classmethod
-    def translation(cls, xoff: float, yoff: float) -> "Affine":
+    def translation(cls, xoff: float, yoff: float) -> Affine:
         """Create a translation transform from an offset vector.
 
         Parameters
@@ -195,7 +196,7 @@ class Affine:
         return cls(1.0, 0.0, xoff, 0.0, 1.0, yoff)
 
     @classmethod
-    def scale(cls, *scaling: float) -> "Affine":
+    def scale(cls, *scaling: float) -> Affine:
         """Create a scaling transform from a scalar or vector.
 
         Parameters
@@ -217,7 +218,7 @@ class Affine:
         return cls(sx, 0.0, 0.0, 0.0, sy, 0.0)
 
     @classmethod
-    def shear(cls, x_angle: float = 0.0, y_angle: float = 0.0) -> "Affine":
+    def shear(cls, x_angle: float = 0.0, y_angle: float = 0.0) -> Affine:
         """Create a shear transform along one or both axes.
 
         Parameters
@@ -234,9 +235,7 @@ class Affine:
         return cls(1.0, mx, 0.0, my, 1.0, 0.0)
 
     @classmethod
-    def rotation(
-        cls, angle: float, pivot: Optional[Sequence[float]] = None
-    ) -> "Affine":
+    def rotation(cls, angle: float, pivot: Sequence[float] | None = None) -> Affine:
         """Create a rotation transform at the specified angle.
 
         Parameters
@@ -263,7 +262,7 @@ class Affine:
         # fmt: on
 
     @classmethod
-    def permutation(cls, *scaling: float) -> "Affine":
+    def permutation(cls, *scaling: float) -> Affine:
         """Create the permutation transform.
 
         For 2x2 matrices, there is only one permutation matrix that is
@@ -280,7 +279,7 @@ class Affine:
         """
         return cls(0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
 
-    def __array__(self, dtype=None, copy: Optional[bool] = None):
+    def __array__(self, dtype=None, copy: bool | None = None):
         """Get affine matrix as a 3x3 NumPy array.
 
         Parameters
@@ -504,7 +503,7 @@ class Affine:
         """
         return (self.a, self.d), (self.b, self.e), (self.c, self.f)
 
-    def almost_equals(self, other, precision: Optional[float] = None) -> bool:
+    def almost_equals(self, other, precision: float | None = None) -> bool:
         """Compare transforms for approximate equality.
 
         Parameters
