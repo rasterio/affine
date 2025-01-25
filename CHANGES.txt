@@ -4,6 +4,7 @@ CHANGES
 3.0a1 (TBD)
 -----------
 
+- Complete type hints for functions and methods (#).
 - Affine raises ValueError if initialized with values for g, h, and i that are
   not 0.0, 0.0, and 1.0, respectively (#117).
 - Python version support was changed to 3.9+ (#110).

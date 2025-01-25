@@ -32,10 +32,10 @@ copyright statement below.
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #############################################################################
 
+from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
 from typing import Optional
-import warnings
 
 from attrs import astuple, define, field
 
@@ -59,7 +59,7 @@ class UndefinedRotationError(AffineError):
     """The rotation angle could not be computed for this transform."""
 
 
-def cos_sin_deg(deg: float):
+def cos_sin_deg(deg: float) -> tuple[float, float]:
     """Return the cosine and sin for the given angle in degrees.
 
     With special-case handling of multiples of 90 for perfect right
@@ -83,19 +83,13 @@ class Affine:
     Parameters
     ----------
     a, b, c, d, e, f, [g, h, i] : float
-        Coefficients of the 3 x 3 augmented affine transformation matrix.
-
-        | x' |   | a  b  c | | x |
-        | y' | = | d  e  f | | y |
-        | 1  |   | 0  0  1 | | 1 |
-
-        `a`, `b`, and `c` are the elements of the first row of the
-        matrix. `d`, `e`, and `f` are the elements of the second row.
+        Coefficients of the 3 x 3 augmented affine transformation
+        matrix.
 
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
-        The coefficients of the 3 x 3 augmented affine transformation
+        Coefficients of the 3 x 3 augmented affine transformation
         matrix::
 
             | x' |   | a  b  c | | x |
@@ -159,7 +153,9 @@ class Affine:
             raise ValueError("i must be equal to 1.0")
 
     @classmethod
-    def from_gdal(cls, c: float, a: float, b: float, f: float, d: float, e: float):
+    def from_gdal(
+        cls, c: float, a: float, b: float, f: float, d: float, e: float
+    ) -> "Affine":
         """Use same coefficient order as GDAL's GetGeoTransform().
 
         Parameters
@@ -174,7 +170,7 @@ class Affine:
         return cls(a, b, c, d, e, f)
 
     @classmethod
-    def identity(cls):
+    def identity(cls) -> "Affine":
         """Return the identity transform.
 
         Returns
@@ -184,7 +180,7 @@ class Affine:
         return identity
 
     @classmethod
-    def translation(cls, xoff: float, yoff: float):
+    def translation(cls, xoff: float, yoff: float) -> "Affine":
         """Create a translation transform from an offset vector.
 
         Parameters
@@ -199,7 +195,7 @@ class Affine:
         return cls(1.0, 0.0, xoff, 0.0, 1.0, yoff)
 
     @classmethod
-    def scale(cls, *scaling):
+    def scale(cls, *scaling: float) -> "Affine":
         """Create a scaling transform from a scalar or vector.
 
         Parameters
@@ -214,13 +210,14 @@ class Affine:
         Affine
         """
         if len(scaling) == 1:
-            sx = sy = float(scaling[0])
+            sx = scaling[0]
+            sy = sx
         else:
             sx, sy = scaling
         return cls(sx, 0.0, 0.0, 0.0, sy, 0.0)
 
     @classmethod
-    def shear(cls, x_angle: float = 0, y_angle: float = 0):
+    def shear(cls, x_angle: float = 0.0, y_angle: float = 0.0) -> "Affine":
         """Create a shear transform along one or both axes.
 
         Parameters
@@ -237,7 +234,9 @@ class Affine:
         return cls(1.0, mx, 0.0, my, 1.0, 0.0)
 
     @classmethod
-    def rotation(cls, angle: float, pivot=None):
+    def rotation(
+        cls, angle: float, pivot: Optional[Sequence[float]] = None
+    ) -> "Affine":
         """Create a rotation transform at the specified angle.
 
         Parameters
@@ -264,7 +263,7 @@ class Affine:
         # fmt: on
 
     @classmethod
-    def permutation(cls, *scaling):
+    def permutation(cls, *scaling: float) -> "Affine":
         """Create the permutation transform.
 
         For 2x2 matrices, there is only one permutation matrix that is
@@ -281,7 +280,7 @@ class Affine:
         """
         return cls(0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
 
-    def __array__(self, dtype=None, copy=None):
+    def __array__(self, dtype=None, copy: Optional[bool] = None):
         """Get affine matrix as a 3x3 NumPy array.
 
         Parameters
@@ -322,7 +321,7 @@ class Affine:
             f"       {self.d!r}, {self.e!r}, {self.f!r})"
         )
 
-    def to_gdal(self):
+    def to_gdal(self) -> tuple[float, float, float, float, float, float]:
         """Return same coefficient order expected by GDAL's SetGeoTransform().
 
         Returns
@@ -332,7 +331,7 @@ class Affine:
         """
         return (self.c, self.a, self.b, self.f, self.d, self.e)
 
-    def to_shapely(self):
+    def to_shapely(self) -> tuple[float, float, float, float, float, float]:
         """Return affine transformation parameters for shapely's affinity module.
 
         Returns
@@ -366,7 +365,7 @@ class Affine:
         return self.a * self.e - self.b * self.d
 
     @property
-    def _scaling(self):
+    def _scaling(self) -> tuple[float, float]:
         """The absolute scaling factors of the transformation.
 
         This tuple represents the absolute value of the scaling factors of the
@@ -493,7 +492,9 @@ class Affine:
         return self.determinant > 0.0
 
     @property
-    def column_vectors(self):
+    def column_vectors(
+        self,
+    ) -> tuple[tuple[float, float], tuple[float, float], tuple[float, float]]:
         """The values of the transform as three 2D column vectors.
 
         Returns
@@ -523,7 +524,7 @@ class Affine:
         return all(abs(sv - ov) < precision for sv, ov in zip(self, other))
 
     @cached_property
-    def _astuple(self):
+    def _astuple(self) -> tuple[float]:
         return astuple(self)
 
     def __getitem__(self, index):
@@ -582,41 +583,12 @@ class Affine:
             return NotImplemented
 
     def __rmul__(self, other):
-        """Right hand multiplication.
-
-        .. deprecated:: 2.3.0
-            Right multiplication will be prohibited in version 3.0. This method
-            will raise AffineError.
-
-        Parameters
-        ----------
-        other : Affine or iterable of (vx, vy)
-
-        Returns
-        -------
-        tuple of two floats
-
-        Notes
-        -----
-        We should not be called if other is an affine instance This is
-        just a guarantee, since we would potentially return the wrong
-        answer in that case.
-        """
-        warnings.warn(
-            "Right multiplication will be prohibited in version 3.0",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        assert not isinstance(other, Affine)
-        return self.__mul__(other)
-
-    def __imul__(self, other):
-        """Provide wrapper for `__mul__`, however `other` is not modified in-place."""
-        if isinstance(other, (Affine, tuple)):
-            return self.__mul__(other)
         return NotImplemented
 
-    def itransform(self, seq) -> None:
+    def __imul__(self, other):
+        return NotImplemented
+
+    def itransform(self, seq: MutableSequence[Sequence[float]]) -> None:
         """Transform a sequence of points or vectors in-place.
 
         Parameters
@@ -674,7 +646,7 @@ identity = Affine(1, 0, 0, 0, 1, 0)
 # Miscellaneous utilities
 
 
-def loadsw(s: str):
+def loadsw(s: str) -> Affine:
     """Return Affine from the contents of a world file string.
 
     This method also translates the coefficients from center- to
@@ -699,7 +671,7 @@ def loadsw(s: str):
     return center * Affine.translation(-0.5, -0.5)
 
 
-def dumpsw(obj) -> str:
+def dumpsw(obj: Affine) -> str:
     """Return string for a world file.
 
     This method also translates the coefficients from corner- to
