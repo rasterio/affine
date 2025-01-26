@@ -477,21 +477,21 @@ def test_shapely():
     assert t.to_shapely() == (425.0, 0.0, 0.0, -425, -237481.5, 237536.4)
 
 
-def test_imul_number():
-    t = Affine(1, 2, 3, 4, 5, 6)
+def test_imul_not_implemented():
+    t = Affine.identity()
     with pytest.raises(TypeError):
         t *= 2.0
+
+
+def test_rmul_notimplemented():
+    t = Affine.identity()
+    with pytest.raises(TypeError):
+        (1.0, 1.0) * t
 
 
 def test_mul_tuple():
     t = Affine(1, 2, 3, 4, 5, 6)
     assert t * (2, 2) == (9, 24)
-
-
-def test_rmul_tuple():
-    with pytest.warns(DeprecationWarning):
-        t = Affine(1, 2, 3, 4, 5, 6)
-        (2.0, 2.0) * t
 
 
 def test_associative():
