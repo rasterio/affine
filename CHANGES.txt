@@ -13,6 +13,7 @@ CHANGES
   (#111).
 - Source was moved to a single-module affine.py in the src directory (#112).
 - Add numpy __array__ interface (#108).
+- Add support for ``@`` matrix multiplier methods (#122).
 
 2.4.0 (2023-01-19)
 ------------------

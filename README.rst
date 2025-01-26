@@ -51,8 +51,9 @@ Matrices can be created by passing the values ``a, b, c, d, e, f`` to the
   Affine(0.7071067811865476, -0.7071067811865475, 0.0,
          0.7071067811865475, 0.7071067811865476, 0.0)
 
-These matrices can be applied to ``(x, y)`` tuples to obtain transformed
-coordinates ``(x', y')``.
+These matrices can be applied to ``(x, y)`` tuples using the
+``*`` operator (or the ``@`` matrix multiplier operator for
+future releases) to obtain transformed coordinates ``(x', y')``.
 
 .. code-block:: pycon
 
@@ -91,7 +92,7 @@ origin can be easily computed.
   >>> fwd * (col, row)
   (-237481.5, 195036.4)
 
-The reverse transformation is obtained using the ``~`` operator.
+The reverse transformation is obtained using the ``~`` inverse operator.
 
 .. code-block:: pycon
 

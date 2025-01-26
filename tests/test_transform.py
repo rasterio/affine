@@ -150,7 +150,7 @@ def test_permutation_constructor():
     perm = Affine.permutation()
     assert isinstance(perm, Affine)
     assert tuple(perm) == (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
-    assert (perm * perm).is_identity
+    assert (perm @ perm).is_identity
 
 
 def test_translation_constructor():
@@ -348,16 +348,16 @@ def test_sub():
         Affine(1, 2, 3, 4, 5, 6) - Affine(6, 5, 4, 3, 2, 1)
 
 
-def test_mul_by_identity():
+def test_matmul_by_identity():
     t = Affine(1, 2, 3, 4, 5, 6)
-    assert tuple(t * Affine.identity()) == tuple(t)
+    assert tuple(t @ Affine.identity()) == tuple(t)
 
 
-def test_mul_transform():
-    t = Affine.rotation(5) * Affine.rotation(29)
+def test_matmul_transform():
+    t = Affine.rotation(5) @ Affine.rotation(29)
     assert isinstance(t, Affine)
     seq_almost_equal(t, Affine.rotation(34))
-    t = Affine.scale(3, 5) * Affine.scale(2)
+    t = Affine.scale(3, 5) @ Affine.scale(2)
     seq_almost_equal(t, Affine.scale(6, 10))
 
 
@@ -369,7 +369,7 @@ def test_itransform():
 
     A = Affine.rotation(33)
     pts = [(4, 1), (-1, 0), (3, 2)]
-    pts_expect = [A * pt for pt in pts]
+    pts_expect = [A @ pt for pt in pts]
     r = A.itransform(pts)
     assert r is None
     assert pts == pts_expect
@@ -380,7 +380,12 @@ def test_mul_wrong_type():
         Affine(1, 2, 3, 4, 5, 6) * None
 
 
-def test_mul_sequence_wrong_member_types():
+def test_matmul_wrong_type():
+    with pytest.raises(TypeError):
+        Affine(1, 2, 3, 4, 5, 6) @ None
+
+
+def test_matmul_sequence_wrong_member_types():
     class NotPtSeq:
         @classmethod
         def from_points(cls, points):
@@ -392,10 +397,44 @@ def test_mul_sequence_wrong_member_types():
     with pytest.raises(TypeError):
         Affine(1, 2, 3, 4, 5, 6) * NotPtSeq()
 
+    with pytest.raises(TypeError):
+        Affine(1, 2, 3, 4, 5, 6) @ NotPtSeq()
+
+
+def test_imul_errors():
+    t = Affine.identity()
+    with pytest.raises(TypeError):
+        t *= 2.0
+
+
+def test_imatmul_errors():
+    t = Affine.identity()
+    with pytest.raises(TypeError):
+        t @= 2.0
+    with pytest.raises(TypeError):
+        t @= (1, 2)
+    with pytest.raises(TypeError):
+        t @= (1, 2, 1)
+
+
+def test_imul_tuple():
+    t = Affine.translation(3, 5)
+    with pytest.deprecated_call():
+        t *= (4, 5)
+    assert isinstance(t, tuple)  # changes type!
+    assert t == (7.0, 10.0)
+
 
 def test_imul_transform():
     t = Affine.translation(3, 5)
     t *= Affine.translation(-2, 3.5)
+    assert isinstance(t, Affine)
+    seq_almost_equal(t, Affine.translation(1, 8.5))
+
+
+def test_imatmul_transform():
+    t = Affine.translation(3, 5)
+    t @= Affine.translation(-2, 3.5)
     assert isinstance(t, Affine)
     seq_almost_equal(t, Affine.translation(1, 8.5))
 
@@ -405,7 +444,7 @@ def test_inverse():
     seq_almost_equal(~Affine.translation(2, -3), Affine.translation(-2, 3))
     seq_almost_equal(~Affine.rotation(-33.3), Affine.rotation(33.3))
     t = Affine(1, 2, 3, 4, 5, 6)
-    seq_almost_equal(~t * t, Affine.identity())
+    seq_almost_equal(~t @ t, Affine.identity())
 
 
 def test_cant_invert_degenerate():
@@ -477,29 +516,33 @@ def test_shapely():
     assert t.to_shapely() == (425.0, 0.0, 0.0, -425, -237481.5, 237536.4)
 
 
-def test_imul_not_implemented():
-    t = Affine.identity()
-    with pytest.raises(TypeError):
-        t *= 2.0
-
-
-def test_rmul_notimplemented():
+def test_rmul_errors():
     t = Affine.identity()
     with pytest.raises(TypeError):
         (1.0, 1.0) * t
 
 
+def test_rmatmul_errors():
+    t = Affine.identity()
+    with pytest.raises(TypeError):
+        (1.0, 1.0) @ t
+    with pytest.raises(TypeError):
+        (1.0, 1.0, 1.0) @ t
+
+
 def test_mul_tuple():
     t = Affine(1, 2, 3, 4, 5, 6)
     assert t * (2, 2) == (9, 24)
+    with pytest.raises(TypeError):
+        t * (2, 2, 1)
 
 
 def test_associative():
     point = (12, 5)
     trans = Affine.translation(-10.0, -5.0)
     rot90 = Affine.rotation(90.0)
-    result1 = rot90 * (trans * point)
-    result2 = (rot90 * trans) * point
+    result1 = rot90 @ (trans @ point)
+    result2 = (rot90 @ trans) @ point
     seq_almost_equal(result1, (0.0, 2.0))
     seq_almost_equal(result1, result2)
 
@@ -508,8 +551,8 @@ def test_roundtrip():
     point = (12, 5)
     trans = Affine.translation(3, 4)
     rot37 = Affine.rotation(37.0)
-    point_prime = (trans * rot37) * point
-    roundtrip_point = ~(trans * rot37) * point_prime
+    point_prime = (trans @ rot37) @ point
+    roundtrip_point = ~(trans @ rot37) @ point_prime
     seq_almost_equal(point, roundtrip_point)
 
 
@@ -526,14 +569,14 @@ def test_eccentricity():
 
 
 def test_eccentricity_complex():
-    assert (Affine.scale(2, 3) * Affine.rotation(77)).eccentricity == pytest.approx(
+    assert (Affine.scale(2, 3) @ Affine.rotation(77)).eccentricity == pytest.approx(
         math.sqrt(5) / 3
     )
-    assert (Affine.rotation(77) * Affine.scale(2, 3)).eccentricity == pytest.approx(
+    assert (Affine.rotation(77) @ Affine.scale(2, 3)).eccentricity == pytest.approx(
         math.sqrt(5) / 3
     )
     assert (
-        Affine.translation(32, -47) * Affine.rotation(77) * Affine.scale(2, 3)
+        Affine.translation(32, -47) @ Affine.rotation(77) @ Affine.scale(2, 3)
     ).eccentricity == pytest.approx(math.sqrt(5) / 3)
 
 
@@ -561,7 +604,12 @@ def test_mul_fallback_unpack():
         def __rmul__(self, other):
             return other * (1, 2)
 
+        def __rmatmul__(self, other):
+            return other @ (1, 2)
+
     assert Affine.identity() * TextPoint() == (1, 2)
+
+    assert Affine.identity() @ TextPoint() == (1, 2)
 
 
 # See gh-71 for bug report motivating this test.
@@ -577,7 +625,12 @@ def test_mul_fallback_type_error():
         def __rmul__(self, other):
             return other * (1, 2)
 
+        def __rmatmul__(self, other):
+            return other @ (1, 2)
+
     assert Affine.identity() * TextPoint() == (1, 2)
+
+    assert Affine.identity() @ TextPoint() == (1, 2)
 
 
 def test_init_invalid_g():
