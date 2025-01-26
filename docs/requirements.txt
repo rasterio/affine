@@ -1,1 +1,2 @@
+attrs
 sphinx==6.2.1
