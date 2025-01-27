@@ -5,13 +5,13 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath("../.."))
+sys.path.append(os.path.abspath("../../src"))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "rasterio/affine"
-copyright = "2023, Sean Gillies"
+copyright = "2025, Sean Gillies"
 author = "Sean Gillies"
 release = "development"
 
