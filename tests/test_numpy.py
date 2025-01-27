@@ -2,7 +2,7 @@
 
 import pytest
 
-from affine import Affine
+from affine import Affine, identity
 
 try:
     import numpy as np
@@ -66,3 +66,30 @@ def test_linalg():
     )
     testing.assert_allclose(~tfm, expected_inv)
     testing.assert_allclose(np.linalg.inv(ar), expected_inv)
+
+
+def test_matmul():
+    A = Affine(2, 0, 3, 0, 3, 2)
+    Ar = np.array(A)
+
+    # matrix @ matrix = matrix
+    res = A @ identity
+    assert isinstance(res, Affine)
+    testing.assert_equal(res, Ar)
+    res = Ar @ np.eye(3)
+    assert isinstance(res, np.ndarray)
+    testing.assert_equal(res, Ar)
+
+    # matrix @ vector = vector
+    v = (2, 3, 1)
+    vr = np.array(v)
+    expected_p = (7, 11, 1)
+    res = A @ v
+    assert isinstance(res, tuple)
+    testing.assert_equal(res, expected_p)
+    res = A @ vr
+    assert isinstance(res, tuple)
+    testing.assert_equal(res, expected_p)
+    res = Ar @ vr
+    assert isinstance(res, np.ndarray)
+    testing.assert_equal(res, expected_p)

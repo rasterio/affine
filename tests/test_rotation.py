@@ -16,7 +16,7 @@ def test_rotation_angle():
         |
         0---------*
 
-    Affine.rotation(45.0) * (1.0, 0.0) == (0.707..., 0.707...)
+    Affine.rotation(45.0) @ (1.0, 0.0) == (0.707..., 0.707...)
 
         |
         |      *
@@ -24,7 +24,7 @@ def test_rotation_angle():
         |
         0----------
     """
-    x, y = Affine.rotation(45.0) * (1.0, 0.0)
+    x, y = Affine.rotation(45.0) @ (1.0, 0.0)
     sqrt2div2 = math.sqrt(2.0) / 2.0
     assert x == pytest.approx(sqrt2div2)
     assert y == pytest.approx(sqrt2div2)
@@ -55,8 +55,8 @@ def test_rotation_matrix_pivot():
     rot = Affine.rotation(90.0, pivot=(1.0, 1.0))
     exp = (
         Affine.translation(1.0, 1.0)
-        * Affine.rotation(90.0)
-        * Affine.translation(-1.0, -1.0)
+        @ Affine.rotation(90.0)
+        @ Affine.translation(-1.0, -1.0)
     )
     for r, e in zip(rot, exp):
         assert r == pytest.approx(e)

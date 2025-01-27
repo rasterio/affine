@@ -37,6 +37,7 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
+import warnings
 
 from attrs import astuple, define, field
 
@@ -549,6 +550,60 @@ class Affine:
 
     __iadd__ = __add__
 
+    def __matmul__(self, other):
+        """Matrix multiplication.
+
+        Apply the transform using matrix multiplication, creating
+        a resulting object of the same type.  A transform may be applied
+        to another transform or vector array.
+
+        Parameters
+        ----------
+        other : Affine or iterable of (vx, vy, [vw])
+
+        Returns
+        -------
+        Affine or a tuple of two or three floats
+        """
+        sa, sb, sc, sd, se, sf = self[:6]
+        if isinstance(other, Affine):
+            oa, ob, oc, od, oe, of = other[:6]
+            return self.__class__(
+                sa * oa + sb * od,
+                sa * ob + sb * oe,
+                sa * oc + sb * of + sc,
+                sd * oa + se * od,
+                sd * ob + se * oe,
+                sd * oc + se * of + sf,
+            )
+        # vector of 2 or 3 values
+        try:
+            other = tuple(map(float, other))
+        except (TypeError, ValueError):
+            return NotImplemented
+        num_values = len(other)
+        if num_values == 2:
+            vx, vy = other
+        elif num_values == 3:
+            vx, vy, vw = other
+            if vw != 1.0:
+                raise ValueError("third value must be 1.0")
+        else:
+            raise TypeError("expected vector of 2 or 3 values")
+        px = vx * sa + vy * sb + sc
+        py = vx * sd + vy * se + sf
+        if num_values == 2:
+            return (px, py)
+        return (px, py, vw)
+
+    def __rmatmul__(self, other):
+        return NotImplemented
+
+    def __imatmul__(self, other):
+        if not isinstance(other, Affine):
+            raise TypeError("Operation not supported")
+        return NotImplemented
+
     def __mul__(self, other):
         """Multiplication.
 
@@ -564,20 +619,17 @@ class Affine:
         -------
         Affine or a tuple of two floats
         """
-        sa, sb, sc, sd, se, sf = self[:6]
+        # TODO: consider enabling this for 3.1
+        # warnings.warn(
+        #     "Use `@` matmul instead of `*` mul operator for matrix multiplication",
+        #     PendingDeprecationWarning,
+        #     stacklevel=2,
+        # )
         if isinstance(other, Affine):
-            oa, ob, oc, od, oe, of = other[:6]
-            return self.__class__(
-                sa * oa + sb * od,
-                sa * ob + sb * oe,
-                sa * oc + sb * of + sc,
-                sd * oa + se * od,
-                sd * ob + se * oe,
-                sd * oc + se * of + sf,
-            )
+            return self.__matmul__(other)
         try:
-            vx, vy = other
-            return (vx * sa + vy * sb + sc, vx * sd + vy * se + sf)
+            _, _ = other
+            return self.__matmul__(other)
         except (ValueError, TypeError):
             return NotImplemented
 
@@ -585,6 +637,12 @@ class Affine:
         return NotImplemented
 
     def __imul__(self, other):
+        if isinstance(other, tuple):
+            warnings.warn(
+                "in-place multiplication with tuple is deprecated",
+                DeprecationWarning,
+                stacklevel=2,
+            )
         return NotImplemented
 
     def itransform(self, seq: MutableSequence[Sequence[float]]) -> None:
@@ -667,7 +725,7 @@ def loadsw(s: str) -> Affine:
         raise ValueError(f"Expected 6 coefficients, found {len(coeffs)}")
     a, d, b, e, c, f = (float(x) for x in coeffs)
     center = Affine(a, b, c, d, e, f)
-    return center * Affine.translation(-0.5, -0.5)
+    return center @ Affine.translation(-0.5, -0.5)
 
 
 def dumpsw(obj: Affine) -> str:
@@ -680,7 +738,7 @@ def dumpsw(obj: Affine) -> str:
     -------
     str
     """
-    center = obj * Affine.translation(0.5, 0.5)
+    center = obj @ Affine.translation(0.5, 0.5)
     return "\n".join(repr(getattr(center, x)) for x in list("adbecf")) + "\n"
 
 
