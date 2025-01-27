@@ -629,7 +629,6 @@ def test_mul_fallback_type_error():
             return other @ (1, 2)
 
     assert Affine.identity() * TextPoint() == (1, 2)
-
     assert Affine.identity() @ TextPoint() == (1, 2)
 
 
@@ -646,3 +645,14 @@ def test_init_invalid_h():
 def test_init_invalid_i():
     with pytest.raises(ValueError, match="i must"):
         Affine(0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+
+def test_matmul_invalid_vector():
+    with pytest.raises(ValueError, match="must be 1.0"):
+        Affine.identity() @ (2.0, 3.0, 0.0)
+
+
+@pytest.mark.parametrize("vec", [(2.0,), (2.0, 2.0, 1.0, 1.0)])
+def test_matmul_invalid_vector_2(vec):
+    with pytest.raises(TypeError, match="2 or 3 values"):
+        Affine.identity() @ vec
