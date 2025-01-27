@@ -1,10 +1,18 @@
 Authors
 =======
 
-- Sean Gillies <sean@mapbox.com>
-- Steven Ring <smr@southsky.com.au>
-- Mike Taves <mwtoews@gmail.com>
-- Kevin Wurster <wursterk@gmail.com>
-- Todd Small <todd_small@icloud.com>
-- Juan Luis Cano Rodríguez <juanlu@satellogic.com>
+- Casey Duncan
+- Sean Gillies
+- Denis Rykov
+- Juan Luis Cano Rodríguez
+- Kevin Wurster
 - Kirill Kouzoubov
+- Loïc Dutrieux
+- Michael Wess
+- Mike Taves
+- Nick Maxwell
+- Rotzbua
+- Ryan Grout
+- Steven Ring
+- Stuart Axon
+- Vincent Sarago

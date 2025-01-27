@@ -1,8 +1,8 @@
 CHANGES
 =======
 
-3.0a1 (TBD)
------------
+3.0a1 (2025-01-27)
+------------------
 
 - Type hint annotations for functions and methods are complete (#121).
 - Affine raises ValueError if initialized with values for g, h, and i that are
