@@ -654,5 +654,5 @@ def test_matmul_invalid_vector():
 
 @pytest.mark.parametrize("vec", [(2.0,), (2.0, 2.0, 1.0, 1.0)])
 def test_matmul_invalid_vector_2(vec):
-    with pytest.raises(TypeError, match="2 or 3 values"):
+    with pytest.raises(TypeError, match="2 or 3 items"):
         Affine.identity() @ vec
