@@ -555,7 +555,7 @@ class Affine:
 
         Apply the transform using matrix multiplication, creating
         a resulting object of the same type.  A transform may be applied
-        to another transform or vector array.
+        to another transform, a vector, vector array, or shape.
 
         Parameters
         ----------
@@ -563,7 +563,7 @@ class Affine:
 
         Returns
         -------
-        Affine or a tuple of two or three floats
+        Affine or a tuple of two or three items
         """
         sa, sb, sc, sd, se, sf = self[:6]
         if isinstance(other, Affine):
@@ -576,23 +576,29 @@ class Affine:
                 sd * ob + se * oe,
                 sd * oc + se * of + sf,
             )
-        # vector of 2 or 3 values
+        # vector of 2 or 3 items
         try:
-            other = tuple(map(float, other))
+            num_items = len(other)
         except (TypeError, ValueError):
             return NotImplemented
-        num_values = len(other)
-        if num_values == 2:
+        if num_items == 2:
             vx, vy = other
-        elif num_values == 3:
+        elif num_items == 3:
             vx, vy, vw = other
-            if vw != 1.0:
-                raise ValueError("third value must be 1.0")
+            vw_eq_one = vw == 1.0
+            try:
+                is_eq_one = bool(vw_eq_one)
+                msg = "third value must be 1.0"
+            except ValueError:
+                is_eq_one = (vw_eq_one).all()
+                msg = "third values must all be 1.0"
+            if not is_eq_one:
+                raise ValueError(msg)
         else:
-            raise TypeError("expected vector of 2 or 3 values")
+            raise TypeError("expected vector of 2 or 3 items")
         px = vx * sa + vy * sb + sc
         py = vx * sd + vy * se + sf
-        if num_values == 2:
+        if num_items == 2:
             return (px, py)
         return (px, py, vw)
 
@@ -617,7 +623,7 @@ class Affine:
 
         Returns
         -------
-        Affine or a tuple of two floats
+        Affine or a tuple of two items
         """
         # TODO: consider enabling this for 3.1
         # warnings.warn(
