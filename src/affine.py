@@ -43,7 +43,7 @@ from attrs import astuple, define, field
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
-__version__ = "3.0b1dev"
+__version__ = "3.0b1"
 
 EPSILON: float = 1e-5
 EPSILON2: float = 1e-10

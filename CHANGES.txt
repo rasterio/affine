@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+3.0b1 (2025-01-29)
+------------------
+
+- Matrix multiplication with tuples of coordinate matrices, like the output of
+  numpy.meshgrid(), has been restored (#126).
+
 3.0a1 (2025-01-27)
 ------------------
 
