@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+3.0rc2 (2026-01-27)
+-------------------
+
+3.0rc1 tagged the wrong commit. The distributions on PyPI have the correct
+version, but the GitHub release does not. This is fixed by 3.0rc2, which makes
+no other changes.
+
 3.0rc1 (2026-01-26)
 -------------------
 
