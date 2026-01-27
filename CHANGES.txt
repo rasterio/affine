@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+3.0rc1 (2026-01-26)
+-------------------
+
+This is the first 3.0 release candidate. There are no significant changes
+since 3.0b1.
+
 3.0b1 (2025-01-29)
 ------------------
 
