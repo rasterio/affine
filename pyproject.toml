@@ -47,6 +47,7 @@ include = [
     "docs/",
     "tests/",
 ]
+exclude = ["docs/build/**"]
 
 [tool.pytest.ini_options]
 pythonpath = "src"
