@@ -5,7 +5,7 @@ CHANGES
 ------------
 
 The single file module affine.py has been moved to affine/__init__.py so that
-a py.typed file can be distributed in the same directory (#135).
+a py.typed file can be distributed in the same directory (#136).
 
 3.0rc2 (2026-01-27)
 -------------------
