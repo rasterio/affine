@@ -37,9 +37,13 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
+from typing import TYPE_CHECKING
 import warnings
 
 from attrs import astuple, define, field
+
+if TYPE_CHECKING:
+    from typing import overload
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
@@ -550,6 +554,17 @@ class Affine:
 
     __iadd__ = __add__
 
+    @overload
+    def __matmul__(self, other: Affine) -> Affine: ...
+    @overload
+    def __matmul__(self, other: tuple[float, float]) -> tuple[float, float]: ...
+    @overload
+    def __matmul__(
+        self, other: tuple[float, float, float]
+    ) -> tuple[float, float, float]: ...
+    # For other float sequences, we don't know the returned tuple length here
+    @overload
+    def __matmul__(self, other: Sequence[float]) -> tuple[float, ...]: ...
     def __matmul__(self, other):
         """Matrix multiplication.
 
@@ -610,6 +625,10 @@ class Affine:
             raise TypeError("Operation not supported")
         return NotImplemented
 
+    @overload
+    def __mul__(self, other: Affine) -> Affine: ...
+    @overload
+    def __mul__(self, other: tuple[float, float]) -> tuple[float, float]: ...
     def __mul__(self, other):
         """Multiplication.
 
