@@ -37,13 +37,10 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
-from typing import TYPE_CHECKING
+from typing import overload
 import warnings
 
 from attrs import astuple, define, field
-
-if TYPE_CHECKING:
-    from typing import overload
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
@@ -620,7 +617,7 @@ class Affine:
     def __rmatmul__(self, other):
         return NotImplemented
 
-    def __imatmul__(self, other):
+    def __imatmul__(self, other):  # type: ignore
         if not isinstance(other, Affine):
             raise TypeError("Operation not supported")
         return NotImplemented
@@ -661,7 +658,7 @@ class Affine:
     def __rmul__(self, other):
         return NotImplemented
 
-    def __imul__(self, other):
+    def __imul__(self, other):  # type: ignore
         if isinstance(other, tuple):
             warnings.warn(
                 "in-place multiplication with tuple is deprecated",
