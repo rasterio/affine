@@ -37,6 +37,7 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
+from typing import overload
 import warnings
 
 from attrs import astuple, define, field
@@ -550,6 +551,17 @@ class Affine:
 
     __iadd__ = __add__
 
+    @overload
+    def __matmul__(self, other: Affine) -> Affine: ...
+    @overload
+    def __matmul__(self, other: tuple[float, float]) -> tuple[float, float]: ...
+    @overload
+    def __matmul__(
+        self, other: tuple[float, float, float]
+    ) -> tuple[float, float, float]: ...
+    # For other float sequences, we don't know the returned tuple length here
+    @overload
+    def __matmul__(self, other: Sequence[float]) -> tuple[float, ...]: ...
     def __matmul__(self, other):
         """Matrix multiplication.
 
@@ -605,11 +617,15 @@ class Affine:
     def __rmatmul__(self, other):
         return NotImplemented
 
-    def __imatmul__(self, other):
+    def __imatmul__(self, other):  # type: ignore
         if not isinstance(other, Affine):
             raise TypeError("Operation not supported")
         return NotImplemented
 
+    @overload
+    def __mul__(self, other: Affine) -> Affine: ...
+    @overload
+    def __mul__(self, other: tuple[float, float]) -> tuple[float, float]: ...
     def __mul__(self, other):
         """Multiplication.
 
@@ -642,7 +658,7 @@ class Affine:
     def __rmul__(self, other):
         return NotImplemented
 
-    def __imul__(self, other):
+    def __imul__(self, other):  # type: ignore
         if isinstance(other, tuple):
             warnings.warn(
                 "in-place multiplication with tuple is deprecated",
