@@ -143,9 +143,9 @@ def test_matmul_items():
 def test_matmul_item_errors():
     shape = (4, 5)
     vx, vy = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
-    with pytest.raises(ValueError, match="third value must be 1.0"):
+    with pytest.raises(ValueError, match=r"third value must be 1.0"):
         Affine.identity() @ (vx, vy, 2)
-    with pytest.raises(ValueError, match="third values must all be 1.0"):
+    with pytest.raises(ValueError, match=r"third values must all be 1.0"):
         Affine.identity() @ (vx, vy, np.zeros(shape))
     with pytest.raises(TypeError, match="2 or 3 items"):
         Affine.identity() @ (vx, vy, np.ones(shape), np.ones(shape))

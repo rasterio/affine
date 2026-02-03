@@ -648,7 +648,7 @@ def test_init_invalid_i():
 
 
 def test_matmul_invalid_vector():
-    with pytest.raises(ValueError, match="must be 1.0"):
+    with pytest.raises(ValueError, match=r"must be 1.0"):
         Affine.identity() @ (2.0, 3.0, 0.0)
 
 
