@@ -1,8 +1,8 @@
 CHANGES
 =======
 
-3.0rc3 (TBD)
-------------
+3.0rc3 (2026-01-30)
+-------------------
 
 The single file module affine.py has been moved to affine/__init__.py so that
 a py.typed file can be distributed in the same directory (#136).
