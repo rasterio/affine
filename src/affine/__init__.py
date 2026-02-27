@@ -37,9 +37,15 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
+from typing import TYPE_CHECKING
 import warnings
 
 from attrs import astuple, define, field
+
+if TYPE_CHECKING:
+    import numpy as np
+    from numpy.typing import NDArray
+
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
@@ -280,7 +286,7 @@ class Affine:
         """
         return cls(0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
 
-    def __array__(self, dtype=None, copy: bool | None = None):
+    def __array__(self, dtype=None, copy: bool | None = None) -> NDArray[np.float64]:
         """Get affine matrix as a 3x3 NumPy array.
 
         Parameters
