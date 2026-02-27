@@ -37,18 +37,14 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from functools import cached_property
 import math
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING
 import warnings
 
 from attrs import astuple, define, field
 
 if TYPE_CHECKING:
-    from typing import TypeVar, overload
-
     import numpy as np
     from numpy.typing import NDArray
-
-    _ScalarType = TypeVar("_ScalarType", bound=np.generic)
 
 
 __all__ = ["Affine"]
