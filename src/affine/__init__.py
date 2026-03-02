@@ -43,7 +43,7 @@ from attrs import astuple, define, field
 
 __all__ = ["Affine"]
 __author__ = "Sean Gillies"
-__version__ = "3.0rc2"
+__version__ = "3.0rc4.dev"
 
 EPSILON: float = 1e-5
 EPSILON2: float = 1e-10
@@ -82,6 +82,11 @@ def cos_sin_deg(deg: float) -> tuple[float, float]:
 class Affine:
     """Two dimensional affine transform for 2D linear mapping.
 
+    Parallel lines are preserved by these transforms. Affine transforms
+    can perform any combination of translations, scales/flips, shears,
+    and rotations. Class methods are provided to conveniently compose
+    transforms from these operations.
+
     Parameters
     ----------
     a, b, c, d, e, f, [g, h, i] : float
@@ -100,25 +105,17 @@ class Affine:
 
         `g`, `h`, and `i` are always 0, 0, and 1.
 
+    Notes
+    -----
+    Multiplication of a transform and an (x, y) vector *always* returns
+    the column vector that is the matrix multiplication product of the
+    transform and (x, y) as a column vector, no matter which is on the
+    left or right side. This is obviously not the case for matrices and
+    vectors in general, but provides a convenience for users of this
+    class.
+
     The Affine package is derived from Casey Duncan's Planar package.
-    See the copyright statement below.  Parallel lines are preserved by
-    these transforms. Affine transforms can perform any combination of
-    translations, scales/flips, shears, and rotations.  Class methods
-    are provided to conveniently compose transforms from these
-    operations.
-
-    Internally the transform is stored as a 3x3 transformation matrix.
-    The transform may be constructed directly by specifying the first
-    two rows of matrix values as 6 floats. Since the matrix is an affine
-    transform, the last row is always ``(0, 0, 1)``.
-
-    N.B.: multiplication of a transform and an (x, y) vector *always*
-    returns the column vector that is the matrix multiplication product
-    of the transform and (x, y) as a column vector, no matter which is
-    on the left or right side. This is obviously not the case for
-    matrices and vectors in general, but provides a convenience for
-    users of this class.
-
+    See the copyright statement.
     """
 
     a: float = field(converter=float)
@@ -203,9 +200,9 @@ class Affine:
         Parameters
         ----------
         *scaling : float or sequence of two floats
-            One or two scaling factors. A scalar value will scale in both
-            dimensions equally. A vector scaling value scales the dimensions
-            independently.
+            One or two scaling factors. A scalar value will scale in
+            both dimensions equally. A vector scaling value scales the
+            dimensions independently.
 
         Returns
         -------
@@ -242,10 +239,11 @@ class Affine:
         Parameters
         ----------
         angle : float
-            Rotation angle in degrees, counter-clockwise about the pivot point.
+            Rotation angle in degrees, counter-clockwise about the pivot
+            point.
         pivot : sequence of float (px, py), optional
-            Pivot point coordinates to rotate around. If None (default), the
-            pivot point is the coordinate system origin (0.0, 0.0).
+            Pivot point coordinates to rotate around. If None (default),
+            the pivot point is the coordinate system origin (0.0, 0.0).
 
         Returns
         -------
@@ -279,32 +277,6 @@ class Affine:
         Affine
         """
         return cls(0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
-
-    def __array__(self, dtype=None, copy: bool | None = None):
-        """Get affine matrix as a 3x3 NumPy array.
-
-        Parameters
-        ----------
-        dtype : data-type, optional
-            The desired data-type for the array.
-        copy : bool, optional
-            If None (default) or True, a copy of the array is always returned.
-            If False, a ValueError is raised as this is not supported.
-
-        Returns
-        -------
-        array
-
-        Raises
-        ------
-        ValueError
-            If ``copy=False`` is specified.
-        """
-        import numpy as np
-
-        if copy is False:
-            raise ValueError("`copy=False` isn't supported. A copy is always created.")
-        return np.array(self._astuple, dtype=(dtype or float)).reshape((3, 3))
 
     def __str__(self) -> str:
         """Concise string representation."""
@@ -368,8 +340,8 @@ class Affine:
     def _scaling(self) -> tuple[float, float]:
         """The absolute scaling factors of the transformation.
 
-        This tuple represents the absolute value of the scaling factors of the
-        transformation, sorted from bigger to smaller.
+        This tuple represents the absolute value of the scaling factors
+        of the transformation, sorted from bigger to smaller.
         """
         a, b, d, e = self.a, self.b, self.d, self.e
 
@@ -407,9 +379,9 @@ class Affine:
     def rotation_angle(self) -> float:
         """The rotation angle in degrees of the affine transformation.
 
-        This is the rotation angle in degrees of the affine transformation,
-        assuming it is in the form M = R S, where R is a rotation and S is a
-        scaling.
+        This is the rotation angle in degrees of the affine
+        transformation, assuming it is in the form M = R S, where R is
+        a rotation and S is a scaling.
 
         Raises
         ------
