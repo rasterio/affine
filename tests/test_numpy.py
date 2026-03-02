@@ -11,6 +11,12 @@ except ImportError:
     pytest.skip("requires numpy", allow_module_level=True)
 
 
+
+def test_array():
+    """Affine instance has 9 elements, becomes 1-D Numpy array."""
+    assert np.array(Affine.identity()).shape == (9,)
+
+
 def test_linalg():
     # cross-check properties with numpy's linear algebra module
     ar = np.array(
