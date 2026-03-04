@@ -1,2 +1,2 @@
 attrs
-sphinx==6.2.1
+sphinx==9.1.0

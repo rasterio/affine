@@ -22,7 +22,7 @@ Usage
 The 3x3 augmented affine transformation matrix for transformations in two
 dimensions is illustrated below.
 
-::
+.. code-block:: none
 
   | x' |   | a  b  c | | x |
   | y' | = | d  e  f | | y |
