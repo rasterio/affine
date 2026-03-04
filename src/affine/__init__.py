@@ -89,15 +89,18 @@ class Affine:
 
     Parameters
     ----------
-    a, b, c, d, e, f, [g, h, i] : float
-        Coefficients of the 3 x 3 augmented affine transformation
-        matrix.
+    a, b, c, d, e, f : float
+        Coefficients of the 3 x 3 augmented affine transformation matrix.
+
+    g, h, i : float, optional
+        Coefficients of the 3 x 3 augmented affine transformation matrix.
 
     Attributes
     ----------
     a, b, c, d, e, f, g, h, i : float
-        Coefficients of the 3 x 3 augmented affine transformation
-        matrix::
+        Coefficients of the 3 x 3 augmented affine transformation matrix.
+
+        .. code-block:: none
 
             | x' |   | a  b  c | | x |
             | y' | = | d  e  f | | y |
