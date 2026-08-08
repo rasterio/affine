@@ -107,7 +107,8 @@ def test_matmul_items():
     testing.assert_array_equal(pw, np.ones(shape))
 
     # see GH-125 with mul `*` op
-    px, py = A * (vx, vy)
+    with pytest.deprecated_call():
+        px, py = A * (vx, vy)
     testing.assert_allclose(px, expected_px)
     testing.assert_allclose(py, expected_py)
 
@@ -126,7 +127,7 @@ def test_matmul_item_errors():
 def test_mul_item_errors():
     shape = (4, 5)
     vx, vy = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError), pytest.deprecated_call():
         Affine.identity() * (vx, vy, 1)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError), pytest.deprecated_call():
         Affine.identity() * (vx, vy, np.zeros(shape))
