@@ -1,8 +1,8 @@
 CHANGES
 =======
 
-3.0rc4 (TBD)
-------------
+3.0.0 (2026-08-08)
+------------------
 
 - `Affine.__array__()` has been deleted to remove a dependency on Numpy and
   associated typing annotations (#140). To convert an Affine instance to
