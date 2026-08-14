@@ -619,6 +619,7 @@ class Affine:
         .. deprecated:: 3.1.0
             Use `@` matmul instead of `*` mul operator for matrix multiplication.
         """
+        # TODO: consider elevating to DeprecationWarning for 3.2
         warnings.warn(
             "Use `@` matmul instead of `*` mul operator for matrix multiplication",
             PendingDeprecationWarning,
