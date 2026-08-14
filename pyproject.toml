@@ -26,14 +26,17 @@ dependencies = [
     "attrs",
 ]
 
-[project.optional-dependencies]
-test = [
+[dependency-groups]
+dev = [
+    "coveralls>=3.0",
+    "pre-commit>=4.3.0",
+    "tox>=4.22",
+    {include-group = "tests"},
+]
+tests = [
     "numpy>=1.20",
     "pytest>=6.0",
     "pytest-cov",
-]
-dev = [
-    "coveralls>=3.0",
 ]
 
 [project.urls]
