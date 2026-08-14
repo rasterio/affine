@@ -376,7 +376,7 @@ def test_itransform():
 
 
 def test_mul_wrong_type():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError), pytest.deprecated_call():
         Affine(1, 2, 3, 4, 5, 6) * None
 
 
@@ -394,7 +394,7 @@ def test_matmul_sequence_wrong_member_types():
         def __iter__():
             yield 0
 
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError), pytest.deprecated_call():
         Affine(1, 2, 3, 4, 5, 6) * NotPtSeq()
 
     with pytest.raises(TypeError):
@@ -403,7 +403,7 @@ def test_matmul_sequence_wrong_member_types():
 
 def test_imul_errors():
     t = Affine.identity()
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError), pytest.deprecated_call():
         t *= 2.0
 
 
@@ -427,7 +427,8 @@ def test_imul_tuple():
 
 def test_imul_transform():
     t = Affine.translation(3, 5)
-    t *= Affine.translation(-2, 3.5)
+    with pytest.deprecated_call():
+        t *= Affine.translation(-2, 3.5)
     assert isinstance(t, Affine)
     seq_almost_equal(t, Affine.translation(1, 8.5))
 
@@ -532,8 +533,9 @@ def test_rmatmul_errors():
 
 def test_mul_tuple():
     t = Affine(1, 2, 3, 4, 5, 6)
-    assert t * (2, 2) == (9, 24)
-    with pytest.raises(TypeError):
+    with pytest.deprecated_call():
+        assert t * (2, 2) == (9, 24)
+    with pytest.raises(TypeError), pytest.deprecated_call():
         t * (2, 2, 1)
 
 
@@ -607,7 +609,8 @@ def test_mul_fallback_unpack():
         def __rmatmul__(self, other):
             return other @ (1, 2)
 
-    assert Affine.identity() * TextPoint() == (1, 2)
+    with pytest.deprecated_call():
+        assert Affine.identity() * TextPoint() == (1, 2)
 
     assert Affine.identity() @ TextPoint() == (1, 2)
 
@@ -628,7 +631,8 @@ def test_mul_fallback_type_error():
         def __rmatmul__(self, other):
             return other @ (1, 2)
 
-    assert Affine.identity() * TextPoint() == (1, 2)
+    with pytest.deprecated_call():
+        assert Affine.identity() * TextPoint() == (1, 2)
     assert Affine.identity() @ TextPoint() == (1, 2)
 
 
