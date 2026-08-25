@@ -23,7 +23,7 @@ license = "BSD-3-Clause"
 license-files = ["AUTHORS.txt", "LICENSE.txt"]
 requires-python = ">=3.9"
 dependencies = [
-    "attrs",
+    "attrs>=21.3.0",
 ]
 
 [dependency-groups]
