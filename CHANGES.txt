@@ -1,6 +1,18 @@
 CHANGES
 =======
 
+3.0.1 (2026-08-28)
+------------------
+
+Deprecations:
+
+- Affine now raises PendingDeprecationWarning when the * operator is used for
+  matrix multiplication. This is intended for developers to see (gh-146).
+
+Bug fixes:
+
+- Affine requires attrs>=21.3.0 (gh-148).
+
 3.0.0 (2026-08-08)
 ------------------
 
